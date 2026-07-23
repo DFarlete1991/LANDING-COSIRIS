@@ -33,3 +33,9 @@ export function cn(...inputs: ClassValue[]) {
   inputs.forEach(append);
   return classes.join(' ');
 }
+
+export function navigateTo(href: string) {
+  window.history.pushState({}, '', href);
+  window.dispatchEvent(new PopStateEvent('popstate'));
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
