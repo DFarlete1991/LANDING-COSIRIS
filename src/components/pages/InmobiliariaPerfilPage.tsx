@@ -5,7 +5,8 @@ import { AgencyLeadForm } from '../ui/AgencyLeadForm';
 import { PlaceholderImage } from '../ui/PlaceholderImage';
 import { AgencyMap } from '../ui/AgencyMap';
 import { InmobiliariasNavbar } from './inmobiliarias/InmobiliariasNavbar';
-import { INMOBILIARIAS_MOCK, type InmobiliariaPublica } from '@/data/inmobiliarias-mock';
+import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
+import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { haversineKm, formatDistanceKm } from '@/lib/geo';
 import { navigateTo } from '@/lib/utils';
 
@@ -95,7 +96,8 @@ function RevealPhone({ telefono, colorHex }: { telefono: string; colorHex: strin
 }
 
 export function InmobiliariaPerfilPage({ id }: { id: string }) {
-  const agency = INMOBILIARIAS_MOCK.find((a) => a.id === id);
+  const { agencies } = useInmobiliarias();
+  const agency = agencies.find((a) => a.id === id);
 
   // Si se llegó desde una búsqueda (lista de resultados), conserva el punto
   // buscado para poder mostrar distancia real en el mapa del perfil.

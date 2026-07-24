@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
 import { Loader2, MapPin, Search } from 'lucide-react';
-import { CITY_INDEX } from '@/data/city-index';
+import { buildCityIndex } from '@/data/city-index';
 import { CITY_IMAGES } from '@/data/city-images';
+import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { PlaceholderImage } from './PlaceholderImage';
 
 export type SearchSuggestion = { label: string; lat: number; lng: number };
@@ -38,6 +39,8 @@ export function AgencySearchBar({
   onSelect: (suggestion: SearchSuggestion) => void;
 }) {
   const geocodeFallback = useGeocodeFallback();
+  const { agencies } = useInmobiliarias();
+  const cityIndex = useMemo(() => buildCityIndex(agencies), [agencies]);
   const [query, setQuery] = useState(initialValue);
   const [addressResults, setAddressResults] = useState<Suggestion[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -48,12 +51,12 @@ export function AgencySearchBar({
   const cityMatches: Suggestion[] = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
     if (trimmed.length === 0) return [];
-    return CITY_INDEX.filter(
+    return cityIndex.filter(
       (c) => c.city.toLowerCase().includes(trimmed) || c.province.toLowerCase().includes(trimmed),
     )
       .slice(0, 5)
       .map((c) => ({ type: 'city' as const, label: `${c.city}, ${c.province}`, city: c.city, province: c.province, count: c.count, lat: c.lat, lng: c.lng }));
-  }, [query]);
+  }, [query, cityIndex]);
 
   const suggestions = useMemo(() => [...cityMatches, ...addressResults], [cityMatches, addressResults]);
 

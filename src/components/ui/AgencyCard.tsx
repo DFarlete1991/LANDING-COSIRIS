@@ -155,9 +155,11 @@ export function AgencyResultRow({
 
         {/* Métricas — mismo estilo gris para todas, sin arcoíris de colores */}
         <div className="mt-4 flex flex-wrap items-center gap-2.5">
-          <span className="inline-flex h-[34px] items-center gap-1.5 rounded-full bg-[#F6F7F9] px-4 text-[13px] font-semibold text-[#1D2433]">
-            <Star size={14} className="fill-amber-400 text-amber-400" /> {agency.rating}
-          </span>
+          {agency.rating != null && (
+            <span className="inline-flex h-[34px] items-center gap-1.5 rounded-full bg-[#F6F7F9] px-4 text-[13px] font-semibold text-[#1D2433]">
+              <Star size={14} className="fill-amber-400 text-amber-400" /> {agency.rating}
+            </span>
+          )}
           <span className="inline-flex h-[34px] items-center gap-1.5 rounded-full bg-[#F6F7F9] px-4 text-[13px] font-semibold text-[#1D2433]">
             <Home size={14} className="text-[#6E7786]" /> {agency.num_propiedades} propiedades
           </span>
@@ -172,9 +174,11 @@ export function AgencyResultRow({
           <span className="inline-flex h-[34px] items-center gap-1.5 rounded-full bg-[#F6F7F9] px-4 text-[13px] font-semibold text-[#1D2433]">
             <Briefcase size={14} className="text-[#6E7786]" /> {agency.anos_experiencia} años
           </span>
-          <span className="inline-flex h-[34px] items-center gap-1.5 rounded-full bg-[#F6F7F9] px-4 text-[13px] font-semibold text-[#1D2433]">
-            <Languages size={14} className="text-[#6E7786]" /> {agency.idiomas[0]}
-          </span>
+          {agency.idiomas[0] && (
+            <span className="inline-flex h-[34px] items-center gap-1.5 rounded-full bg-[#F6F7F9] px-4 text-[13px] font-semibold text-[#1D2433]">
+              <Languages size={14} className="text-[#6E7786]" /> {agency.idiomas[0]}
+            </span>
+          )}
         </div>
 
         {/* Especialidades — máximo 4 visibles */}
@@ -195,12 +199,16 @@ export function AgencyResultRow({
       {/* Derecha: Logo → Valoración → CTA, todo centrado verticalmente */}
       <div className="flex w-[132px] shrink-0 flex-col items-center gap-4 self-start">
         <AgencyThumbnail agency={agency} size={56} />
-        <div className="text-center">
-          <p className="flex items-center justify-center gap-1 text-[15px] font-bold text-[#1D2433]">
-            <Star size={14} className="fill-amber-400 text-amber-400" /> {agency.rating}
-          </p>
-          <p className="text-[11px] text-[#6E7786]">{agency.num_opiniones} opiniones</p>
-        </div>
+        {agency.rating != null && (
+          <div className="text-center">
+            <p className="flex items-center justify-center gap-1 text-[15px] font-bold text-[#1D2433]">
+              <Star size={14} className="fill-amber-400 text-amber-400" /> {agency.rating}
+            </p>
+            {agency.num_opiniones != null && (
+              <p className="text-[11px] text-[#6E7786]">{agency.num_opiniones} opiniones</p>
+            )}
+          </div>
+        )}
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); goToProfile(); }}

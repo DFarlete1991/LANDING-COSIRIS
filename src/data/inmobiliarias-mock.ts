@@ -1,10 +1,10 @@
-// Datos de ejemplo para el borrador del buscador de inmobiliarias.
-// Los nombres de campo replican 1:1 las columnas reales de `profiles` en Supabase
-// (nombre_comercial, direccion, poblacion, provincia, cp, telefono, pagina_web,
-// logo_url, color_hex, texto_presentacion, media_presentacion_url) para que el
-// swap a una vista pública real de Supabase sea directo. `lat`/`lng` no existen
-// hoy en el schema real — aquí van fijas a mano; en real se geocodificarían o
-// se guardarían en la propia tabla.
+// Datos de ejemplo — se usan como fallback mientras no hay inmobiliarias
+// reales con mostrar_en_directorio=true en Supabase (ver src/data/live-inmobiliarias.ts,
+// que intenta traer datos reales de la vista `directorio_inmobiliarias_publico`
+// del CRM y cae a este mock si no hay resultados). Los nombres de campo
+// replican los de esa vista, salvo rating/num_opiniones, que NO existen en el
+// schema real (no hay sistema de reseñas todavía) — quedan opcionales y solo
+// se ven con datos de ejemplo, nunca con datos reales.
 
 export type InmobiliariaPublica = {
   id: string;
@@ -26,8 +26,10 @@ export type InmobiliariaPublica = {
   num_empleados: number;
   num_propiedades: number;
   precio_medio: number;
-  rating: number;
-  num_opiniones: number;
+  /** Solo existe en los datos de ejemplo — no hay sistema de reseñas real todavía. */
+  rating?: number;
+  /** Solo existe en los datos de ejemplo — no hay sistema de reseñas real todavía. */
+  num_opiniones?: number;
   idiomas: string[];
   especialidades: string[];
   lat: number;

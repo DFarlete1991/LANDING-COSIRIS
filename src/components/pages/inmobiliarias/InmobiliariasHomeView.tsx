@@ -1,13 +1,13 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Building2, ChevronRight, MapPinned, MessageCircle, ShieldCheck } from 'lucide-react';
 import { AgencySearchBar, type SearchSuggestion } from '../../ui/AgencySearchBar';
 import { AgencyCard } from '../../ui/AgencyCard';
 import { AgencyMap } from '../../ui/AgencyMap';
 import { PlaceholderImage } from '../../ui/PlaceholderImage';
-import { INMOBILIARIAS_MOCK } from '@/data/inmobiliarias-mock';
-import { CITY_INDEX } from '@/data/city-index';
+import { buildCityIndex } from '@/data/city-index';
 import { CITY_IMAGES } from '@/data/city-images';
+import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo } from '@/lib/utils';
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
@@ -25,8 +25,6 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   );
 }
 
-const totalYearsExperience = INMOBILIARIAS_MOCK.reduce((sum, a) => sum + a.anos_experiencia, 0);
-
 const WHY_COSIRIS = [
   { icon: ShieldCheck, title: 'Inmobiliarias verificadas', text: 'Todas las agencias del directorio son clientes activos de Cosiris, con datos de contacto reales.' },
   { icon: MapPinned, title: 'Conocimiento local', text: 'Encuentra la inmobiliaria con más presencia en la zona exacta donde buscas.' },
@@ -37,8 +35,11 @@ const WHY_COSIRIS = [
 const STAT_ICONS = [Building2, MapPinned, ShieldCheck];
 
 export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSuggestion) => void }) {
-  const featured = INMOBILIARIAS_MOCK.slice(0, 6);
-  const popularCities = CITY_INDEX.slice(0, 6);
+  const { agencies } = useInmobiliarias();
+  const cityIndex = useMemo(() => buildCityIndex(agencies), [agencies]);
+  const totalYearsExperience = useMemo(() => agencies.reduce((sum, a) => sum + a.anos_experiencia, 0), [agencies]);
+  const featured = agencies.slice(0, 6);
+  const popularCities = cityIndex.slice(0, 6);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -101,8 +102,8 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
         <Reveal>
           <div className="grid grid-cols-1 gap-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-xl shadow-slate-900/10 md:grid-cols-3">
             {[
-              { value: INMOBILIARIAS_MOCK.length, label: 'Inmobiliarias asociadas', icon: STAT_ICONS[0] },
-              { value: CITY_INDEX.length, label: 'Ciudades con presencia', icon: STAT_ICONS[1] },
+              { value: agencies.length, label: 'Inmobiliarias asociadas', icon: STAT_ICONS[0] },
+              { value: cityIndex.length, label: 'Ciudades con presencia', icon: STAT_ICONS[1] },
               { value: `${totalYearsExperience}+`, label: 'Años de experiencia combinada', icon: STAT_ICONS[2] },
             ].map(({ value, label, icon: Icon }) => (
               <div key={label} className="flex items-center gap-4 rounded-xl bg-slate-50 p-4 transition-colors hover:bg-slate-100">
@@ -143,7 +144,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             <h2 className="text-lg font-black tracking-[-0.01em] text-[#0F172A] md:text-xl">Busca por ciudad</h2>
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-            {CITY_INDEX.map((c) => (
+            {cityIndex.map((c) => (
               <button
                 key={c.city}
                 type="button"
@@ -179,13 +180,13 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           </div>
           <div className="h-[420px] overflow-hidden rounded-xl shadow-lg shadow-slate-900/5">
             <AgencyMap
-              agencies={INMOBILIARIAS_MOCK}
+              agencies={agencies}
               nearestId={null}
               searchPoint={null}
               center={[40.2, -3.0]}
               zoom={5}
               onSelect={(id) => {
-                const agency = INMOBILIARIAS_MOCK.find((a) => a.id === id);
+                const agency = agencies.find((a) => a.id === id);
                 if (agency) navigateTo(`/inmobiliarias/${agency.id}`);
               }}
             />

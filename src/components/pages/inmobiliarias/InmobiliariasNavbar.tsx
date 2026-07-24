@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { Loader2, MapPin, Search } from 'lucide-react';
 import { navigateTo } from '@/lib/utils';
-import { CITY_INDEX } from '@/data/city-index';
+import { buildCityIndex } from '@/data/city-index';
 import { CITY_IMAGES } from '@/data/city-images';
+import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { PlaceholderImage } from '@/components/ui/PlaceholderImage';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
 
@@ -31,6 +32,8 @@ export function InmobiliariasNavbar({
   };
 }) {
   const [scrolled, setScrolled] = useState(false);
+  const { agencies } = useInmobiliarias();
+  const cityIndex = useMemo(() => buildCityIndex(agencies), [agencies]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -58,7 +61,7 @@ export function InmobiliariasNavbar({
   const cityMatches: Suggestion[] = (() => {
     const trimmed = query.trim().toLowerCase();
     if (trimmed.length === 0) return [];
-    return CITY_INDEX.filter(
+    return cityIndex.filter(
       (c) => c.city.toLowerCase().includes(trimmed) || c.province.toLowerCase().includes(trimmed),
     )
       .slice(0, 5)

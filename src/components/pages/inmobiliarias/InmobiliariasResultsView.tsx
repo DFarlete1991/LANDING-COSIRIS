@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Building2, MapPin } from 'lucide-react';
 import { AgencyResultRow } from '../../ui/AgencyCard';
 import { FilterChips, type SortOption } from '../../ui/FilterChips';
-import { INMOBILIARIAS_MOCK } from '@/data/inmobiliarias-mock';
+import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { haversineKm } from '@/lib/geo';
 
 const NAVBAR_HEIGHT = 72;
@@ -15,6 +15,7 @@ export function InmobiliariasResultsView({
   initialQuery: string;
   searchPoint: { lat: number; lng: number };
 }) {
+  const { agencies, isLive } = useInmobiliarias();
   const [sort, setSort] = useState<SortOption>('distancia');
   const [maxDistanceKm, setMaxDistanceKm] = useState<number | null>(null);
   const [specialty, setSpecialty] = useState<string | null>(null);
@@ -22,17 +23,17 @@ export function InmobiliariasResultsView({
   const cityName = initialQuery.split(',')[0];
 
   const specialtyOptions = useMemo(
-    () => [...new Set(INMOBILIARIAS_MOCK.flatMap((a) => a.especialidades))].sort(),
-    [],
+    () => [...new Set(agencies.flatMap((a) => a.especialidades))].sort(),
+    [agencies],
   );
 
   const distances = useMemo(() => {
     const map = new Map<string, number>();
-    for (const agency of INMOBILIARIAS_MOCK) {
+    for (const agency of agencies) {
       map.set(agency.id, haversineKm(searchPoint, { lat: agency.lat, lng: agency.lng }));
     }
     return map;
-  }, [searchPoint]);
+  }, [agencies, searchPoint]);
 
   const nearestId = useMemo(() => {
     let best: { id: string; km: number } | null = null;
@@ -43,7 +44,7 @@ export function InmobiliariasResultsView({
   }, [distances]);
 
   const visibleAgencies = useMemo(() => {
-    let list = INMOBILIARIAS_MOCK;
+    let list = agencies;
     if (maxDistanceKm != null) {
       list = list.filter((a) => (distances.get(a.id) ?? Infinity) <= maxDistanceKm);
     }
@@ -53,11 +54,11 @@ export function InmobiliariasResultsView({
     list = [...list];
     if (sort === 'distancia') list.sort((a, b) => (distances.get(a.id) ?? Infinity) - (distances.get(b.id) ?? Infinity));
     else if (sort === 'experiencia') list.sort((a, b) => b.anos_experiencia - a.anos_experiencia);
-    else if (sort === 'valoracion') list.sort((a, b) => b.rating - a.rating);
+    else if (sort === 'valoracion') list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     else if (sort === 'propiedades') list.sort((a, b) => b.num_propiedades - a.num_propiedades);
     else list.sort((a, b) => a.nombre_comercial.localeCompare(b.nombre_comercial));
     return list;
-  }, [sort, maxDistanceKm, specialty, distances]);
+  }, [agencies, sort, maxDistanceKm, specialty, distances]);
 
   return (
     <div>
@@ -130,7 +131,9 @@ export function InmobiliariasResultsView({
         </div>
 
         <p className="mt-10 text-center text-xs text-slate-400">
-          Borrador con datos de ejemplo — el directorio real se conectará a las inmobiliarias activas del CRM Cosiris.
+          {isLive
+            ? 'Inmobiliarias reales, activas en el CRM Cosiris.'
+            : 'Borrador con datos de ejemplo — todavía no hay inmobiliarias reales visibles en el directorio.'}
         </p>
       </main>
     </div>

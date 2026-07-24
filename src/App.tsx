@@ -16,6 +16,7 @@ import { GraciasVenderPage } from './components/pages/GraciasVenderPage';
 import { GraciasPage } from './components/pages/GraciasPage';
 import { BuscadorInmobiliariasPage } from './components/pages/BuscadorInmobiliariasPage';
 import { InmobiliariaPerfilPage } from './components/pages/InmobiliariaPerfilPage';
+import { InmobiliariasProvider } from './context/InmobiliariasContext';
 
 declare global {
   interface Window {
@@ -37,7 +38,6 @@ const standaloneRoutes: Record<string, React.ComponentType> = {
   '/captaci%C3%B3n_inmobiliarias': CaptacionInmobiliariasPage,
   '/gracias-vender': GraciasVenderPage,
   '/gracias': GraciasPage,
-  '/inmobiliarias': BuscadorInmobiliariasPage,
 };
 
 export default function App() {
@@ -91,10 +91,19 @@ export default function App() {
   if (currentPath.startsWith('/inmobiliarias/')) {
     const agencyId = decodeURIComponent(currentPath.slice('/inmobiliarias/'.length));
     return (
-      <>
+      <InmobiliariasProvider>
         <InmobiliariaPerfilPage id={agencyId} />
         <ContactModal />
-      </>
+      </InmobiliariasProvider>
+    );
+  }
+
+  if (currentPath === '/inmobiliarias') {
+    return (
+      <InmobiliariasProvider>
+        <BuscadorInmobiliariasPage />
+        <ContactModal />
+      </InmobiliariasProvider>
     );
   }
 

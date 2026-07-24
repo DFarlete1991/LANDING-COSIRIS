@@ -1,4 +1,4 @@
-import { INMOBILIARIAS_MOCK, type InmobiliariaPublica } from './inmobiliarias-mock';
+import type { InmobiliariaPublica } from './inmobiliarias-mock';
 
 export type CityIndexEntry = {
   city: string;
@@ -29,5 +29,3 @@ export function buildCityIndex(agencies: InmobiliariaPublica[]): CityIndexEntry[
     .map((e) => ({ city: e.city, province: e.province, count: e.count, lat: e.latSum / e.count, lng: e.lngSum / e.count }))
     .sort((a, b) => b.count - a.count);
 }
-
-export const CITY_INDEX = buildCityIndex(INMOBILIARIAS_MOCK);
