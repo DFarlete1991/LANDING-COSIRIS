@@ -1,4 +1,3 @@
-import { buildCityIndex } from './city-index';
 import type { InmobiliariaPublica } from './inmobiliarias-mock';
 
 export const FIXED_CITIES: { city: string; province: string; lat: number; lng: number }[] = [
@@ -13,10 +12,14 @@ export const FIXED_CITIES: { city: string; province: string; lat: number; lng: n
 export type CityWithCount = (typeof FIXED_CITIES)[number] & { count: number };
 
 export function getAllCitiesWithCounts(agencies: InmobiliariaPublica[]): CityWithCount[] {
-  const index = buildCityIndex(agencies);
+  // Cuenta por PROVINCIA, no por coincidencia exacta de población — una
+  // inmobiliaria en Aranjuez (provincia Madrid) debe contar para "Madrid",
+  // aunque su población no sea literalmente "Madrid".
   return FIXED_CITIES.map((c) => {
-    const found = index.find((ci) => ci.city === c.city);
-    return { ...c, count: found?.count ?? 0 };
+    const count = agencies.filter(
+      (a) => a.provincia.trim().toLowerCase() === c.province.trim().toLowerCase(),
+    ).length;
+    return { ...c, count };
   });
 }
 

@@ -14,14 +14,16 @@ export function buildCityIndex(agencies: InmobiliariaPublica[]): CityIndexEntry[
   const acc = new Map<string, { city: string; province: string; count: number; latSum: number; lngSum: number }>();
 
   for (const agency of agencies) {
-    const key = `${agency.poblacion}|${agency.provincia}`;
+    const city = agency.poblacion.trim();
+    const province = agency.provincia.trim();
+    const key = `${city}|${province}`;
     const existing = acc.get(key);
     if (existing) {
       existing.count += 1;
       existing.latSum += agency.lat;
       existing.lngSum += agency.lng;
     } else {
-      acc.set(key, { city: agency.poblacion, province: agency.provincia, count: 1, latSum: agency.lat, lngSum: agency.lng });
+      acc.set(key, { city, province, count: 1, latSum: agency.lat, lngSum: agency.lng });
     }
   }
 
