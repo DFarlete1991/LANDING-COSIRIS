@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Loader2, MapPin, MapPinned, Search, X } from 'lucide-react';
+import { Loader2, MapPin, MapPinned, Menu, Search, X } from 'lucide-react';
 import { navigateTo } from '@/lib/utils';
 import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
@@ -60,6 +60,7 @@ export function InmobiliariasNavbar({
   const [highlighted, setHighlighted] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
   const [noAgenciesToast, setNoAgenciesToast] = useState<{ city: string; nearby: string[] } | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -144,7 +145,7 @@ export function InmobiliariasNavbar({
 
   return (
     <header
-      className={`sticky top-0 z-50 grid h-[72px] w-full grid-cols-[auto_1fr_auto] items-center gap-3 border-b px-6 transition-all duration-300 ${
+      className={`sticky top-0 z-50 flex h-[72px] w-full items-center gap-2 border-b px-4 transition-all duration-300 sm:gap-3 sm:px-6 ${
         scrolled
           ? 'border-white/10 bg-black/90 shadow-lg shadow-black/20 backdrop-blur-xl'
           : transparent
@@ -155,12 +156,13 @@ export function InmobiliariasNavbar({
       <a
         href={showBack ? '#' : '/inmobiliarias'}
         onClick={(e) => { e.preventDefault(); showBack ? onBack?.() : navigateTo('/inmobiliarias'); }}
-        className="shrink-0 justify-self-start transition-transform duration-200 hover:scale-105 active:scale-90"
+        className="shrink-0 transition-transform duration-200 hover:scale-105 active:scale-90"
       >
         <img src="/assets/logo_white.png" alt="Cosiris" className="h-8 w-auto" />
       </a>
 
-      <nav className="flex items-center justify-self-center gap-0.5 md:gap-1">
+      {/* Desktop: enlaces centrados. En móvil desaparecen por completo (van al menú hamburguesa). */}
+      <nav className="hidden flex-1 items-center justify-center gap-0.5 md:flex md:gap-1">
         {LINKS.map((link) => (
           <button
             key={link.href}
@@ -175,9 +177,10 @@ export function InmobiliariasNavbar({
         ))}
       </nav>
 
-      <div className="min-w-0 justify-self-end">
+      {/* Buscador: en móvil ocupa el espacio flexible entre logo y hamburguesa; en desktop tiene ancho fijo a la derecha. */}
+      <div className="min-w-0 flex-1 md:max-w-sm md:flex-none">
         {searchProps && (
-          <div ref={wrapperRef} className="relative w-full max-w-xs sm:max-w-sm">
+          <div ref={wrapperRef} className="relative w-full">
             <div className="flex h-[44px] items-center gap-2 rounded-full border border-white/15 bg-white/10 pl-4 pr-3 text-sm text-white/60 transition-all duration-200 focus-within:border-[#FF8000]/40 focus-within:bg-white/15 focus-within:shadow-[0_0_0_4px_rgba(255,128,0,0.12)]">
               <Search size={18} className="shrink-0 text-white/40" />
               <input
@@ -294,6 +297,39 @@ export function InmobiliariasNavbar({
           </div>
         )}
       </div>
+
+      {/* Hamburguesa: solo móvil, los enlaces (Inicio, Servicios, etc.) viven aquí en vez de competir por espacio con el buscador. */}
+      <button
+        type="button"
+        onClick={() => setMobileMenuOpen((v) => !v)}
+        aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+        className="flex shrink-0 items-center justify-center rounded-full p-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white md:hidden"
+      >
+        {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.nav
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
+            className="absolute left-0 right-0 top-full z-40 flex flex-col gap-0.5 border-b border-white/10 bg-black p-3 md:hidden"
+          >
+            {LINKS.map((link) => (
+              <button
+                key={link.href}
+                type="button"
+                onClick={() => { setMobileMenuOpen(false); navigateTo(link.href); }}
+                className="rounded-lg px-4 py-3 text-left text-sm font-semibold text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                {link.label}
+              </button>
+            ))}
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
