@@ -2,7 +2,6 @@ import { ArrowRight, BadgeCheck, Briefcase, Home, Languages, MapPin, Star, Walle
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { formatDistanceKm } from '@/lib/geo';
 import { navigateTo } from '@/lib/utils';
-import { PlaceholderImage } from './PlaceholderImage';
 
 function formatPrice(price: number): string {
   if (price >= 1000000) return `${(price / 1000000).toFixed(1)}M€`;
@@ -16,7 +15,7 @@ function Avatar({ agency, size = 88 }: { agency: InmobiliariaPublica; size?: num
       <img
         src={agency.foto_url}
         alt={agency.nombre_agente}
-        style={{ width: size, height: size }}
+        style={{ width: size, height: size, objectPosition: agency.foto_pos ?? '50% 50%' }}
         className="shrink-0 rounded-full border-2 border-white object-cover shadow-lg"
       />
     );
@@ -37,7 +36,7 @@ function AgencyThumbnail({ agency, size }: { agency: InmobiliariaPublica; size: 
       <img
         src={agency.logo_url}
         alt={agency.nombre_comercial}
-        style={{ width: size, height: size }}
+        style={{ width: size, height: size, objectPosition: agency.logo_pos ?? '50% 50%' }}
         className="shrink-0 rounded-full border-2 border-white object-cover shadow-sm"
       />
     );
@@ -65,22 +64,36 @@ export function AgencyCard({
     <button
       type="button"
       onClick={() => navigateTo(`/inmobiliarias/${agency.id}`)}
-      className="group flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm shadow-slate-900/5 transition-all duration-300 hover:-translate-y-1.5 hover:border-[#FF8000]/20 hover:shadow-xl hover:shadow-[#FF8000]/10"
+      className="group flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm shadow-slate-900/5 transition-[transform,border-color,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:border-[#FF8000]/20 hover:shadow-xl hover:shadow-[#FF8000]/10"
     >
-      <div className="relative h-36 w-full shrink-0 overflow-hidden">
-        <PlaceholderImage icon="building" className="h-full w-full" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 to-transparent" />
+      <div
+        className="relative h-36 w-full shrink-0 overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${agency.color_hex} 0%, #0F172A 140%)` }}
+      >
+        {agency.banner_url && (
+          <img src={agency.banner_url} alt="" className="h-full w-full object-cover" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         {isNearest && (
           <span className="absolute left-3 top-3 rounded-full bg-[#0F172A]/90 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-white shadow-sm backdrop-blur-sm">
             Más cercana
           </span>
         )}
-        <div
-          className="absolute -bottom-4 left-4 flex h-10 w-10 items-center justify-center rounded-xl border-2 border-white text-xs font-black text-white shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-110"
-          style={{ backgroundColor: agency.color_hex }}
-        >
-          {agency.nombre_comercial.slice(0, 1)}
-        </div>
+        {agency.logo_url ? (
+          <img
+            src={agency.logo_url}
+            alt={agency.nombre_comercial}
+            style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
+            className="absolute -bottom-4 left-4 h-10 w-10 rounded-full border-2 border-white object-cover shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-110"
+          />
+        ) : (
+          <div
+            className="absolute -bottom-4 left-4 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white text-xs font-black text-white shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-110"
+            style={{ backgroundColor: agency.color_hex }}
+          >
+            {agency.nombre_comercial.slice(0, 1)}
+          </div>
+        )}
       </div>
 
       <div className="flex-1 px-4 pb-4 pt-6">
@@ -130,7 +143,7 @@ export function AgencyResultRow({
           goToProfile();
         }
       }}
-      className="flex cursor-pointer gap-8 rounded-[24px] border border-slate-100 bg-white p-9 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-[250ms] hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(15,23,42,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000]"
+      className="flex cursor-pointer gap-8 rounded-[24px] border border-slate-100 bg-white p-9 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-[transform,box-shadow] duration-[250ms] ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(15,23,42,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000]"
     >
       {/* Zona izquierda: Avatar */}
       <div className="relative shrink-0 self-start">
@@ -212,7 +225,7 @@ export function AgencyResultRow({
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); goToProfile(); }}
-          className="flex h-[52px] w-full items-center justify-center gap-1.5 rounded-full bg-[#FF8000] text-[14px] font-bold text-white shadow-sm shadow-[#FF8000]/20 transition-all duration-200 hover:bg-[#E67300] hover:shadow-md hover:shadow-[#FF8000]/30 active:scale-95"
+          className="flex h-[52px] w-full items-center justify-center gap-1.5 rounded-full bg-[#FF8000] text-[14px] font-bold text-white shadow-sm shadow-[#FF8000]/20 transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#E67300] hover:shadow-md hover:shadow-[#FF8000]/30 active:scale-95"
         >
           Ver perfil <ArrowRight size={15} />
         </button>

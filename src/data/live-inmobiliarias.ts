@@ -15,7 +15,9 @@ type DirectorioRow = {
   telefono: string | null;
   pagina_web: string | null;
   logo_url: string | null;
+  logo_pos: string | null;
   foto_agente_url: string | null;
+  foto_agente_pos: string | null;
   banner_url: string | null;
   color_hex: string | null;
   texto_presentacion: string | null;
@@ -46,7 +48,9 @@ function mapRow(row: DirectorioRow): InmobiliariaPublica | null {
     telefono: row.telefono ?? '',
     pagina_web: row.pagina_web,
     logo_url: row.logo_url,
+    logo_pos: row.logo_pos,
     foto_url: row.foto_agente_url,
+    foto_pos: row.foto_agente_pos,
     banner_url: row.banner_url,
     color_hex: row.color_hex ?? '#FF8000',
     texto_presentacion: row.texto_presentacion ?? '',

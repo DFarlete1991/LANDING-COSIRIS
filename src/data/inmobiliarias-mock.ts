@@ -17,7 +17,11 @@ export type InmobiliariaPublica = {
   telefono: string;
   pagina_web: string | null;
   logo_url: string | null;
+  /** Encuadre CSS object-position ("X% Y%") guardado por el cliente, estilo WhatsApp. */
+  logo_pos?: string | null;
   foto_url: string | null;
+  /** Encuadre CSS object-position ("X% Y%") guardado por el cliente, estilo WhatsApp. */
+  foto_pos?: string | null;
   banner_url: string | null;
   color_hex: string;
   texto_presentacion: string;

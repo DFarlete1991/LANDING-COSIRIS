@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
-import { Loader2, MapPin, Search } from 'lucide-react';
-import { buildCityIndex } from '@/data/city-index';
-import { CITY_IMAGES } from '@/data/city-images';
+import { Loader2, MapPin, MapPinned, Search, X } from 'lucide-react';
+import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { PlaceholderImage } from './PlaceholderImage';
 
@@ -39,24 +39,32 @@ export function AgencySearchBar({
   onSelect: (suggestion: SearchSuggestion) => void;
 }) {
   const geocodeFallback = useGeocodeFallback();
-  const { agencies } = useInmobiliarias();
-  const cityIndex = useMemo(() => buildCityIndex(agencies), [agencies]);
+  const { agencies, cityImages } = useInmobiliarias();
+  const allCities = useMemo(() => getAllCitiesWithCounts(agencies), [agencies]);
   const [query, setQuery] = useState(initialValue);
   const [addressResults, setAddressResults] = useState<Suggestion[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
+  const [noAgenciesToast, setNoAgenciesToast] = useState<{ city: string; nearby: string[] } | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!noAgenciesToast) return;
+    const t = setTimeout(() => setNoAgenciesToast(null), 5000);
+    return () => clearTimeout(t);
+  }, [noAgenciesToast]);
 
   const cityMatches: Suggestion[] = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
     if (trimmed.length === 0) return [];
-    return cityIndex.filter(
-      (c) => c.city.toLowerCase().includes(trimmed) || c.province.toLowerCase().includes(trimmed),
-    )
+    return allCities
+      .filter(
+        (c) => c.city.toLowerCase().includes(trimmed) || c.province.toLowerCase().includes(trimmed),
+      )
       .slice(0, 5)
       .map((c) => ({ type: 'city' as const, label: `${c.city}, ${c.province}`, city: c.city, province: c.province, count: c.count, lat: c.lat, lng: c.lng }));
-  }, [query, cityIndex]);
+  }, [query, allCities]);
 
   const suggestions = useMemo(() => [...cityMatches, ...addressResults], [cityMatches, addressResults]);
 
@@ -94,6 +102,11 @@ export function AgencySearchBar({
   }, [query, cityMatches.length, geocodeFallback]);
 
   const selectSuggestion = (suggestion: Suggestion) => {
+    if (suggestion.type === 'city' && suggestion.count === 0) {
+      setNoAgenciesToast({ city: suggestion.city, nearby: getNearbyCities(suggestion.city) });
+      setIsOpen(false);
+      return;
+    }
     setQuery(suggestion.label);
     setIsOpen(false);
     onSelect({ label: suggestion.label, lat: suggestion.lat, lng: suggestion.lng });
@@ -129,7 +142,7 @@ export function AgencySearchBar({
   return (
     <div ref={wrapperRef} className="relative w-full">
       <div
-        className={`flex items-center gap-2 rounded-full border border-slate-200 bg-white transition-all focus-within:border-[#FF8000] focus-within:ring-4 focus-within:ring-[#FF8000]/15 ${
+        className={`flex items-center gap-2 rounded-full border border-slate-200 bg-white transition-[border-color,box-shadow] duration-200 ease-out focus-within:border-[#FF8000] focus-within:ring-4 focus-within:ring-[#FF8000]/15 ${
           isHero ? 'p-2 shadow-2xl shadow-slate-900/20' : 'p-1 shadow-sm'
         }`}
       >
@@ -141,7 +154,7 @@ export function AgencySearchBar({
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => { if (suggestions.length > 0) setIsOpen(true); }}
+            onFocus={() => { if (!noAgenciesToast && suggestions.length > 0) setIsOpen(true); }}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             className={`w-full rounded-full bg-transparent pl-11 pr-4 font-medium text-slate-900 placeholder:text-slate-400 outline-none ${
@@ -157,15 +170,23 @@ export function AgencySearchBar({
           <button
             type="button"
             onClick={handleSubmit}
-            className="flex shrink-0 items-center gap-2 rounded-full bg-[#FF8000] px-6 py-3 text-sm font-bold text-white transition-all hover:bg-[#E67300] active:scale-95"
+            className="flex shrink-0 items-center gap-2 rounded-full bg-[#FF8000] px-6 py-3 text-sm font-bold text-white transition-[background-color,transform] duration-200 ease-out hover:bg-[#E67300] active:scale-95"
           >
             <Search size={16} /> Buscar
           </button>
         )}
       </div>
 
+      <AnimatePresence>
       {isOpen && suggestions.length > 0 && (
-        <ul className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/15">
+        <motion.ul
+          initial={{ opacity: 0, scale: 0.95, y: -4 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -4 }}
+          transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
+          style={{ transformOrigin: 'top' }}
+          className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/15"
+        >
           {suggestions.map((s, index) => (
             <li
               key={`${s.type}-${s.label}-${index}`}
@@ -178,8 +199,8 @@ export function AgencySearchBar({
               {s.type === 'city' ? (
                 <>
                   <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg shadow-sm">
-                    {CITY_IMAGES[s.city] ? (
-                      <img src={CITY_IMAGES[s.city]} alt={s.city} className="h-full w-full object-cover" />
+                    {cityImages[s.city] ? (
+                      <img src={cityImages[s.city]} alt={s.city} className="h-full w-full object-cover" />
                     ) : (
                       <PlaceholderImage icon="building" className="h-full w-full" />
                     )}
@@ -204,8 +225,58 @@ export function AgencySearchBar({
               )}
             </li>
           ))}
-        </ul>
+        </motion.ul>
       )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {noAgenciesToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.96 }}
+            transition={{ duration: 0.25, ease: [0.19, 1, 0.22, 1] }}
+            className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-xl border border-[#FF8000]/20 bg-[#0F172A] shadow-2xl shadow-black/30"
+          >
+            <div className="flex items-start gap-3 p-4">
+              <div className="mt-0.5 shrink-0">
+                <MapPinned size={18} className="text-[#FF8000]" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-white">No hay inmobiliarias en {noAgenciesToast.city} todavía</p>
+                <p className="mt-1 text-xs text-white/60">
+                  Prueba en{' '}
+                  {noAgenciesToast.nearby.map((name, i) => (
+                    <span key={name}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const target = allCities.find((ac) => ac.city === name);
+                          if (target) {
+                            setNoAgenciesToast(null);
+                            onSelect({ label: `${target.city}, ${target.province}`, lat: target.lat, lng: target.lng });
+                          }
+                        }}
+                        className="font-semibold text-[#FF8000] underline underline-offset-2 hover:text-orange-400"
+                      >
+                        {name}
+                      </button>
+                      {i < noAgenciesToast.nearby.length - 1 && <span className="text-white/40">{', '}</span>}
+                    </span>
+                  ))}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNoAgenciesToast(null)}
+                className="shrink-0 rounded-full p-1 text-white/40 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

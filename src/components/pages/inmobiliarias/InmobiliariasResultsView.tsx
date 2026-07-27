@@ -63,20 +63,30 @@ export function InmobiliariasResultsView({
   return (
     <div>
       {/* Hero — compacto, 220-260px */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-[#12192B] to-[#1a2340] px-6 py-9">
+      <div
+        className="relative overflow-hidden bg-black px-6 py-9"
+        style={{
+          backgroundImage: 'url(/assets/inmobiliarias/results-banner.png)',
+          // >100% empuja el recorte más allá del borde derecho real de la imagen
+          // (el negro de fondo rellena el hueco, se funde con el degradado).
+          backgroundPosition: '130% center',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] opacity-20 [background-size:26px_26px]"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/10 via-black/50 to-black/90"
         />
         <div className="relative mx-auto w-full max-w-[1400px]">
           <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#FF8000]">Directorio Cosiris</p>
           <h1 className="mt-2.5 text-[32px] font-black leading-[1.1] tracking-[-0.02em] text-white md:text-[36px]">
             Inmobiliarias en {cityName}
           </h1>
-          <p className="mt-2 max-w-xl text-sm text-white/70">
+          <p className="mt-2 max-w-xl text-sm text-white/85">
             Compara agencias por experiencia, propiedades, ubicación y valoración.
           </p>
-          <div className="mt-3 flex items-center gap-2 text-sm text-white/60">
+          <div className="mt-3 flex items-center gap-2 text-sm text-white/75">
             <MapPin size={14} />
             <span>
               <strong className="font-bold text-white">{visibleAgencies.length}</strong> {visibleAgencies.length === 1 ? 'inmobiliaria encontrada' : 'inmobiliarias encontradas'}

@@ -28,6 +28,7 @@ function VideoSection({ agency }: { agency: InmobiliariaPublica }) {
 
 function LocationSection({ agency, searchPoint }: { agency: InmobiliariaPublica; searchPoint: { lat: number; lng: number } | null }) {
   const distanceKm = searchPoint ? haversineKm(searchPoint, { lat: agency.lat, lng: agency.lng }) : null;
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${agency.lat},${agency.lng}`;
 
   return (
     <div>
@@ -42,12 +43,23 @@ function LocationSection({ agency, searchPoint }: { agency: InmobiliariaPublica;
       <div className="h-64 overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
         <AgencyMap
           agencies={[agency]}
-          nearestId={null}
           searchPoint={searchPoint}
           center={[agency.lat, agency.lng]}
           zoom={14}
-          onSelect={() => {}}
         />
+      </div>
+      <div className="mt-3 flex items-center justify-between">
+        <p className="text-xs text-slate-400">
+          {agency.direccion}, {agency.poblacion} ({agency.cp})
+        </p>
+        <a
+          href={directionsUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1.5 rounded-full bg-[#FF8000] px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-[#E67300] hover:shadow-md active:scale-95"
+        >
+          <MapPin size={13} /> Cómo llegar
+        </a>
       </div>
     </div>
   );
@@ -148,17 +160,35 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
       <main className="mx-auto w-full max-w-5xl px-4 pb-20">
         <div className="-mt-14 mb-4 md:-mt-16">
           <div className="relative inline-block">
-            <PlaceholderImage
-              icon="person"
-              label="Foto pendiente"
-              className="h-24 w-24 shrink-0 rounded-2xl border-4 border-white shadow-xl md:h-28 md:w-28"
-            />
-            <div
-              className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-xl border-2 border-white text-xs font-black text-white shadow-lg md:h-10 md:w-10"
-              style={{ backgroundColor: agency.color_hex }}
-            >
-              {agency.nombre_comercial.slice(0, 1)}
-            </div>
+            {agency.foto_url ? (
+              <img
+                src={agency.foto_url}
+                alt={agency.nombre_agente}
+                style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
+                className="h-24 w-24 shrink-0 rounded-full border-4 border-white object-cover shadow-xl md:h-28 md:w-28"
+              />
+            ) : (
+              <PlaceholderImage
+                icon="person"
+                label="Foto pendiente"
+                className="h-24 w-24 shrink-0 rounded-full border-4 border-white shadow-xl md:h-28 md:w-28"
+              />
+            )}
+            {agency.logo_url ? (
+              <img
+                src={agency.logo_url}
+                alt={agency.nombre_comercial}
+                style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
+                className="absolute -bottom-1 -right-1 h-9 w-9 rounded-full border-2 border-white object-cover shadow-lg md:h-10 md:w-10"
+              />
+            ) : (
+              <div
+                className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-xl border-2 border-white text-xs font-black text-white shadow-lg md:h-10 md:w-10"
+                style={{ backgroundColor: agency.color_hex }}
+              >
+                {agency.nombre_comercial.slice(0, 1)}
+              </div>
+            )}
           </div>
         </div>
 
@@ -234,13 +264,31 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
             <div className="sticky top-24 rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5">
               <div className="mb-5 flex items-center gap-3">
                 <div className="relative shrink-0">
-                  <PlaceholderImage icon="person" className="h-12 w-12 rounded-full" />
-                  <div
-                    className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-md border-2 border-white text-[9px] font-black text-white shadow-sm"
-                    style={{ backgroundColor: agency.color_hex }}
-                  >
-                    {agency.nombre_comercial.slice(0, 1)}
-                  </div>
+                  {agency.foto_url ? (
+                    <img
+                      src={agency.foto_url}
+                      alt={agency.nombre_agente}
+                      style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
+                      className="h-12 w-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <PlaceholderImage icon="person" className="h-12 w-12 rounded-full" />
+                  )}
+                  {agency.logo_url ? (
+                    <img
+                      src={agency.logo_url}
+                      alt={agency.nombre_comercial}
+                      style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
+                      className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-white object-cover shadow-sm"
+                    />
+                  ) : (
+                    <div
+                      className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-md border-2 border-white text-[9px] font-black text-white shadow-sm"
+                      style={{ backgroundColor: agency.color_hex }}
+                    >
+                      {agency.nombre_comercial.slice(0, 1)}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-slate-400">Contactar con</p>

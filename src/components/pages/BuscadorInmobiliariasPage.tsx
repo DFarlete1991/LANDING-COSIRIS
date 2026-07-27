@@ -40,6 +40,7 @@ export function BuscadorInmobiliariasPage() {
         showBack={!!searchPoint}
         onBack={handleBack}
         searchProps={searchPoint ? { initialValue: query, onSelect: handleSearch } : undefined}
+        transparent={!searchPoint}
       />
 
       {searchPoint ? (

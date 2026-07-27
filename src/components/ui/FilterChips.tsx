@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, MapPin, Briefcase, ArrowDownAZ, Ruler, Star, Home, Tag } from 'lucide-react';
 
 export type SortOption = 'distancia' | 'valoracion' | 'experiencia' | 'propiedades' | 'alfabetico';
@@ -20,7 +21,7 @@ const DISTANCE_OPTIONS: { value: number | null; label: string }[] = [
 ];
 
 const chipBase =
-  'flex shrink-0 items-center gap-1.5 rounded-full border px-[18px] text-[13px] font-semibold transition-all duration-200 whitespace-nowrap h-[46px]';
+  'flex shrink-0 items-center gap-1.5 rounded-full border px-[18px] text-[13px] font-semibold transition-[background-color,border-color,color,transform] duration-200 ease-out whitespace-nowrap h-[46px]';
 const chipActive = 'border-[#FF8000] bg-[#FF8000] text-white shadow-[0_4px_14px_rgba(255,128,0,0.3)]';
 const chipInactive = 'border-slate-200 bg-white text-slate-700 shadow-sm hover:border-[#FF8000] hover:bg-[#FFF4EC] hover:text-[#FF8000] active:scale-[0.97]';
 
@@ -55,21 +56,30 @@ function Dropdown({
       <button type="button" onClick={() => setOpen((v) => !v)} className={`${chipBase} ${active ? chipActive : chipInactive}`}>
         <Icon size={15} /> {selectedLabel || label} <ChevronDown size={14} className="ml-0.5" />
       </button>
-      {open && (
-        <ul className="absolute left-0 top-full z-30 mt-1.5 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10">
-          {options.map((option) => (
-            <li
-              key={option.value}
-              onClick={() => { onSelect(option.value); setOpen(false); }}
-              className={`cursor-pointer px-4 py-2.5 text-[13px] transition-colors ${
-                selectedLabel === option.label ? 'bg-[#FFF4EC] text-[#FF8000] font-semibold' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              {option.label}
-            </li>
-          ))}
-        </ul>
-      )}
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            initial={{ opacity: 0, scale: 0.95, y: -4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -4 }}
+            transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
+            style={{ transformOrigin: 'top left' }}
+            className="absolute left-0 top-full z-30 mt-1.5 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10"
+          >
+            {options.map((option) => (
+              <li
+                key={option.value}
+                onClick={() => { onSelect(option.value); setOpen(false); }}
+                className={`cursor-pointer px-4 py-2.5 text-[13px] transition-colors ${
+                  selectedLabel === option.label ? 'bg-[#FFF4EC] text-[#FF8000] font-semibold' : 'text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                {option.label}
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
