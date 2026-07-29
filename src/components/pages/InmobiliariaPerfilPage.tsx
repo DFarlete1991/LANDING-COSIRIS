@@ -1,30 +1,15 @@
-import { useMemo, useState } from 'react';
-import { ArrowLeft, BadgeCheck, ChevronRight, Globe, MapPin, Phone, PlayCircle, Users, Briefcase } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowLeft, BadgeCheck, ChevronDown, ChevronRight, Globe, MapPin, Phone, Users, Briefcase, X } from 'lucide-react';
 import { Footer } from '../Footer';
 import { AgencyLeadForm } from '../ui/AgencyLeadForm';
 import { PlaceholderImage } from '../ui/PlaceholderImage';
 import { AgencyMap } from '../ui/AgencyMap';
-import { InmobiliariasNavbar } from './inmobiliarias/InmobiliariasNavbar';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { haversineKm, formatDistanceKm } from '@/lib/geo';
 import { navigateTo } from '@/lib/utils';
-
-function VideoSection({ agency }: { agency: InmobiliariaPublica }) {
-  if (agency.media_presentacion_url) {
-    return (
-      <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
-        <video controls className="aspect-video w-full bg-black" src={agency.media_presentacion_url} />
-      </div>
-    );
-  }
-  return (
-    <div className="flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 bg-[#F6F7F9] text-slate-400">
-      <PlayCircle size={36} strokeWidth={1.5} />
-      <span className="text-xs font-semibold uppercase tracking-wide">Video pendiente</span>
-    </div>
-  );
-}
 
 function LocationSection({ agency, searchPoint }: { agency: InmobiliariaPublica; searchPoint: { lat: number; lng: number } | null }) {
   // Sin coordenadas fijadas no hay nada que pintar en el mapa ni "cómo
@@ -89,26 +74,129 @@ function Breadcrumb({ items }: { items: { label: string; href?: string }[] }) {
   );
 }
 
-function RevealPhone({ telefono, colorHex }: { telefono: string; colorHex: string }) {
+const FAQ = [
+  { q: '¿Cuánto vale realmente mi casa?', a: 'No existe un precio único. Analizamos ventas recientes, datos oficiales y herramientas profesionales para ofrecerte una valoración realista con una horquilla de tres precios: venta rápida, precio recomendado y precio máximo de mercado.' },
+  { q: '¿Infláis el precio para captar la propiedad?', a: 'No. Trabajamos con datos reales y experiencia de mercado. Una valoración ajustada aumenta las posibilidades de vender antes y en mejores condiciones.' },
+  { q: '¿Cobráis por valorar la vivienda?', a: 'No. La valoración es gratuita y sin compromiso. Es el primer paso para asesorarte correctamente antes de poner tu vivienda a la venta.' },
+  { q: '¿Cuánto se tarda en vender una vivienda?', a: 'Depende del mercado y, sobre todo, del precio de salida. Cuanto más ajustado esté a la realidad, más opciones habrá de vender en menos tiempo.' },
+  { q: '¿Cuánto cobráis por vender una propiedad?', a: 'Los honorarios dependen de cada operación. Te explicaremos las condiciones de forma transparente durante la visita, sin compromiso.' },
+  { q: '¿Tenéis que venir a mi casa para valorarla?', a: 'Sí, siempre que sea posible. Hay muchos aspectos que solo pueden valorarse en persona, como el estado de la vivienda, las reformas, la orientación, la luminosidad o los acabados.' },
+  { q: '¿Por qué debería confiar en vosotros?', a: 'Porque combinamos experiencia, marketing y tecnología para dar la máxima visibilidad a tu vivienda y ayudarte a vender al mejor precio posible.' },
+  { q: '¿Tengo que firmar una exclusiva?', a: 'No siempre. Analizaremos tu caso y te recomendaremos la opción que mejor se adapte a tus objetivos.' },
+];
+
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="overflow-hidden rounded-xl border border-slate-200 transition-colors hover:border-slate-300">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50"
+      >
+        {question}
+        <ChevronDown
+          size={15}
+          className={`shrink-0 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="answer"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.19, 1, 0.22, 1] }}
+            className="overflow-hidden"
+          >
+            <p className="border-t border-slate-100 px-4 py-3 text-sm leading-relaxed text-slate-600">{answer}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function RevealPhone({ agency }: { agency: InmobiliariaPublica }) {
   const [revealed, setRevealed] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (!showModal) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowModal(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showModal]);
 
   if (revealed) {
     return (
-      <a href={`tel:${telefono}`} className="flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-200">
-        <Phone size={14} className="text-green-600" /> {telefono}
+      <a href={`tel:${agency.telefono}`} className="flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-200">
+        <Phone size={14} className="text-green-600" /> {agency.telefono}
       </a>
     );
   }
 
   return (
-    <button
-      type="button"
-      onClick={() => setRevealed(true)}
-      style={{ backgroundColor: colorHex }}
-      className="flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-md shadow-black/10 transition-all duration-200 hover:opacity-90 hover:shadow-lg active:scale-[0.98]"
-    >
-      <Phone size={14} /> Mostrar teléfono
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => setShowModal(true)}
+        style={{ backgroundColor: agency.color_hex }}
+        className="flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-md shadow-black/10 transition-all duration-200 hover:opacity-90 hover:shadow-lg active:scale-[0.98]"
+      >
+        <Phone size={14} /> Mostrar teléfono
+      </button>
+
+      {createPortal(
+        <AnimatePresence>
+          {showModal && (
+            <>
+              <motion.div
+                key="backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-40 bg-black/65 backdrop-blur-sm"
+                aria-hidden="true"
+              />
+              <motion.div
+                key="panel"
+                role="dialog"
+                aria-modal
+                initial={{ opacity: 0, y: 24, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 16, scale: 0.97 }}
+                transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+                onClick={() => setShowModal(false)}
+                className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl shadow-black/20"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    aria-label="Cerrar"
+                    className="absolute right-4 top-4 z-10 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                  >
+                    <X size={18} />
+                  </button>
+                  <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Antes de ver el teléfono</p>
+                  <h3 className="mb-5 text-lg font-extrabold text-slate-900">Cuéntale a {agency.nombre_comercial} qué necesitas</h3>
+                  <AgencyLeadForm agency={agency} onSuccess={() => { setRevealed(true); setShowModal(false); }} />
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
+    </>
   );
 }
 
@@ -138,7 +226,6 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
   if (!agency) {
     return (
       <div className="flex min-h-screen flex-col">
-      <InmobiliariasNavbar />
         <main className="mx-auto flex flex-1 flex-col items-center justify-center px-4 text-center">
           <p className="text-lg font-bold text-slate-900">No encontramos esta inmobiliaria</p>
           <button
@@ -156,8 +243,6 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 antialiased">
-      <InmobiliariasNavbar />
-
       <div
         className="relative h-48 w-full overflow-hidden md:h-64"
         style={agency.banner_url ? undefined : { background: `linear-gradient(135deg, ${agency.color_hex} 0%, #0F172A 140%)` }}
@@ -267,23 +352,34 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
               )}
             </div>
 
-            <RevealPhone telefono={agency.telefono} colorHex={agency.color_hex} />
+            <RevealPhone agency={agency} />
 
             <div className="border-t border-slate-100 pt-7">
               <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.14em] text-slate-500">Sobre nosotros</h2>
               <p className="text-sm leading-relaxed text-slate-700">{agency.texto_presentacion}</p>
             </div>
 
-            <div className="border-t border-slate-100 pt-7">
-              <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.14em] text-slate-500">Video de presentación</h2>
-              <VideoSection agency={agency} />
-            </div>
+            {agency.media_presentacion_url && (
+              <div className="border-t border-slate-100 pt-7">
+                <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.14em] text-slate-500">Video de presentación</h2>
+                <video controls className="aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-sm" src={agency.media_presentacion_url} />
+              </div>
+            )}
 
             {agency.lat != null && agency.lng != null && (
               <div className="border-t border-slate-100 pt-7">
                 <LocationSection agency={agency} searchPoint={searchPoint} />
               </div>
             )}
+
+            <div className="border-t border-slate-100 pt-7">
+              <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-slate-500">Preguntas frecuentes</h2>
+              <div className="space-y-2">
+                {FAQ.map((item) => (
+                  <FaqItem key={item.q} question={item.q} answer={item.a} />
+                ))}
+              </div>
+            </div>
           </div>
 
           <aside>

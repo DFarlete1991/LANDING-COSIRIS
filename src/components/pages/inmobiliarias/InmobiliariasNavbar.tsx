@@ -4,9 +4,8 @@ import { ArrowLeft, Building2, Loader2, MapPin, MapPinned, Menu, Search, X } fro
 import { navigateTo } from '@/lib/utils';
 import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
-import { useUI } from '@/context/UIContext';
 import { PlaceholderImage } from '@/components/ui/PlaceholderImage';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
 
 export type SearchSuggestion = { label: string; lat: number; lng: number };
@@ -16,8 +15,6 @@ type Suggestion =
   | { type: 'address'; label: string; lat: number; lng: number }
   | { type: 'agency'; label: string; id: string; poblacion: string };
 
-// Mismos links que el resto del sitio (LandingNavbar) — el menú superior no
-// puede cambiar según la sección en la que esté el usuario.
 const LINKS = [
   { label: 'Servicios', href: '/servicios', hideOnMobile: true },
   { label: 'Nosotros', href: '/nosotros', hideOnMobile: true },
@@ -39,7 +36,6 @@ export function InmobiliariasNavbar({
 }) {
   const { agencies, cityImages } = useInmobiliarias();
   const allCities = useMemo(() => getAllCitiesWithCounts(agencies), [agencies]);
-  const { openContactModal } = useUI();
 
   const provider = useRef(
     new OpenStreetMapProvider({
@@ -175,7 +171,6 @@ export function InmobiliariasNavbar({
         <img src="/assets/logo_orange.png" alt="Cosiris" className="h-8 w-auto" />
       </a>
 
-      {/* Desktop: enlaces centrados. En móvil desaparecen por completo (van al menú hamburguesa). */}
       <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center justify-center gap-0.5 md:flex md:gap-1">
         {LINKS.map((link) => (
           <button
@@ -320,18 +315,10 @@ export function InmobiliariasNavbar({
         )}
       </div>
 
-      {/* CTAs — mismas que en el navbar principal del sitio, solo visibles cuando hay espacio. */}
+      {/* CTAs — solo visible cuando hay espacio. */}
       <div className="ml-auto hidden shrink-0 items-center gap-2 lg:flex">
-        <a
-          href="https://crm.cosiris.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: 'outline', className: 'text-xs' })}
-        >
+        <Button className="text-xs" onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
           Acceso Clientes
-        </a>
-        <Button className="text-xs" onClick={() => openContactModal({ sourceContext: 'navbar_inmobiliarias_empezar' })}>
-          Empezar
         </Button>
       </div>
 
@@ -365,19 +352,11 @@ export function InmobiliariasNavbar({
                 </button>
               ))}
               <div className="mt-1 flex flex-col gap-2 border-t border-slate-100 pt-3">
-                <a
-                  href="https://crm.cosiris.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={buttonVariants({ variant: 'outline' })}
-                >
-                  Acceso Clientes
-                </a>
                 <Button
                   className="w-full"
-                  onClick={() => { setMobileMenuOpen(false); openContactModal({ sourceContext: 'navbar_inmobiliarias_empezar' }); }}
+                  onClick={() => { setMobileMenuOpen(false); window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer'); }}
                 >
-                  Empezar
+                  Acceso Clientes
                 </Button>
               </div>
             </motion.nav>

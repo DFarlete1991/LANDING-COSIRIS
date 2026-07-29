@@ -8,7 +8,7 @@ import { useUI } from '@/context/UIContext';
 export function LandingNavbar() {
   const [open, setOpen] = React.useState(false);
   const scrolled = useScroll(10);
-  const { openContactModal, isContactModalOpen } = useUI();
+  const { isContactModalOpen } = useUI();
 
   const links = [
     { label: 'Servicios', href: '/servicios' },
@@ -88,10 +88,9 @@ export function LandingNavbar() {
           {/* <a href="https://homestaging-cosiris.com/" target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: 'outline' })}>
             Home Staging
           </a> */}
-          <a href="https://crm.cosiris.com/" target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: 'outline' })}>
+          <Button onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
             Acceso Clientes
-          </a>
-          <Button onClick={() => openContactModal({ sourceContext: 'navbar_empezar' })}>Empezar</Button>
+          </Button>
         </div>
         <Button size="icon" variant="outline" onClick={() => setOpen(!open)} className="md:hidden">
           <MenuToggleIcon open={open} className="size-5" duration={300} />
@@ -130,11 +129,8 @@ export function LandingNavbar() {
             {/* <a href="https://homestaging-cosiris.com/" target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: 'outline' })}>
             Home Staging
           </a> */}
-            <a href="https://crm.cosiris.com/" target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: 'outline' })}>
-            Acceso Clientes
-          </a>
-            <Button className="w-full" onClick={() => openContactModal({ sourceContext: 'navbar_empezar' })}>
-              Empezar
+            <Button className="w-full" onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
+              Acceso Clientes
             </Button>
           </div>
         </div>

@@ -49,7 +49,7 @@ async function submitAgencyLead(payload: Record<string, unknown>): Promise<{ ok:
 
 const TOTAL_STEPS = 5;
 
-export function AgencyLeadForm({ agency }: { agency: InmobiliariaPublica }) {
+export function AgencyLeadForm({ agency, onSuccess }: { agency: InmobiliariaPublica; onSuccess?: () => void }) {
   const [step, setStep] = useState(1);
   const [phase, setPhase] = useState<Phase>('idle');
   const [isAutoAdvancing, setIsAutoAdvancing] = useState(false);
@@ -75,23 +75,27 @@ export function AgencyLeadForm({ agency }: { agency: InmobiliariaPublica }) {
 
   const handleStep1 = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!direccion.trim() || !cp.trim()) {
-      setErrorMessage('Introduce la dirección y el código postal.');
+    if (!nombre.trim() || (!telefono.trim() && !email.trim())) {
+      setErrorMessage('Introduce tu nombre y al menos un teléfono o email.');
       return;
     }
     setErrorMessage('');
     setStep(2);
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleStep2 = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (phase === 'loading') return;
-
-    if (!nombre.trim() || (!telefono.trim() && !email.trim())) {
-      setErrorMessage('Introduce tu nombre y al menos un teléfono o email.');
+    if (!direccion.trim() || !cp.trim()) {
+      setErrorMessage('Introduce la dirección y el código postal.');
       return;
     }
+    setErrorMessage('');
+    setStep(3);
+  };
 
+  const handleFinish = async (selectedPlazo: Plazo) => {
+    if (phase === 'loading') return;
+    setPlazo(selectedPlazo);
     setErrorMessage('');
     setPhase('loading');
 
@@ -99,7 +103,7 @@ export function AgencyLeadForm({ agency }: { agency: InmobiliariaPublica }) {
       `Dirección: ${direccion} (CP ${cp})`,
       motivo && `Motivo de venta: ${motivo}`,
       tiempo && `Tiempo intentando vender: ${tiempo}`,
-      plazo && `Plazo deseado: ${plazo}`,
+      selectedPlazo && `Plazo deseado: ${selectedPlazo}`,
     ].filter(Boolean).join('\n');
 
     const result = await submitAgencyLead({
@@ -108,11 +112,20 @@ export function AgencyLeadForm({ agency }: { agency: InmobiliariaPublica }) {
       telefono: telefono || null,
       email: email || null,
       mensaje,
+      // Campos sueltos además del `mensaje` ya armado — así el correo de
+      // notificación puede mostrarlos como filas separadas en vez de un solo
+      // bloque de texto (ver metadataFormulario en portal-lead/route.ts).
+      direccion,
+      cp,
+      motivo: motivo || null,
+      tiempo: tiempo || null,
+      plazo: selectedPlazo || null,
       tipo_origen: 'Portal Inmobiliarias',
     });
 
     if (result.ok) {
       setPhase('sent');
+      onSuccess?.();
     } else {
       setErrorMessage(result.error ?? 'No se pudo enviar el mensaje.');
       setPhase('error');
@@ -142,75 +155,6 @@ export function AgencyLeadForm({ agency }: { agency: InmobiliariaPublica }) {
       <AnimatePresence mode="wait">
         {step === 1 ? (
           <motion.form key="s1" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.25 }} onSubmit={handleStep1} noValidate className="space-y-3">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Sobre tu vivienda</p>
-            <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-900">Dirección de la vivienda</label>
-              <input value={direccion} onChange={(e) => setDireccion(e.target.value)} className={inputClass} placeholder="Calle, número" />
-            </div>
-            <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-900">Código postal</label>
-              <input value={cp} onChange={(e) => setCp(e.target.value.replace(/\D/g, '').slice(0, 5))} className={inputClass} placeholder="28001" />
-            </div>
-            <button type="submit" style={{ backgroundColor: agency.color_hex }} className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-lg shadow-black/10 transition-all duration-200 hover:opacity-90 active:scale-[0.98]">
-              Siguiente <ArrowRight size={14} />
-            </button>
-          </motion.form>
-        ) : step === 2 ? (
-          <motion.div key="s2" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.25 }} className="space-y-3">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">¿Cuál es el motivo principal de la venta?</p>
-            <div className="grid gap-2">
-              {MOTIVOS.map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  disabled={isAutoAdvancing}
-                  onClick={() => { setMotivo(m); advanceAfter(3); }}
-                  className={`rounded-lg border px-3 py-2.5 text-left text-xs font-semibold transition-all ${motivo === m ? 'border-[#FF8000] bg-orange-50 text-[#FF8000]' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
-            <button type="button" onClick={() => setStep(1)} className="text-xs font-semibold text-slate-400 hover:text-slate-600">Volver</button>
-          </motion.div>
-        ) : step === 3 ? (
-          <motion.div key="s3" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.25 }} className="space-y-3">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">¿Cuánto tiempo llevas intentando vender tu propiedad?</p>
-            <div className="grid gap-2">
-              {TIEMPOS.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  disabled={isAutoAdvancing}
-                  onClick={() => { setTiempo(t); advanceAfter(4); }}
-                  className={`rounded-lg border px-3 py-2.5 text-left text-xs font-semibold transition-all ${tiempo === t ? 'border-[#FF8000] bg-orange-50 text-[#FF8000]' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-            <button type="button" onClick={() => setStep(2)} className="text-xs font-semibold text-slate-400 hover:text-slate-600">Volver</button>
-          </motion.div>
-        ) : step === 4 ? (
-          <motion.div key="s4" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.25 }} className="space-y-3">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">¿En qué plazo te gustaría vender?</p>
-            <div className="grid gap-2">
-              {PLAZOS.map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  disabled={isAutoAdvancing}
-                  onClick={() => { setPlazo(p); advanceAfter(5); }}
-                  className={`rounded-lg border px-3 py-2.5 text-left text-xs font-semibold transition-all ${plazo === p ? 'border-[#FF8000] bg-orange-50 text-[#FF8000]' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-            <button type="button" onClick={() => setStep(3)} className="text-xs font-semibold text-slate-400 hover:text-slate-600">Volver</button>
-          </motion.div>
-        ) : (
-          <motion.form key="s5" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.25 }} onSubmit={handleSubmit} noValidate className="space-y-3">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Tus datos de contacto</p>
             <div>
               <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-900">Nombre</label>
@@ -235,20 +179,101 @@ export function AgencyLeadForm({ agency }: { agency: InmobiliariaPublica }) {
               )}
             </AnimatePresence>
 
+            <button type="submit" style={{ backgroundColor: agency.color_hex }} className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-lg shadow-black/10 transition-all duration-200 hover:opacity-90 active:scale-[0.98]">
+              Siguiente <ArrowRight size={14} />
+            </button>
+          </motion.form>
+        ) : step === 2 ? (
+          <motion.form key="s2" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.25 }} onSubmit={handleStep2} noValidate className="space-y-3">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Sobre tu vivienda</p>
+            <div>
+              <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-900">Dirección de la vivienda</label>
+              <input value={direccion} onChange={(e) => setDireccion(e.target.value)} className={inputClass} placeholder="Calle, número" />
+            </div>
+            <div>
+              <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-900">Código postal</label>
+              <input value={cp} onChange={(e) => setCp(e.target.value.replace(/\D/g, '').slice(0, 5))} className={inputClass} placeholder="28001" />
+            </div>
+
+            <AnimatePresence>
+              {errorMessage && (
+                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-xs text-red-500">
+                  {errorMessage}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
             <div className="flex gap-2">
-              <button type="button" onClick={() => setStep(4)} disabled={phase === 'loading'} className="rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-xs font-bold text-slate-500 transition hover:bg-slate-50 disabled:opacity-60">
-                Volver
-              </button>
-              <button
-                type="submit"
-                disabled={phase === 'loading'}
-                style={{ backgroundColor: agency.color_hex }}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-lg shadow-black/10 transition-all duration-200 hover:opacity-90 hover:shadow-xl active:scale-[0.98] disabled:opacity-70"
-              >
-                {phase === 'loading' ? <Loader2 size={14} className="animate-spin" /> : `Contactar con ${agency.nombre_comercial}`}
+              <button type="button" onClick={() => setStep(1)} className="rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-xs font-bold text-slate-500 transition hover:bg-slate-50">Volver</button>
+              <button type="submit" style={{ backgroundColor: agency.color_hex }} className="flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-lg shadow-black/10 transition-all duration-200 hover:opacity-90 active:scale-[0.98]">
+                Siguiente <ArrowRight size={14} />
               </button>
             </div>
           </motion.form>
+        ) : step === 3 ? (
+          <motion.div key="s3" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.25 }} className="space-y-3">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">¿Cuál es el motivo principal de la venta?</p>
+            <div className="grid gap-2">
+              {MOTIVOS.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  disabled={isAutoAdvancing}
+                  onClick={() => { setMotivo(m); advanceAfter(4); }}
+                  className={`rounded-lg border px-3 py-2.5 text-left text-xs font-semibold transition-all ${motivo === m ? 'border-[#FF8000] bg-orange-50 text-[#FF8000]' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+            <button type="button" onClick={() => setStep(2)} className="text-xs font-semibold text-slate-400 hover:text-slate-600">Volver</button>
+          </motion.div>
+        ) : step === 4 ? (
+          <motion.div key="s4" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.25 }} className="space-y-3">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">¿Cuánto tiempo llevas intentando vender tu propiedad?</p>
+            <div className="grid gap-2">
+              {TIEMPOS.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  disabled={isAutoAdvancing}
+                  onClick={() => { setTiempo(t); advanceAfter(5); }}
+                  className={`rounded-lg border px-3 py-2.5 text-left text-xs font-semibold transition-all ${tiempo === t ? 'border-[#FF8000] bg-orange-50 text-[#FF8000]' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            <button type="button" onClick={() => setStep(3)} className="text-xs font-semibold text-slate-400 hover:text-slate-600">Volver</button>
+          </motion.div>
+        ) : (
+          <motion.div key="s5" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.25 }} className="space-y-3">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">¿En qué plazo te gustaría vender?</p>
+            <div className="grid gap-2">
+              {PLAZOS.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  disabled={phase === 'loading'}
+                  onClick={() => handleFinish(p)}
+                  className={`flex items-center justify-between rounded-lg border px-3 py-2.5 text-left text-xs font-semibold transition-all ${plazo === p ? 'border-[#FF8000] bg-orange-50 text-[#FF8000]' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'} disabled:opacity-60`}
+                >
+                  {p}
+                  {phase === 'loading' && plazo === p && <Loader2 size={13} className="animate-spin" />}
+                </button>
+              ))}
+            </div>
+
+            <AnimatePresence>
+              {errorMessage && (
+                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-xs text-red-500">
+                  {errorMessage}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            <button type="button" onClick={() => setStep(4)} disabled={phase === 'loading'} className="text-xs font-semibold text-slate-400 hover:text-slate-600 disabled:opacity-60">Volver</button>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
