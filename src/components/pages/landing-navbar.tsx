@@ -14,7 +14,7 @@ export function LandingNavbar() {
     { label: 'Servicios', href: '/servicios' },
     { label: 'Nosotros', href: '/nosotros' },
     { label: 'Vender Tu Vivienda', href: '/vendetuvivienda' },
-    { label: 'Inmobiliarias', href: '/inmobiliarias' },
+    { label: 'Inmobiliarias en tu zona', href: '/inmobiliarias' },
   ];
 
   const navigate = (href: string) => {

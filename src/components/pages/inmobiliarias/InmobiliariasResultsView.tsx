@@ -15,10 +15,18 @@ export function InmobiliariasResultsView({
   initialQuery: string;
   searchPoint: { lat: number; lng: number };
 }) {
-  const { agencies, isLive } = useInmobiliarias();
+  const { agencies: allAgencies, isLive } = useInmobiliarias();
   const [sort, setSort] = useState<SortOption>('distancia');
   const [maxDistanceKm, setMaxDistanceKm] = useState<number | null>(null);
   const [specialty, setSpecialty] = useState<string | null>(null);
+
+  // Esta vista filtra por lugar (distancia a un punto buscado) — las
+  // inmobiliarias sin ubicación fijada no tienen cómo calcularse aquí, se
+  // excluyen de este listado aunque sigan contando en el resto del sitio.
+  const agencies = useMemo(
+    () => allAgencies.filter((a) => a.lat != null && a.lng != null),
+    [allAgencies],
+  );
 
   const cityName = initialQuery.split(',')[0];
 
@@ -30,7 +38,7 @@ export function InmobiliariasResultsView({
   const distances = useMemo(() => {
     const map = new Map<string, number>();
     for (const agency of agencies) {
-      map.set(agency.id, haversineKm(searchPoint, { lat: agency.lat, lng: agency.lng }));
+      map.set(agency.id, haversineKm(searchPoint, { lat: agency.lat as number, lng: agency.lng as number }));
     }
     return map;
   }, [agencies, searchPoint]);
@@ -97,7 +105,7 @@ export function InmobiliariasResultsView({
 
       {/* Filtros — sticky justo debajo del navbar */}
       <div
-        className="z-30 border-b border-slate-100 bg-white/95 px-6 py-4 backdrop-blur-sm"
+        className="z-30 border-b border-slate-100 bg-white px-6 py-4"
         style={{ position: 'sticky', top: NAVBAR_HEIGHT }}
       >
         <div className="mx-auto w-full max-w-[1400px]">

@@ -3,10 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Building2, ChevronLeft, ChevronRight, MapPinned, MessageCircle, ShieldCheck, X } from 'lucide-react';
 import { AgencySearchBar, type SearchSuggestion } from '../../ui/AgencySearchBar';
 import { AgencyCard } from '../../ui/AgencyCard';
-import { StaticProvinceMap } from '../../ui/StaticProvinceMap';
 import { PlaceholderImage } from '../../ui/PlaceholderImage';
 import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
-import { buildProvinceIndex } from '@/data/province-index';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo } from '@/lib/utils';
 
@@ -37,11 +35,10 @@ const STAT_ICONS = [Building2, MapPinned, ShieldCheck];
 export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSuggestion) => void }) {
   const { agencies, cityImages } = useInmobiliarias();
   const allCities = useMemo(() => getAllCitiesWithCounts(agencies), [agencies]);
-  const provinceIndex = useMemo(() => buildProvinceIndex(agencies), [agencies]);
   const totalYearsExperience = useMemo(() => agencies.reduce((sum, a) => sum + a.anos_experiencia, 0), [agencies]);
   const featured = agencies.slice(0, 6);
   const citiesWithPresence = allCities.filter((c) => c.count > 0).length;
-  const cityScrollRef = useRef<HTMLDivElement>(null);
+  const featuredScrollRef = useRef<HTMLDivElement>(null);
 
   const [toast, setToast] = useState<{ city: string; nearby: string[] } | null>(null);
 
@@ -60,10 +57,13 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
     onSearch({ label: `${c.city}, ${c.province}`, lat: c.lat, lng: c.lng });
   };
 
-  const scrollCarousel = (direction: 'left' | 'right') => {
-    const el = cityScrollRef.current;
+  const scrollFeatured = (direction: 'left' | 'right') => {
+    const el = featuredScrollRef.current;
     if (!el) return;
-    const cardWidth = 208 + 16;
+    const firstCard = el.children[0] as HTMLElement | undefined;
+    if (!firstCard) return;
+    const gap = window.innerWidth >= 640 ? 16 : 12;
+    const cardWidth = firstCard.offsetWidth + gap;
     el.scrollBy({ left: direction === 'right' ? cardWidth : -cardWidth, behavior: 'smooth' });
   };
 
@@ -73,7 +73,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           -mt-[72px]: el navbar de esta página es transparente y "sticky" (reserva su
           propio alto en el flujo normal); esto sube el hero para que el vídeo se vea
           detrás del navbar en vez de dejar un hueco blanco encima. */}
-      <section className="relative -mt-[72px] flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-4 pb-20 pt-24 text-center text-white sm:min-h-[78vh] sm:pb-28 sm:pt-28">
+      <section className="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-4 pb-20 pt-24 text-center text-white sm:min-h-[78vh] sm:pb-28 sm:pt-28">
         <div className="absolute inset-0">
           <video
             className="h-full w-full object-cover"
@@ -148,180 +148,190 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
         </Reveal>
       </div>
 
-      <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-10 sm:pb-20 sm:pt-16">
-        {/* CTA — al principio del contenido */}
-        <Reveal>
-          <div className="flex flex-col items-center justify-between gap-5 rounded-2xl bg-gradient-to-br from-[#0F172A] to-[#1a2340] px-5 py-7 text-center shadow-xl shadow-slate-900/20 sm:flex-row sm:px-8 sm:py-8 sm:text-left">
-            <div>
-              <p className="text-base font-bold text-white md:text-lg">¿Tienes una inmobiliaria y quieres aparecer aquí?</p>
-              <p className="mt-1 text-sm text-white/60">Únete a las inmobiliarias que ya trabajan con Cosiris.</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => navigateTo('/captacion_inmobiliarias')}
-              className="group shrink-0 rounded-full bg-[#FF8000] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#FF8000]/25 transition-all duration-200 hover:bg-[#E67300] hover:shadow-xl hover:shadow-[#FF8000]/30 active:scale-95"
-            >
-              Únete a Cosiris <ChevronRight size={14} className="ml-1 inline-block transition-transform group-hover:translate-x-0.5" />
-            </button>
-          </div>
-        </Reveal>
-
-        {/* FEATURED */}
-        <Reveal>
-          <div className="mb-5 mt-10 flex items-end justify-between sm:mt-12">
-            <h2 className="text-lg font-black tracking-[-0.01em] text-[#0F172A] sm:text-xl md:text-2xl">Inmobiliarias destacadas</h2>
-          </div>
-          <div className="relative">
-            <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 sm:gap-4">
-              {featured.map((agency) => (
-                <div key={agency.id} className="w-64 shrink-0 snap-start sm:w-72">
-                  <AgencyCard agency={agency} />
-                </div>
-              ))}
-            </div>
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white to-transparent sm:w-16" />
-          </div>
-        </Reveal>
-
-        {/* BUSCAR POR CIUDAD + MAPA — carrusel con flechas, mapa a la derecha en lg */}
-        <Reveal delay={0.05}>
-          <div className="mb-4 mt-10 flex items-end justify-between sm:mb-5 sm:mt-16">
-            <h2 className="text-lg font-black tracking-[-0.01em] text-[#0F172A] sm:text-xl md:text-2xl">Busca por ciudad</h2>
-            <button
-              type="button"
-              onClick={() => navigateTo('/inmobiliarias')}
-              className="flex items-center gap-1 text-xs font-semibold text-[#FF8000] hover:underline shrink-0"
-            >
-              Ver todas <ChevronRight size={12} />
-            </button>
-          </div>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.6fr_1fr]">
-            {/* min-w-0: el carrusel interno tiene overflow-x-auto, pero sin esto
-                un grid item con contenido scrollable sigue reportando su ancho de
-                contenido COMPLETO como mínimo — eso empuja esta columna a ocupar
-                casi todo el ancho y aplasta la del mapa (1fr) a una franja mínima. */}
-            <div className="relative flex min-w-0 items-center">
+      {/* CTA — tarjeta oscura sobre fondo blanco */}
+      <div className="bg-white">
+        <div className="mx-auto w-full max-w-6xl px-4 pb-0 pt-8 sm:pb-0 sm:pt-14">
+          <Reveal>
+            <div className="flex flex-col items-center justify-between gap-5 rounded-2xl bg-gradient-to-br from-[#0F172A] to-[#1a2340] px-5 py-7 text-center shadow-xl shadow-slate-900/20 sm:flex-row sm:px-8 sm:py-8 sm:text-left">
+              <div>
+                <p className="text-base font-bold text-white md:text-lg">¿Tienes una inmobiliaria y quieres aparecer aquí?</p>
+                <p className="mt-1 text-sm text-white/60">Únete a las inmobiliarias que ya trabajan con Cosiris.</p>
+              </div>
               <button
                 type="button"
-                onClick={() => scrollCarousel('left')}
+                onClick={() => navigateTo('/inmobiliarias/planes')}
+                className="group shrink-0 rounded-full bg-[#FF8000] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#FF8000]/25 transition-all duration-200 hover:bg-[#E67300] hover:shadow-xl hover:shadow-[#FF8000]/30 active:scale-95"
+              >
+                Únete a Cosiris <ChevronRight size={14} className="ml-1 inline-block transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+
+      {/* FEATURED — fondo slate, carrusel con flechas */}
+      <div className="bg-slate-50">
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
+          <Reveal>
+            <div className="mb-5 flex items-end justify-between">
+              <h2 className="text-lg font-black tracking-[-0.01em] text-[#0F172A] sm:text-xl md:text-2xl">Inmobiliarias destacadas</h2>
+            </div>
+            <div className="relative flex items-center">
+              <button
+                type="button"
+                onClick={() => scrollFeatured('left')}
                 className="absolute left-2 z-10 hidden h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg shadow-slate-900/15 transition-all hover:scale-105 hover:shadow-xl active:scale-95 sm:flex"
                 aria-label="Anterior"
               >
                 <ChevronLeft size={18} className="text-slate-700" />
               </button>
               <div
-                ref={cityScrollRef}
-                className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden sm:gap-4"
+                ref={featuredScrollRef}
+                className="flex gap-3 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden sm:gap-4"
               >
-                {allCities.map((c) => (
-                  <button
-                    key={c.city}
-                    type="button"
-                    onClick={() => handleCityClick(c)}
-                    className="group relative h-28 w-44 shrink-0 snap-start overflow-hidden rounded-xl shadow-md shadow-slate-900/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#FF8000]/10 sm:h-32 sm:w-52"
-                  >
-                    {cityImages[c.city] ? (
-                      <img
-                        src={cityImages[c.city]}
-                        alt={c.city}
-                        className="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <PlaceholderImage className="h-full w-full" label="Foto pendiente" />
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/10 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#FF8000]/0 via-transparent to-transparent transition-all duration-300 group-hover:from-[#FF8000]/20" />
-                    <div className="absolute inset-x-0 bottom-0 p-2.5 text-left">
-                      <p className="text-sm font-bold text-white drop-shadow-sm">{c.city}</p>
-                      <p className="text-[11px] text-white/70">{c.count} {c.count === 1 ? 'inmobiliaria' : 'inmobiliarias'}</p>
-                    </div>
-                  </button>
+                {featured.map((agency) => (
+                  <div key={agency.id} className="w-64 shrink-0 sm:w-72">
+                    <AgencyCard agency={agency} />
+                  </div>
                 ))}
               </div>
               <button
                 type="button"
-                onClick={() => scrollCarousel('right')}
+                onClick={() => scrollFeatured('right')}
                 className="absolute right-2 z-10 hidden h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg shadow-slate-900/15 transition-all hover:scale-105 hover:shadow-xl active:scale-95 sm:flex"
                 aria-label="Siguiente"
               >
                 <ChevronRight size={18} className="text-slate-700" />
               </button>
             </div>
-            <div className="flex flex-col">
-              <div className="relative">
-                <AnimatePresence>
-                  {toast && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                      transition={{ duration: 0.25, ease: [0.19, 1, 0.22, 1] }}
-                      className="absolute bottom-full left-0 right-0 z-30 mb-3 overflow-hidden rounded-xl border border-[#FF8000]/20 bg-[#0F172A] shadow-xl shadow-black/30"
-                    >
-                      <div className="flex items-start gap-3 p-4">
-                        <div className="mt-0.5 shrink-0">
-                          <MapPinned size={18} className="text-[#FF8000]" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-white">No hay inmobiliarias en {toast.city} todavía</p>
-                          <p className="mt-1 text-xs text-white/60">
-                            Prueba en{' '}
-                            {toast.nearby.map((name, i) => (
-                              <span key={name}>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const target = allCities.find((ac) => ac.city === name);
-                                    if (target) onSearch({ label: `${target.city}, ${target.province}`, lat: target.lat, lng: target.lng });
-                                  }}
-                                  className="font-semibold text-[#FF8000] underline underline-offset-2 hover:text-orange-400"
-                                >
-                                  {name}
-                                </button>
-                                {i < toast.nearby.length - 1 && <span className="text-white/40">{', '}</span>}
-                              </span>
-                            ))}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setToast(null)}
-                          className="shrink-0 rounded-full p-1 text-white/40 transition-colors hover:bg-white/10 hover:text-white"
-                        >
-                          <X size={14} />
-                        </button>
+          </Reveal>
+        </div>
+      </div>
+
+      {/* BUSCAR POR CIUDAD + EXPLORADOR — fondo blanco */}
+      <div className="bg-white">
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
+          <Reveal delay={0.05}>
+            <div className="mb-5 flex items-end justify-between">
+              <h2 className="text-lg font-black tracking-[-0.01em] text-[#0F172A] sm:text-xl md:text-2xl">Busca por ciudad</h2>
+              <button
+                type="button"
+                onClick={() => navigateTo('/inmobiliarias')}
+                className="flex items-center gap-1 text-xs font-semibold text-[#FF8000] hover:underline shrink-0"
+              >
+                Ver todas <ChevronRight size={12} />
+              </button>
+            </div>
+            <div className="relative">
+              <AnimatePresence>
+                {toast && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                    transition={{ duration: 0.25, ease: [0.19, 1, 0.22, 1] }}
+                    className="absolute bottom-full left-0 right-0 z-30 mb-3 overflow-hidden rounded-xl border border-[#FF8000]/20 bg-[#0F172A] shadow-xl shadow-black/30"
+                  >
+                    <div className="flex items-start gap-3 p-4">
+                      <div className="mt-0.5 shrink-0">
+                        <MapPinned size={18} className="text-[#FF8000]" />
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">Explora en el mapa</p>
-                <div className="h-56 overflow-hidden rounded-xl shadow-lg shadow-slate-900/10 sm:h-64">
-                  <StaticProvinceMap provinces={provinceIndex} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-bold text-white">No hay inmobiliarias en {toast.city} todavía</p>
+                        <p className="mt-1 text-xs text-white/60">
+                          Prueba en{' '}
+                          {toast.nearby.map((name, i) => (
+                            <span key={name}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const target = allCities.find((ac) => ac.city === name);
+                                  if (target) onSearch({ label: `${target.city}, ${target.province}`, lat: target.lat, lng: target.lng });
+                                }}
+                                className="font-semibold text-[#FF8000] underline underline-offset-2 hover:text-orange-400"
+                              >
+                                {name}
+                              </button>
+                              {i < toast.nearby.length - 1 && <span className="text-white/40">{', '}</span>}
+                            </span>
+                          ))}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setToast(null)}
+                        className="shrink-0 rounded-full p-1 text-white/40 transition-colors hover:bg-white/10 hover:text-white"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <div
+                className="group relative overflow-hidden"
+                style={{
+                  WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)',
+                  maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)',
+                }}
+              >
+                <div
+                  className="animate-marquee flex w-max gap-3 py-2 sm:gap-4"
+                  style={{ animationDuration: `${allCities.length * 7}s` }}
+                >
+                  {[...allCities, ...allCities].map((c, index) => (
+                    <button
+                      key={`${c.city}-${index}`}
+                      type="button"
+                      onClick={() => handleCityClick(c)}
+                      className="group relative h-28 w-44 shrink-0 overflow-hidden rounded-xl shadow-md shadow-slate-900/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#FF8000]/10 sm:h-32 sm:w-52"
+                    >
+                      {cityImages[c.city] ? (
+                        <img
+                          src={cityImages[c.city]}
+                          alt={c.city}
+                          className="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <PlaceholderImage className="h-full w-full" label="Foto pendiente" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/10 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#FF8000]/0 via-transparent to-transparent transition-all duration-300 group-hover:from-[#FF8000]/20" />
+                      <div className="absolute inset-x-0 bottom-0 p-2.5 text-left">
+                        <p className="text-sm font-bold text-white drop-shadow-sm">{c.city}</p>
+                        <p className="text-[11px] text-white/70">{c.count} {c.count === 1 ? 'inmobiliaria' : 'inmobiliarias'}</p>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        </div>
+      </div>
 
-        {/* POR QUÉ COSIRIS */}
-        <Reveal delay={0.05}>
-          <div className="mb-5 mt-12 text-center sm:mb-6 sm:mt-16">
-            <h2 className="text-lg font-black tracking-[-0.01em] text-[#0F172A] sm:text-xl md:text-2xl">¿Por qué este directorio?</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {WHY_COSIRIS.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="group rounded-xl border border-slate-100 bg-white p-6 shadow-sm shadow-slate-900/5 transition-all duration-300 hover:-translate-y-1 hover:border-[#FF8000]/20 hover:shadow-lg hover:shadow-[#FF8000]/5">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FF8000]/10 text-[#FF8000] transition-all duration-300 group-hover:bg-[#FF8000] group-hover:text-white">
-                  <Icon size={22} />
+      {/* POR QUÉ COSIRIS — fondo slate */}
+      <div className="bg-slate-50">
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
+          <Reveal delay={0.05}>
+            <div className="mb-8 text-center">
+              <h2 className="text-lg font-black tracking-[-0.01em] text-[#0F172A] sm:text-xl md:text-2xl">¿Por qué este directorio?</h2>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {WHY_COSIRIS.map(({ icon: Icon, title, text }) => (
+                <div key={title} className="group rounded-xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 transition-all duration-300 hover:-translate-y-1 hover:border-[#FF8000]/20 hover:shadow-lg hover:shadow-[#FF8000]/5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FF8000]/10 text-[#FF8000] transition-all duration-300 group-hover:bg-[#FF8000] group-hover:text-white">
+                    <Icon size={22} />
+                  </div>
+                  <p className="mt-4 text-sm font-bold text-slate-900">{title}</p>
+                  <p className="mt-1.5 text-xs leading-relaxed text-slate-500">{text}</p>
                 </div>
-                <p className="mt-4 text-sm font-bold text-slate-900">{title}</p>
-                <p className="mt-1.5 text-xs leading-relaxed text-slate-500">{text}</p>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-      </main>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </div>
     </div>
   );
 }

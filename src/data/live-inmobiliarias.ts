@@ -32,11 +32,11 @@ type DirectorioRow = {
   lng: number | null;
 };
 
-function mapRow(row: DirectorioRow): InmobiliariaPublica | null {
-  // Sin ubicación no hay pin que mostrar en un directorio basado en mapa —
-  // se excluye en vez de inventar una coordenada.
-  if (row.lat == null || row.lng == null) return null;
-
+function mapRow(row: DirectorioRow): InmobiliariaPublica {
+  // Sin ubicación no hay pin que mostrar en mapa/ciudad/distancia, pero la
+  // inmobiliaria sigue existiendo: debe contar en estadísticas y aparecer si
+  // se busca por nombre. Cada consumidor basado en ubicación (AgencyMap,
+  // city-index, resultados por distancia) filtra lat/lng == null por su cuenta.
   return {
     id: row.id,
     nombre_comercial: row.nombre_comercial,
@@ -83,9 +83,7 @@ export async function fetchLiveInmobiliarias(): Promise<InmobiliariaPublica[]> {
       return [];
     }
 
-    return (data as DirectorioRow[])
-      .map(mapRow)
-      .filter((a): a is InmobiliariaPublica => a !== null);
+    return (data as DirectorioRow[]).map(mapRow);
   } catch (err) {
     console.warn('[live-inmobiliarias] Error inesperado leyendo el directorio real:', err);
     return [];

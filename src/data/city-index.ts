@@ -14,6 +14,9 @@ export function buildCityIndex(agencies: InmobiliariaPublica[]): CityIndexEntry[
   const acc = new Map<string, { city: string; province: string; count: number; latSum: number; lngSum: number }>();
 
   for (const agency of agencies) {
+    // Sin lat/lng no hay forma de ubicar la ciudad en el mapa — se excluye del
+    // índice (que alimenta el buscador/filtro por lugar), no de la lista general.
+    if (agency.lat == null || agency.lng == null) continue;
     const city = agency.poblacion.trim();
     const province = agency.provincia.trim();
     const key = `${city}|${province}`;

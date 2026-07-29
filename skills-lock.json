@@ -5,6 +5,12 @@
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
       "computedHash": "5d8f869c7e683e4d4fc7aa7a2b0d370b0ad54a81d9cffb48736ffc47759b3f4d"
+    },
+    "impeccable": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/impeccable/SKILL.md",
+      "computedHash": "61d3dfbf42e1e930fb3624cee4ebcd99667193e3d3aaca4cb663660293e7cae6"
     }
   }
 }

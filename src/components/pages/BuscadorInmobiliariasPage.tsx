@@ -28,19 +28,10 @@ export function BuscadorInmobiliariasPage() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
-  const handleBack = () => {
-    setQuery('');
-    setSearchPoint(null);
-    window.history.replaceState({}, '', '/inmobiliarias');
-  };
-
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased">
       <InmobiliariasNavbar
-        showBack={!!searchPoint}
-        onBack={handleBack}
         searchProps={searchPoint ? { initialValue: query, onSelect: handleSearch } : undefined}
-        transparent={!searchPoint}
       />
 
       {searchPoint ? (

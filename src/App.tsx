@@ -16,6 +16,8 @@ import { GraciasVenderPage } from './components/pages/GraciasVenderPage';
 import { GraciasPage } from './components/pages/GraciasPage';
 import { BuscadorInmobiliariasPage } from './components/pages/BuscadorInmobiliariasPage';
 import { InmobiliariaPerfilPage } from './components/pages/InmobiliariaPerfilPage';
+import { PlanesInmobiliariasPage } from './components/pages/PlanesInmobiliariasPage';
+import { RegistroInmobiliariaPage } from './components/pages/RegistroInmobiliariaPage';
 import { InmobiliariasProvider } from './context/InmobiliariasContext';
 
 declare global {
@@ -87,6 +89,21 @@ export default function App() {
       page_location: window.location.href,
     });
   }, [currentLocationKey]);
+
+  // Estas dos van ANTES del prefijo genérico /inmobiliarias/:id — si no,
+  // "planes"/"registro" se interpretarían como un id de inmobiliaria.
+  if (currentPath === '/inmobiliarias/planes') {
+    return (
+      <>
+        <PlanesInmobiliariasPage />
+        <ContactModal />
+      </>
+    );
+  }
+
+  if (currentPath === '/inmobiliarias/registro') {
+    return <RegistroInmobiliariaPage />;
+  }
 
   if (currentPath.startsWith('/inmobiliarias/')) {
     const agencyId = decodeURIComponent(currentPath.slice('/inmobiliarias/'.length));

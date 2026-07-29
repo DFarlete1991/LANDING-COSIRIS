@@ -36,8 +36,9 @@ export type InmobiliariaPublica = {
   num_opiniones?: number;
   idiomas: string[];
   especialidades: string[];
-  lat: number;
-  lng: number;
+  /** null cuando la inmobiliaria (típicamente un cliente de prueba recién aprobado) no fijó su ubicación en el mapa — sigue siendo válida para búsqueda por nombre y estadísticas, pero se excluye de mapa/ciudad/distancia. */
+  lat: number | null;
+  lng: number | null;
 };
 
 export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [

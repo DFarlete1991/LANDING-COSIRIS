@@ -13,6 +13,9 @@ export function buildProvinceIndex(agencies: InmobiliariaPublica[]): ProvinceInd
   const acc = new Map<string, { province: string; count: number; latSum: number; lngSum: number }>();
 
   for (const agency of agencies) {
+    // Sin lat/lng no hay forma de ubicar la provincia en el mini mapa —
+    // se excluye del índice, no de la lista general de agencias.
+    if (agency.lat == null || agency.lng == null) continue;
     const existing = acc.get(agency.provincia);
     if (existing) {
       existing.count += 1;

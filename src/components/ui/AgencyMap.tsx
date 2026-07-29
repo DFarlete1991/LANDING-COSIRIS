@@ -18,7 +18,9 @@ const mapOptions: google.maps.MapOptions = {
   ],
 };
 
-function AgencyInfoWindow({ agency, distanceKm }: { agency: InmobiliariaPublica; distanceKm: number | null }) {
+type LocatedAgency = InmobiliariaPublica & { lat: number; lng: number };
+
+function AgencyInfoWindow({ agency, distanceKm }: { agency: LocatedAgency; distanceKm: number | null }) {
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${agency.lat},${agency.lng}`;
 
   return (
@@ -105,9 +107,15 @@ export function AgencyMap({
     mapRef.current = null;
   }, []);
 
-  const selectedAgency = selectedId ? agencies.find((a) => a.id === selectedId) ?? null : null;
+  // Agencias sin ubicación (p. ej. clientes de prueba que no fijaron el mapa)
+  // no tienen pin que mostrar — se excluyen solo de este componente.
+  const locatedAgencies: LocatedAgency[] = agencies.filter(
+    (a): a is LocatedAgency => a.lat != null && a.lng != null,
+  );
 
-  const distanceFor = (agency: InmobiliariaPublica) =>
+  const selectedAgency = selectedId ? locatedAgencies.find((a) => a.id === selectedId) ?? null : null;
+
+  const distanceFor = (agency: LocatedAgency) =>
     searchPoint ? haversineKm(searchPoint, { lat: agency.lat, lng: agency.lng }) : null;
 
   if (!gmapsAvailable()) {
@@ -144,7 +152,7 @@ export function AgencyMap({
           />
         )}
 
-        {agencies.map((agency) => (
+        {locatedAgencies.map((agency) => (
           <Marker
             key={agency.id}
             position={{ lat: agency.lat, lng: agency.lng }}

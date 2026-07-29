@@ -27,8 +27,13 @@ function VideoSection({ agency }: { agency: InmobiliariaPublica }) {
 }
 
 function LocationSection({ agency, searchPoint }: { agency: InmobiliariaPublica; searchPoint: { lat: number; lng: number } | null }) {
-  const distanceKm = searchPoint ? haversineKm(searchPoint, { lat: agency.lat, lng: agency.lng }) : null;
-  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${agency.lat},${agency.lng}`;
+  // Sin coordenadas fijadas no hay nada que pintar en el mapa ni "cómo
+  // llegar" que calcular — se oculta la sección entera en vez de romper.
+  if (agency.lat == null || agency.lng == null) return null;
+
+  const location = { lat: agency.lat, lng: agency.lng };
+  const distanceKm = searchPoint ? haversineKm(searchPoint, location) : null;
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`;
 
   return (
     <div>
@@ -44,7 +49,7 @@ function LocationSection({ agency, searchPoint }: { agency: InmobiliariaPublica;
         <AgencyMap
           agencies={[agency]}
           searchPoint={searchPoint}
-          center={[agency.lat, agency.lng]}
+          center={[location.lat, location.lng]}
           zoom={14}
         />
       </div>
@@ -120,10 +125,20 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
     return lat && lng ? { lat: Number(lat), lng: Number(lng) } : null;
   }, []);
 
+  /** Vuelve a los resultados de búsqueda si venía de ahí, o al home si no. */
+  const backUrl = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
+    const lat = params.get('lat');
+    const lng = params.get('lng');
+    if (q && lat && lng) return `/inmobiliarias?${params.toString()}`;
+    return '/inmobiliarias';
+  }, []);
+
   if (!agency) {
     return (
       <div className="flex min-h-screen flex-col">
-        <InmobiliariasNavbar />
+      <InmobiliariasNavbar />
         <main className="mx-auto flex flex-1 flex-col items-center justify-center px-4 text-center">
           <p className="text-lg font-bold text-slate-900">No encontramos esta inmobiliaria</p>
           <button
@@ -147,6 +162,15 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
         className="relative h-48 w-full overflow-hidden md:h-64"
         style={agency.banner_url ? undefined : { background: `linear-gradient(135deg, ${agency.color_hex} 0%, #0F172A 140%)` }}
       >
+        <button
+          type="button"
+          onClick={() => navigateTo(backUrl)}
+          className="absolute top-4 left-4 z-10 flex items-center gap-1.5 rounded-full bg-white/90 px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-lg shadow-black/10 backdrop-blur-sm transition-all hover:bg-white hover:text-slate-900 active:scale-95"
+          aria-label="Volver a resultados"
+        >
+          <ArrowLeft size={16} />
+          Volver
+        </button>
         {agency.banner_url ? (
           <>
             <img src={agency.banner_url} alt="" className="h-full w-full object-cover" />
@@ -255,9 +279,11 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
               <VideoSection agency={agency} />
             </div>
 
-            <div className="border-t border-slate-100 pt-7">
-              <LocationSection agency={agency} searchPoint={searchPoint} />
-            </div>
+            {agency.lat != null && agency.lng != null && (
+              <div className="border-t border-slate-100 pt-7">
+                <LocationSection agency={agency} searchPoint={searchPoint} />
+              </div>
+            )}
           </div>
 
           <aside>

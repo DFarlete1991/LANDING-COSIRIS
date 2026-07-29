@@ -36,5 +36,27 @@
   }
 }
 
+/* Carrusel "ruleta" de inmobiliarias destacadas: la lista de tarjetas se
+   duplica una vez en el JSX y esta animación desplaza exactamente el 50% del
+   ancho total (= una copia completa), así el loop es perfectamente continuo. */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee-scroll linear infinite;
+}
+
+.group:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
+
 
 
