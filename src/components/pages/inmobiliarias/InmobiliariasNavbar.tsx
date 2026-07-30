@@ -176,7 +176,13 @@ export function InmobiliariasNavbar({
           <button
             key={link.href}
             type="button"
-            onClick={() => navigateTo(link.href)}
+            onClick={() => {
+              if (link.label === 'Inmobiliarias en tu zona') {
+                const el = document.getElementById('inicio-directorio');
+                if (el) { el.scrollIntoView({ behavior: 'smooth' }); return; }
+              }
+              navigateTo(link.href);
+            }}
             className={`rounded-full px-3 py-2 text-[12px] font-semibold whitespace-nowrap text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95 ${link.hideOnMobile ? 'hidden lg:inline-flex' : 'inline-flex'}`}
           >
             {link.label}
@@ -345,7 +351,14 @@ export function InmobiliariasNavbar({
                 <button
                   key={link.href}
                   type="button"
-                  onClick={() => { setMobileMenuOpen(false); navigateTo(link.href); }}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (link.label === 'Inmobiliarias en tu zona') {
+                      const el = document.getElementById('inicio-directorio');
+                      if (el) { el.scrollIntoView({ behavior: 'smooth' }); return; }
+                    }
+                    navigateTo(link.href);
+                  }}
                   className="rounded-lg px-4 py-3 text-left text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
                 >
                   {link.label}

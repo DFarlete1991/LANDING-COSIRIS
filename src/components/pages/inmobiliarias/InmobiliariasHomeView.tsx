@@ -99,7 +99,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
   return (
     <div>
       {/* HERO — video de fondo real, overlay oscuro + buscador */}
-      <section className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-4 pb-20 pt-28 text-center text-white sm:min-h-[92vh] sm:pb-28 sm:pt-32">
+      <section id="inicio-directorio" className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-4 pb-20 pt-28 text-center text-white sm:min-h-[92vh] sm:pb-28 sm:pt-32">
         <div className="absolute inset-0">
           <video
             className="h-full w-full object-cover"
@@ -183,7 +183,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                   Red de inmobiliarias
                 </p>
                 <h2 className="mt-3 text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
-                  Propietarios de toda España ya confían en nosotros para encontrar su inmobiliaria ideal que les ayude a vender su propiedad
+                  Propietarios de toda España ya confían en nosotros para encontrar su inmobiliaria ideal
                 </h2>
               </div>
               <div className="mt-6">
