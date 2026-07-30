@@ -1,7 +1,7 @@
-const GMAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY as string | undefined;
+import { GOOGLE_MAPS_API_KEY } from '@/lib/google-maps-loader';
 
 export function gmapsAvailable(): boolean {
-  return !!GMAPS_KEY;
+  return !!GOOGLE_MAPS_API_KEY;
 }
 
 type MarkerDef = {
@@ -38,6 +38,6 @@ export function staticMapUrl(
     url += `&markers=${style}|${coords.join('|')}`;
   }
 
-  url += `&key=${GMAPS_KEY}`;
+  url += `&key=${GOOGLE_MAPS_API_KEY}`;
   return url;
 }

@@ -23,6 +23,8 @@ export type InmobiliariaPublica = {
   /** Encuadre CSS object-position ("X% Y%") guardado por el cliente, estilo WhatsApp. */
   foto_pos?: string | null;
   banner_url: string | null;
+  /** Foto de apoyo del hero del perfil público (oficina, equipo, agente) — opcional, distinta del banner. */
+  hero_image_url?: string | null;
   color_hex: string;
   texto_presentacion: string;
   media_presentacion_url: string | null;
@@ -36,6 +38,8 @@ export type InmobiliariaPublica = {
   num_opiniones?: number;
   idiomas: string[];
   especialidades: string[];
+  /** ID de Google Places para obtener reseñas reales vía Places API. */
+  google_place_id?: string | null;
   /** null cuando la inmobiliaria (típicamente un cliente de prueba recién aprobado) no fijó su ubicación en el mapa — sigue siendo válida para búsqueda por nombre y estadísticas, pero se excluye de mapa/ciudad/distancia. */
   lat: number | null;
   lng: number | null;
@@ -65,6 +69,7 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     precio_medio: 425000,
     rating: 4.8,
     num_opiniones: 92,
+    google_place_id: 'REEMPLAZA_CON_TU_PLACE_ID',
     idiomas: ['Español', 'Inglés'],
     especialidades: ['Compraventa', 'Pisos', 'Ático'],
     lat: 40.4200,

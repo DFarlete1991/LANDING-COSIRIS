@@ -4,17 +4,38 @@ import { Briefcase, MapPin } from 'lucide-react';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { haversineKm, formatDistanceKm } from '@/lib/geo';
 import { gmapsAvailable } from '@/lib/map-static';
+import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
 
 const containerStyle = { width: '100%', height: '100%' };
 
 const mapOptions: google.maps.MapOptions = {
   streetViewControl: false,
   mapTypeControl: false,
-  fullscreenControl: false,
+  fullscreenControl: true,
   zoomControl: true,
   styles: [
     { featureType: 'poi', stylers: [{ visibility: 'off' }] },
     { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+    {
+      featureType: 'landscape',
+      elementType: 'geometry.fill',
+      stylers: [{ color: '#f7f5f0' }],
+    },
+    {
+      featureType: 'road',
+      elementType: 'geometry',
+      stylers: [{ color: '#ffffff' }, { lightness: -8 }],
+    },
+    {
+      featureType: 'water',
+      elementType: 'geometry.fill',
+      stylers: [{ color: '#e1e8ed' }],
+    },
+    {
+      featureType: 'road',
+      elementType: 'labels.text.fill',
+      stylers: [{ color: '#9ca3af' }, { lightness: 10 }],
+    },
   ],
 };
 
@@ -67,7 +88,7 @@ const AGENCY_ICON = (): google.maps.Symbol => ({
   fillOpacity: 1,
   strokeColor: '#FFFFFF',
   strokeWeight: 3,
-  scale: 10,
+  scale: 11,
 });
 
 const SEARCH_ICON = (): google.maps.Symbol => ({
@@ -90,11 +111,7 @@ export function AgencyMap({
   center: [number, number];
   zoom: number;
 }) {
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_KEY as string,
-    version: 'weekly',
-  });
+  const { isLoaded } = useJsApiLoader(googleMapsLoaderOptions);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);

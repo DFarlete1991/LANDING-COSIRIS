@@ -30,6 +30,7 @@ type DirectorioRow = {
   especialidades: string[] | null;
   lat: number | null;
   lng: number | null;
+  hero_image_url: string | null;
 };
 
 function mapRow(row: DirectorioRow): InmobiliariaPublica {
@@ -63,6 +64,7 @@ function mapRow(row: DirectorioRow): InmobiliariaPublica {
     especialidades: row.especialidades ?? [],
     lat: row.lat,
     lng: row.lng,
+    hero_image_url: row.hero_image_url,
   };
 }
 

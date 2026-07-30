@@ -4,6 +4,7 @@ import { GoogleMap, MarkerF, useJsApiLoader } from '@react-google-maps/api';
 import { ArrowRight, Check, CheckCircle2, ChevronDown, ImageIcon, Link2, Loader2, MapPin, Search, Video, Upload, X } from 'lucide-react';
 import { navigateTo } from '@/lib/utils';
 import { gmapsAvailable } from '@/lib/map-static';
+import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
 
 const AVAILABLE_LANGUAGES = [
   'Español', 'Inglés', 'Francés', 'Alemán', 'Italiano', 'Portugués',
@@ -17,9 +18,7 @@ const AVAILABLE_SPECIALTIES = [
 ];
 
 const CRM_API_URL = import.meta.env.VITE_CRM_API_URL ?? 'http://localhost:3000';
-const GOOGLE_MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY as string | undefined;
 const MADRID = { lat: 40.4168, lng: -3.7038 };
-const MAP_LIBRARIES: 'places'[] = ['places'];
 
 const baseInputClass =
   'w-full rounded-xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#FF8000] focus:bg-white focus-visible:ring-2 focus-visible:ring-[#FF8000]/20 disabled:opacity-50';
@@ -313,11 +312,7 @@ function LocationField({
   const hasPosition = place != null;
   const position = hasPosition ? { lat: place.lat, lng: place.lng } : MADRID;
 
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: GOOGLE_MAPS_KEY ?? '',
-    libraries: MAP_LIBRARIES,
-  });
+  const { isLoaded } = useJsApiLoader(googleMapsLoaderOptions);
 
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
   const getGeocoder = () => {
