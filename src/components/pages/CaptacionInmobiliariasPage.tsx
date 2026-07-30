@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, ChevronDown } from 'lucide-react';
+import { Building2, Check, ChevronDown } from 'lucide-react';
 import { FormNavbar } from '../ui/form-navbar';
-import { HeroSection } from '../ui/hero-1';
 import { SharedLandingSections } from '../ui/shared-landing-sections';
 
 const PROVINCES = [
@@ -470,6 +469,76 @@ function CaptacionForm() {
   );
 }
 
+function InmobiliariasHero() {
+  return (
+    <section className="relative mx-auto w-full max-w-3xl px-4 pt-12 pb-2 md:pt-16">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: EXPO }}
+        className="mx-auto mb-6 flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 shadow-sm"
+      >
+        <Building2 size={14} className="text-[#FF8000]" />
+        <span className="text-xs font-semibold text-slate-700">Especialistas en marketing para inmobiliarias</span>
+      </motion.div>
+
+      <motion.h1
+        initial={{ opacity: 0, y: 24, filter: 'blur(6px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{ duration: 0.7, ease: EXPO, delay: 0.1 }}
+        className="text-balance text-4xl font-black leading-[1.08] tracking-[-0.03em] text-[#0F172A] md:text-5xl"
+      >
+        Deja de depender solo de referidos.
+        <br />
+        Construye un{' '}
+        <span className="relative inline-flex text-[#FF8000]">
+          sistema de captación
+          <svg
+            className="pointer-events-none absolute -bottom-1 left-0 h-2.5 w-full"
+            viewBox="0 0 300 14"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <motion.path
+              d="M4 10.5C90 3 210 3 296 10.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.75, delay: 0.55, ease: EXPO }}
+            />
+          </svg>
+        </span>
+        .
+      </motion.h1>
+
+      <motion.p
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: EXPO, delay: 0.25 }}
+        className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-600 md:text-lg"
+      >
+        Gestión de redes, captación de leads, email marketing y automatizaciones con IA — con un único proveedor especializado en el sector, sin permanencia.
+      </motion.p>
+
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: EXPO, delay: 0.4 }}
+        className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-medium text-slate-500"
+      >
+        <span><strong className="font-bold text-slate-900">+11 años</strong> en el sector</span>
+        <span className="hidden h-1 w-1 rounded-full bg-slate-300 sm:block" aria-hidden="true" />
+        <span><strong className="font-bold text-slate-900">+1.000</strong> inmobiliarias visitadas</span>
+        <span className="hidden h-1 w-1 rounded-full bg-slate-300 sm:block" aria-hidden="true" />
+        <span><strong className="font-bold text-slate-900">100%</strong> enfoque en captación</span>
+      </motion.div>
+    </section>
+  );
+}
+
 export function CaptacionInmobiliariasPage() {
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#FF8000]/30 flex flex-col text-center">
@@ -478,9 +547,7 @@ export function CaptacionInmobiliariasPage() {
       <FormNavbar />
 
       <main className="z-10 flex flex-col flex-1 pb-12 pt-0 w-full relative">
-        <section className="relative flex flex-col items-center justify-center pt-8">
-          <HeroSection hideButton={true} />
-        </section>
+        <InmobiliariasHero />
 
         <CaptacionForm />
 

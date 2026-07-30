@@ -437,8 +437,7 @@ function Accordion({ items }: { items: { q: string; a: string }[] }) {
   );
 }
 
-function RevealPhone({ agency }: { agency: InmobiliariaPublica }) {
-  const [revealed, setRevealed] = useState(false);
+function CtaButton({ agency }: { agency: InmobiliariaPublica }) {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -450,14 +449,6 @@ function RevealPhone({ agency }: { agency: InmobiliariaPublica }) {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [showModal]);
 
-  if (revealed) {
-    return (
-      <a href={`tel:${agency.telefono}`} className="flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-200">
-        <Phone size={14} className="text-green-600" /> {agency.telefono}
-      </a>
-    );
-  }
-
   return (
     <>
       <button
@@ -465,7 +456,7 @@ function RevealPhone({ agency }: { agency: InmobiliariaPublica }) {
         onClick={() => setShowModal(true)}
         className="flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-soft transition-all duration-200 hover:bg-primary-hover hover:shadow-card active:scale-[0.98]"
       >
-        <Phone size={14} /> Mostrar teléfono
+        <Phone size={14} /> Solicitar valoración
       </button>
 
       {createPortal(
@@ -504,9 +495,9 @@ function RevealPhone({ agency }: { agency: InmobiliariaPublica }) {
                   >
                     <X size={18} />
                   </button>
-                  <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Antes de ver el teléfono</p>
+                  <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Sin compromiso</p>
                   <h3 className="mb-5 text-lg font-extrabold text-slate-900">Cuéntale a {agency.nombre_comercial} qué necesitas</h3>
-                  <AgencyLeadForm agency={agency} onSuccess={() => { setRevealed(true); setShowModal(false); }} />
+                  <AgencyLeadForm agency={agency} onSuccess={() => setShowModal(false)} />
                 </div>
               </motion.div>
             </>
@@ -655,7 +646,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
               </p>
 
               <div className="mt-8">
-                <RevealPhone agency={agency} />
+                <CtaButton agency={agency} />
               </div>
             </motion.div>
 

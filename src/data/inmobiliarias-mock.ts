@@ -56,8 +56,8 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     cp: '28013',
     telefono: '+34 611 222 333',
     pagina_web: 'https://inmoacierta.example.com',
-    logo_url: null,
-    foto_url: null,
+    logo_url: 'https://picsum.photos/seed/inmoacierta/200',
+    foto_url: 'https://picsum.photos/seed/carlos/200',
     banner_url: null,
     color_hex: '#E85D2A',
     texto_presentacion:
@@ -86,7 +86,7 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     telefono: '+34 622 333 444',
     pagina_web: 'https://chamberihomes.example.com',
     logo_url: null,
-    foto_url: null,
+    foto_url: 'https://picsum.photos/seed/laura/200',
     banner_url: null,
     color_hex: '#1E3A5F',
     texto_presentacion:
@@ -113,8 +113,8 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     cp: '08006',
     telefono: '+34 633 444 555',
     pagina_web: 'https://mbgestors.example.com',
-    logo_url: null,
-    foto_url: null,
+    logo_url: 'https://picsum.photos/seed/mbgestors/200',
+    foto_url: 'https://picsum.photos/seed/marc/200',
     banner_url: null,
     color_hex: '#B8860B',
     texto_presentacion:

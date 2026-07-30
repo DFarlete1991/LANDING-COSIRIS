@@ -1,13 +1,11 @@
-import { ArrowRight, BadgeCheck, Briefcase, Home, Languages, MapPin, Star, Wallet } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowRight, BadgeCheck, Briefcase, Clock, Home, MapPin, Phone, Star, Users, X } from 'lucide-react';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { formatDistanceKm } from '@/lib/geo';
 import { navigateTo } from '@/lib/utils';
-
-function formatPrice(price: number): string {
-  if (price >= 1000000) return `${(price / 1000000).toFixed(1)}M€`;
-  if (price >= 1000) return `${Math.round(price / 1000)}k€`;
-  return `${price}€`;
-}
+import { AgencyLeadForm } from './AgencyLeadForm';
 
 function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: InmobiliariaPublica; sizeClass?: string }) {
   if (agency.foto_url) {
@@ -37,14 +35,14 @@ function AgencyThumbnail({ agency, sizeClass }: { agency: InmobiliariaPublica; s
         src={agency.logo_url}
         alt={agency.nombre_comercial}
         style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
-        className={`shrink-0 rounded-full border-2 border-white object-cover shadow-sm ${sizeClass}`}
+        className={`shrink-0 border-2 border-white object-cover shadow-sm ${sizeClass}`}
       />
     );
   }
   return (
     <div
       style={{ backgroundColor: agency.color_hex }}
-      className={`shrink-0 items-center justify-center rounded-full border-2 border-white text-[9px] font-black text-white shadow-sm ${sizeClass}`}
+      className={`inline-flex shrink-0 items-center justify-center border-2 border-white font-black text-white shadow-sm ${sizeClass}`}
     >
       {agency.nombre_comercial.slice(0, 1)}
     </div>
@@ -79,7 +77,14 @@ export function AgencyCard({
             Más cercana
           </span>
         )}
-        {agency.logo_url ? (
+        {agency.foto_url ? (
+          <img
+            src={agency.foto_url}
+            alt={agency.nombre_agente}
+            style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
+            className="absolute -bottom-4 left-4 h-10 w-10 rounded-full border-[3px] border-white object-cover shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-110"
+          />
+        ) : agency.logo_url ? (
           <img
             src={agency.logo_url}
             alt={agency.nombre_comercial}
@@ -125,12 +130,33 @@ export function AgencyResultRow({
   isNearest: boolean;
   searchPoint?: { lat: number; lng: number } | null;
 }) {
+  const [showPhone, setShowPhone] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (!showModal) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowModal(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showModal]);
+
   const goToProfile = () => {
     const href = searchPoint
       ? `/inmobiliarias/${agency.id}?lat=${searchPoint.lat}&lng=${searchPoint.lng}`
       : `/inmobiliarias/${agency.id}`;
     navigateTo(href);
   };
+
+  const filledStars = agency.rating != null ? Math.round(agency.rating) : 0;
+
+  const metrics = [
+    { icon: Home, value: String(agency.num_propiedades), label: 'Propiedades' },
+    { icon: Clock, value: `${agency.anos_experiencia} años`, label: 'Experiencia' },
+    ...(distanceKm != null ? [{ icon: MapPin, value: formatDistanceKm(distanceKm), label: 'De tu ubicación' }] : []),
+    { icon: Users, value: String(agency.num_empleados), label: 'Agentes' },
+  ];
 
   return (
     <div
@@ -143,101 +169,162 @@ export function AgencyResultRow({
           goToProfile();
         }
       }}
-      className="flex cursor-pointer flex-col gap-4 rounded-[24px] border border-slate-100 bg-white p-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-[transform,box-shadow] duration-[250ms] ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(15,23,42,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000] sm:gap-8 sm:p-9"
+      className="flex cursor-pointer flex-col gap-4 rounded-[24px] border border-slate-100 bg-white p-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-[transform,box-shadow] duration-[250ms] ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(15,23,42,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000] sm:flex-row sm:gap-6 sm:p-6"
     >
       {/* En móvil: avatar + nombre lado a lado. En sm+: display:contents hace que
           este wrapper "desaparezca" y avatar/central vuelvan a ser columnas
           independientes del flex-row original. */}
       <div className="flex gap-3 sm:contents">
-        {/* Zona izquierda: Avatar */}
-        <div className="relative shrink-0 self-start">
-          <Avatar agency={agency} sizeClass="h-16 w-16 sm:h-[116px] sm:w-[116px]" />
+        {/* Zona izquierda: foto del asesor + logo pequeño de la inmobiliaria debajo */}
+        <div className="relative flex shrink-0 flex-col items-start gap-2.5 self-start sm:items-center">
+          <Avatar agency={agency} sizeClass="h-16 w-16 sm:h-[92px] sm:w-[92px]" />
           {isNearest && (
             <span className="absolute -top-2 -left-2 rounded-full bg-[#0F172A]/90 px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.08em] text-white shadow-sm backdrop-blur-sm sm:px-2.5 sm:py-1 sm:text-[9px]">
               Cerca
             </span>
           )}
+          <div className="hidden items-center gap-1.5 sm:flex">
+            <AgencyThumbnail agency={agency} sizeClass="h-6 w-6 rounded-md" />
+            <span className="max-w-[90px] truncate text-[10px] font-black uppercase leading-tight tracking-tight text-slate-400">
+              {agency.nombre_comercial}
+            </span>
+          </div>
         </div>
 
-        {/* Zona central: nombre → empresa → ubicación → métricas → especialidades, en ese orden fijo */}
+        {/* Zona central: nombre → verificada → ubicación → valoración → descripción → métricas */}
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <p className="truncate text-base font-bold leading-tight text-[#1D2433] sm:text-[32px] sm:leading-[38px]">{agency.nombre_agente}</p>
-            <BadgeCheck size={16} className="shrink-0 text-[#FF8000] sm:hidden" aria-label="Cliente verificado" />
-            <BadgeCheck size={19} className="hidden shrink-0 text-[#FF8000] sm:block" aria-label="Cliente verificado" />
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            <p className="truncate text-base font-bold leading-tight text-slate-900 sm:text-[26px] sm:leading-[32px]">{agency.nombre_agente}</p>
+            <span className="flex shrink-0 items-center gap-1 text-xs font-bold text-[#FF8000] sm:text-[13px]">
+              <BadgeCheck size={16} className="shrink-0" /> Verificada
+            </span>
           </div>
-          <p className="mt-1 truncate text-sm font-medium text-[#1D2433] sm:mt-2 sm:text-[20px]">{agency.nombre_comercial}</p>
-          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-[#6E7786] sm:mt-2.5 sm:text-[16px]">
-            <MapPin size={13} className="shrink-0 sm:hidden" />
-            <MapPin size={15} className="hidden shrink-0 sm:block" />
+          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-500 sm:text-sm">
+            <MapPin size={13} className="shrink-0 text-slate-400" />
             {agency.poblacion}, {agency.provincia}
           </p>
 
-          {/* Métricas — mismo estilo gris para todas, sin arcoíris de colores */}
-          <div className="mt-3 flex flex-wrap items-center gap-2 sm:mt-4 sm:gap-2.5">
-            {agency.rating != null && (
-              <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#F6F7F9] px-3 text-xs font-semibold text-[#1D2433] sm:h-[34px] sm:px-4 sm:text-[13px]">
-                <Star size={13} className="fill-amber-400 text-amber-400" /> {agency.rating}
-              </span>
-            )}
-            <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#F6F7F9] px-3 text-xs font-semibold text-[#1D2433] sm:h-[34px] sm:px-4 sm:text-[13px]">
-              <Home size={13} className="text-[#6E7786]" /> {agency.num_propiedades} propiedades
-            </span>
-            {distanceKm != null && (
-              <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#F6F7F9] px-3 text-xs font-semibold text-[#1D2433] sm:h-[34px] sm:px-4 sm:text-[13px]">
-                <MapPin size={13} className="text-[#6E7786]" /> {formatDistanceKm(distanceKm)}
-              </span>
-            )}
-            <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#F6F7F9] px-3 text-xs font-semibold text-[#1D2433] sm:h-[34px] sm:px-4 sm:text-[13px]">
-              <Wallet size={13} className="text-[#6E7786]" /> {formatPrice(agency.precio_medio)}
-            </span>
-            <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#F6F7F9] px-3 text-xs font-semibold text-[#1D2433] sm:h-[34px] sm:px-4 sm:text-[13px]">
-              <Briefcase size={13} className="text-[#6E7786]" /> {agency.anos_experiencia} años
-            </span>
-            {agency.idiomas[0] && (
-              <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[#F6F7F9] px-3 text-xs font-semibold text-[#1D2433] sm:h-[34px] sm:px-4 sm:text-[13px]">
-                <Languages size={13} className="text-[#6E7786]" /> {agency.idiomas[0]}
-              </span>
-            )}
-          </div>
+          {agency.rating != null && (
+            <div className="mt-1.5 flex items-center gap-1.5">
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    size={13}
+                    className={i < filledStars ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'}
+                  />
+                ))}
+              </div>
+              <span className="text-xs font-bold text-slate-900 sm:text-sm">{agency.rating}</span>
+              {agency.num_opiniones != null && (
+                <span className="text-xs text-slate-400 sm:text-sm">({agency.num_opiniones} reseñas)</span>
+              )}
+            </div>
+          )}
 
-          {/* Especialidades — máximo 4 visibles */}
-          <div className="mt-3 flex flex-wrap gap-2">
-            {agency.especialidades.slice(0, 4).map((esp) => (
-              <span key={esp} className="rounded-md bg-slate-50 px-2.5 py-1 text-[12px] font-medium text-[#6E7786]">
-                {esp}
-              </span>
+          <p className="mt-2.5 line-clamp-2 text-xs leading-relaxed text-slate-600 sm:text-sm">{agency.texto_presentacion}</p>
+
+          <div className="mt-3.5 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-slate-100 pt-3.5 sm:mt-4 sm:pt-4">
+            {metrics.map(({ icon: Icon, value, label }) => (
+              <div key={label} className="flex items-center gap-2">
+                <Icon size={16} className="shrink-0 text-[#FF8000]" />
+                <div className="leading-tight">
+                  <p className="text-sm font-bold text-slate-900">{value}</p>
+                  <p className="text-[11px] text-slate-400">{label}</p>
+                </div>
+              </div>
             ))}
-            {agency.especialidades.length > 4 && (
-              <span className="rounded-md bg-slate-50 px-2.5 py-1 text-[12px] font-medium text-[#6E7786]">
-                +{agency.especialidades.length - 4}
-              </span>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Derecha: en móvil, fila horizontal completa abajo; en sm+, columna a la derecha */}
-      <div className="flex shrink-0 items-center gap-3 sm:w-[132px] sm:flex-col sm:items-center sm:gap-4 sm:self-start">
-        <AgencyThumbnail agency={agency} sizeClass="hidden h-14 w-14 sm:flex" />
-        {agency.rating != null && (
-          <div className="hidden text-center sm:block">
-            <p className="flex items-center justify-center gap-1 text-[15px] font-bold text-[#1D2433]">
-              <Star size={14} className="fill-amber-400 text-amber-400" /> {agency.rating}
-            </p>
-            {agency.num_opiniones != null && (
-              <p className="text-[11px] text-[#6E7786]">{agency.num_opiniones} opiniones</p>
-            )}
-          </div>
-        )}
+      {/* Derecha: acciones — solo desktop */}
+      <div className="hidden shrink-0 flex-col items-stretch gap-2 self-center sm:flex sm:w-[160px]">
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); goToProfile(); }}
-          className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-[#FF8000] text-sm font-bold text-white shadow-sm shadow-[#FF8000]/20 transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#E67300] hover:shadow-md hover:shadow-[#FF8000]/30 active:scale-95 sm:h-[52px] sm:w-full sm:text-[14px]"
+          className="flex h-[48px] w-full items-center justify-center gap-1.5 rounded-full bg-[#FF8000] text-[14px] font-bold text-white shadow-sm shadow-[#FF8000]/20 transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#E67300] hover:shadow-md hover:shadow-[#FF8000]/30 active:scale-95"
         >
           Ver perfil <ArrowRight size={15} />
         </button>
+        {showPhone ? (
+          <a
+            href={`tel:${agency.telefono}`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center justify-center gap-1.5 py-1 text-center text-[13px] font-bold text-green-700 underline decoration-green-300 underline-offset-2 transition-colors hover:text-green-800 hover:decoration-green-500"
+          >
+            <Phone size={12} /> {agency.telefono}
+          </a>
+        ) : (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
+            className="flex cursor-pointer items-center justify-center gap-1.5 py-1 text-center text-[13px] font-semibold text-slate-500 underline decoration-slate-300 underline-offset-2 transition-colors hover:text-[#FF8000] hover:decoration-[#FF8000]"
+          >
+            <Phone size={12} /> Ver teléfono
+          </button>
+        )}
       </div>
+      {/* En móvil: botón compacto */}
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); goToProfile(); }}
+        className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-[#FF8000] px-5 text-sm font-bold text-white shadow-sm shadow-[#FF8000]/20 transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#E67300] hover:shadow-md hover:shadow-[#FF8000]/30 active:scale-95 sm:hidden"
+      >
+        Ver perfil <ArrowRight size={15} />
+      </button>
+
+      {createPortal(
+        <AnimatePresence>
+          {showModal && (
+            <>
+              <motion.div
+                key="backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-40 bg-black/65 backdrop-blur-sm"
+                aria-hidden="true"
+              />
+              <motion.div
+                key="panel"
+                role="dialog"
+                aria-modal
+                initial={{ opacity: 0, y: 24, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 16, scale: 0.97 }}
+                transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+                onClick={() => setShowModal(false)}
+                className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl shadow-black/20"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    aria-label="Cerrar"
+                    className="absolute right-4 top-4 z-10 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                  >
+                    <X size={18} />
+                  </button>
+                  <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Sin compromiso</p>
+                  <h3 className="mb-5 text-lg font-extrabold text-slate-900">
+                    Cuéntale a {agency.nombre_comercial} qué necesitas
+                  </h3>
+                  <AgencyLeadForm
+                    agency={agency}
+                    onSuccess={() => { setShowPhone(true); setShowModal(false); }}
+                  />
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
     </div>
   );
 }

@@ -125,10 +125,10 @@ export function InmobiliariasResultsView({
       <main className="mx-auto w-full max-w-[960px] px-6 pb-16 pt-6">
         <div className="space-y-5">
           {visibleAgencies.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-[#E6E8EC] bg-white p-10 text-center shadow-sm">
+            <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center shadow-sm">
               <Building2 size={36} className="mx-auto text-slate-300" />
               <p className="mt-3 font-semibold text-slate-700">No hay inmobiliarias en este rango</p>
-              <p className="mt-1 text-sm text-[#6E7786]">Prueba a ampliar la distancia máxima de búsqueda.</p>
+              <p className="mt-1 text-sm text-slate-400">Prueba a ampliar la distancia máxima de búsqueda.</p>
             </div>
           )}
           {visibleAgencies.map((agency, index) => (
