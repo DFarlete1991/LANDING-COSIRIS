@@ -88,7 +88,19 @@ function WhyUsGrid() {
   );
 }
 
-function VideoCard({ url, nombre }: { url: string; nombre: string }) {
+function VideoCard({
+  url,
+  nombre,
+  logoUrl,
+  logoPos,
+  colorHex,
+}: {
+  url: string;
+  nombre: string;
+  logoUrl?: string | null;
+  logoPos?: string | null;
+  colorHex?: string;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
 
@@ -135,17 +147,41 @@ function VideoCard({ url, nombre }: { url: string; nombre: string }) {
         </div>
       </div>
 
+      {logoUrl && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.4, delay: 0.1, ease: [0.19, 1, 0.22, 1] }}
+          className="relative z-10 -mb-8 mt-5 flex justify-center"
+        >
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-white shadow-lg shadow-slate-900/10">
+            <img
+              src={logoUrl}
+              alt={nombre}
+              style={{ objectPosition: logoPos ?? '50% 50%' }}
+              className="h-full w-full rounded-full object-cover"
+            />
+          </div>
+        </motion.div>
+      )}
+
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
         transition={{ duration: 0.5, delay: 0.15, ease: [0.19, 1, 0.22, 1] }}
-        className="mt-5 flex items-center gap-3 rounded-[22px] border border-[#ECE8E1] bg-white px-5 py-4 shadow-[0_10px_30px_rgba(30,35,50,.05)]"
+        className={`flex items-center gap-3 rounded-[22px] border border-[#ECE8E1] bg-white px-5 py-4 shadow-[0_10px_30px_rgba(30,35,50,.05)] ${logoUrl ? 'pt-9' : 'mt-5'}`}
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
-          <ShieldCheck size={18} />
-        </div>
-        <div>
+        {!logoUrl && (
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-primary bg-primary/8"
+            style={colorHex ? { backgroundColor: `${colorHex}14`, color: colorHex } : undefined}
+          >
+            <ShieldCheck size={18} />
+          </div>
+        )}
+        <div className={logoUrl ? 'w-full text-center' : ''}>
           <p className="text-sm font-bold text-[#0F172A]">Transparencia, compromiso y resultados comprobados.</p>
           <p className="text-xs text-[#68707F]">Así trabajamos en {nombre}.</p>
         </div>
@@ -639,7 +675,31 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
+              className="relative"
             >
+              {/* Foto del agente — flota en el hueco a la derecha del texto, solo cuando hay
+                  espacio real para ella (columna del formulario ya al lado en lg+). */}
+              {agency.foto_url && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
+                  className="pointer-events-none absolute -right-2 top-1/2 hidden -translate-y-1/2 xl:-right-8 lg:block"
+                >
+                  <div className="relative">
+                    <span className="absolute -left-7 -top-6 h-14 w-14 rounded-full bg-primary/10" aria-hidden="true" />
+                    <span className="absolute -bottom-5 -right-4 h-9 w-9 rounded-full bg-primary/15" aria-hidden="true" />
+                    <span className="absolute -right-8 top-8 h-5 w-5 rounded-full bg-primary/20" aria-hidden="true" />
+                    <img
+                      src={agency.foto_url}
+                      alt={agency.nombre_agente}
+                      style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
+                      className="relative h-52 w-52 rounded-full border-4 border-white object-cover shadow-2xl shadow-slate-900/15 xl:h-60 xl:w-60"
+                    />
+                  </div>
+                </motion.div>
+              )}
+
               <div className="flex items-center gap-2">
                 <span className="rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
                   {agency.poblacion}
@@ -752,7 +812,13 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
           <div className={`grid grid-cols-1 gap-10 ${agency.media_presentacion_url ? 'lg:grid-cols-[2fr_3fr] lg:gap-16' : ''}`}>
             {agency.media_presentacion_url && (
               <div className="lg:pt-16">
-                <VideoCard url={agency.media_presentacion_url} nombre={agency.nombre_comercial} />
+                <VideoCard
+                  url={agency.media_presentacion_url}
+                  nombre={agency.nombre_comercial}
+                  logoUrl={agency.logo_url}
+                  logoPos={agency.logo_pos}
+                  colorHex={agency.color_hex}
+                />
               </div>
             )}
 

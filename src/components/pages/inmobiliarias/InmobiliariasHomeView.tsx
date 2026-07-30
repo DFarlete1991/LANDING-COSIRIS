@@ -349,10 +349,10 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             <button
               type="button"
               onClick={() => { document.getElementById('inicio-directorio')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
-              className="group inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 text-sm font-bold text-[#0F172A] shadow-lg transition-all duration-200 hover:bg-slate-100 hover:shadow-xl active:scale-95"
+              className="group inline-flex items-center gap-2 rounded-full bg-[#FF8000] px-8 py-3 text-sm font-bold text-white shadow-lg shadow-[#FF8000]/25 transition-all duration-200 hover:bg-[#E67300] hover:shadow-xl hover:shadow-[#FF8000]/30 active:scale-95"
             >
               Busca tu inmobiliaria
-              <Search size={16} className="text-[#FF8000] transition-transform group-hover:translate-x-0.5" />
+              <Search size={16} className="transition-transform group-hover:translate-x-0.5" />
             </button>
           </div>
         </div>
@@ -375,11 +375,11 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             <div className="mt-6 text-center">
               <button
                 type="button"
-                onClick={() => { document.getElementById('recorrido')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
-                className="group inline-flex items-center gap-2 rounded-full bg-[#FF8000] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#FF8000]/20 transition-all duration-200 hover:bg-[#E67300] hover:shadow-lg hover:shadow-[#FF8000]/25 active:scale-95"
+                onClick={() => navigateTo('/inmobiliarias/registro')}
+                className="group inline-flex items-center gap-2.5 rounded-full bg-[#FF8000] px-8 py-4 text-base font-bold text-white shadow-lg shadow-[#FF8000]/25 transition-all duration-200 hover:bg-[#E67300] hover:shadow-xl hover:shadow-[#FF8000]/30 active:scale-95"
               >
-                Más información
-                <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+                Inmobiliaria, aparece en el buscador gratis 30 días
+                <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
               </button>
             </div>
           </Reveal>
@@ -572,22 +572,9 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
         </div>
       </section>
 
-      {/* 3c. CTA + BENEFICIOS + FUNCIONALIDADES */}
+      {/* 3c. BENEFICIOS + FUNCIONALIDADES */}
       <section className="bg-white py-14 sm:py-28">
         <div className="mx-auto max-w-6xl px-4">
-          {/* CTA */}
-          <Reveal>
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => navigateTo('/inmobiliarias/registro')}
-                className="group inline-flex items-center gap-2.5 rounded-full bg-[#FF8000] px-8 py-4 text-base font-bold text-white shadow-lg shadow-[#FF8000]/25 transition-all duration-200 hover:bg-[#E67300] hover:shadow-xl hover:shadow-[#FF8000]/30 active:scale-95"
-              >
-                Inmobiliaria, aparece en el buscador gratis 30 días
-                <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
-              </button>
-            </div>
-          </Reveal>
 
           {/* BENEFICIOS */}
           <Reveal delay={0.1}>
