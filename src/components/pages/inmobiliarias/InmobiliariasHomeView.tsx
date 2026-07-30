@@ -306,7 +306,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             <div className="mt-10 text-center">
               <button
                 type="button"
-                onClick={() => navigateTo('/inmobiliarias')}
+                onClick={() => { document.getElementById('recorrido')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
                 className="group inline-flex items-center gap-2 rounded-full bg-[#FF8000] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#FF8000]/20 transition-all duration-200 hover:bg-[#E67300] hover:shadow-lg hover:shadow-[#FF8000]/25 active:scale-95"
               >
                 Más información
@@ -318,7 +318,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
       </section>
 
       {/* 3. PARA INMOBILIARIAS — header + confianza */}
-      <section className="bg-white py-14 sm:py-28">
+      <section id="para-inmobiliarias" className="bg-white py-14 sm:py-28">
         <div className="mx-auto max-w-6xl px-4">
           {/* HEADER */}
           <Reveal>
@@ -363,7 +363,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
       </section>
 
       {/* 3b. STORYTELLING + MOCKUP — banda naranja pálido, pasos como tarjetas independientes con reveal al hacer scroll */}
-      <section className="bg-orange-50 py-14 sm:py-28">
+      <section id="recorrido" className="bg-orange-50 py-14 sm:py-28">
         <div className="mx-auto max-w-6xl px-4">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
             <div>
@@ -375,7 +375,6 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                   El recorrido del propietario hasta tu inmobiliaria
                 </h3>
               </Reveal>
-
               <Reveal delay={0.1}>
                 <div ref={stepsRef} className="relative mt-8">
                   {/* riel del recorrido + marcador que viaja con el scroll real */}
