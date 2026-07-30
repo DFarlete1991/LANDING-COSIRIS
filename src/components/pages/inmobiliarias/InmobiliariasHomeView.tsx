@@ -15,6 +15,8 @@ import {
   User,
   UserPlus,
   Wallet,
+  MessageCircle,
+  Star,
   Zap,
 } from 'lucide-react';
 import { AgencyNetworkIllustration } from '../../ui/AgencyNetworkIllustration';
@@ -176,15 +178,46 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
       <section className="bg-white py-14 sm:py-28">
         <div className="mx-auto max-w-6xl px-4">
           <Reveal>
-            <div className="mb-12 text-center md:mb-16">
+            <div className="mb-10 text-center md:mb-12">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
                 El directorio
               </p>
               <h2 className="mt-3 text-3xl font-black leading-[1.1] tracking-[-0.02em] text-[#0F172A] sm:text-4xl md:text-5xl">
-                La red de confianza para<br className="sm:hidden" /> propietarios e inmobiliarias
+                Cómo funciona
               </h2>
             </div>
           </Reveal>
+
+          <div className="mb-14 grid grid-cols-1 gap-4 sm:grid-cols-3 md:mb-20">
+            {[
+              {
+                icon: MapPin,
+                title: '1. Define la ubicación',
+                desc: 'Introduce tu ciudad o código postal para ver las inmobiliarias verificadas de tu zona.',
+              },
+              {
+                icon: Star,
+                title: '2. Elige tu inmobiliaria',
+                desc: 'Compara experiencia, propiedades y valoraciones para decidir con confianza.',
+              },
+              {
+                icon: MessageCircle,
+                title: '3. Ponte en contacto',
+                desc: 'Contacta directo con la inmobiliaria que elijas, sin coste ni compromiso.',
+              },
+            ].map(({ icon: Icon, title, desc }, i) => (
+              <Reveal key={title} delay={i * 0.08}>
+                <div className="h-full rounded-2xl border border-slate-100 bg-slate-50 p-6 text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#FF8000]/10 text-[#FF8000]">
+                    <Icon size={22} />
+                  </div>
+                  <p className="mt-4 text-base font-black tracking-[-0.01em] text-[#0F172A]">{title}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{desc}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
           <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2 md:gap-8 lg:gap-10">
             {/* IZQUIERDA: carrusel de logos */}
             <Reveal>
@@ -312,6 +345,16 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             ))}
           </div>
 
+          <div className="mt-10 text-center">
+            <button
+              type="button"
+              onClick={() => { document.getElementById('inicio-directorio')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
+              className="group inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 text-sm font-bold text-[#0F172A] shadow-lg transition-all duration-200 hover:bg-slate-100 hover:shadow-xl active:scale-95"
+            >
+              Busca tu inmobiliaria
+              <Search size={16} className="text-[#FF8000] transition-transform group-hover:translate-x-0.5" />
+            </button>
+          </div>
         </div>
       </section>
 
