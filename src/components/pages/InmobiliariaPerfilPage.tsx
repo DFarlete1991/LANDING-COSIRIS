@@ -14,7 +14,7 @@ import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo } from '@/lib/utils';
 import { haversineKm, formatDistanceKm } from '@/lib/geo';
 import { fetchPlaceReviews, type GoogleReview } from '@/lib/google-places';
-import { agencyThemeStyle } from '@/lib/color';
+import { fetchResenasManuales, type ResenaManual } from '@/data/live-resenas';
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -73,7 +73,7 @@ function WhyUsGrid() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4, delay: 0.1 * i, ease: [0.19, 1, 0.22, 1] }}
-          className="group flex h-[150px] flex-col rounded-[22px] border border-[#ECE8E1] bg-white p-6 shadow-[0_10px_30px_rgba(30,35,50,.05)] transition-all duration-[250ms] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,35,50,.1)]"
+          className="group flex min-h-[150px] flex-col rounded-[22px] border border-[#ECE8E1] bg-white p-6 shadow-[0_10px_30px_rgba(30,35,50,.05)] transition-all duration-[250ms] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,35,50,.1)]"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/8 text-primary">
             <Icon size={20} />
@@ -154,25 +154,61 @@ function VideoCard({ url, nombre }: { url: string; nombre: string }) {
   );
 }
 
-/** Reseñas — contenido de muestra (ver @/data/reviews-placeholder) hasta que
-    exista una fuente real por inmobiliaria; el resumen de rating de arriba
-    (ProofStrip) ya usa agency.rating/num_opiniones reales cuando existen. */
+/** Reseñas — contenido de muestra (ver @/data/reviews-placeholder), usado
+    solo cuando la inmobiliaria no tiene ni google_place_id ni reseñas
+    manuales cargadas desde el CRM. */
 const REVIEWS_PLACEHOLDER_EXPANDED = REVIEWS_PLACEHOLDER;
+
+type DisplayReview = {
+  key: string | number;
+  autor: string;
+  rating: number;
+  comentario: string;
+  fecha: string;
+  avatarUrl?: string;
+};
 
 function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
   const [googleReviews, setGoogleReviews] = useState<GoogleReview[] | null>(null);
+  const [manualReviews, setManualReviews] = useState<ResenaManual[] | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Prioridad: Google (si hay google_place_id) > reseñas escritas a mano
+  // desde el CRM > placeholder de ejemplo — ver CRM: Perfil > Directorio
+  // público > Reseñas de clientes, donde el cliente elige una de las dos
+  // primeras opciones (o ninguna, y se queda en el placeholder).
   useEffect(() => {
-    if (!agency.google_place_id) return;
+    if (agency.google_place_id) {
+      setLoading(true);
+      fetchPlaceReviews(agency.google_place_id).then((result) => {
+        if (result?.reviews?.length) setGoogleReviews(result.reviews);
+        setLoading(false);
+      });
+      return;
+    }
     setLoading(true);
-    fetchPlaceReviews(agency.google_place_id).then((result) => {
-      if (result?.reviews) setGoogleReviews(result.reviews);
+    fetchResenasManuales(agency.id).then((rows) => {
+      if (rows.length > 0) setManualReviews(rows);
       setLoading(false);
     });
-  }, [agency.google_place_id]);
+  }, [agency.google_place_id, agency.id]);
 
-  const reviews = googleReviews ?? REVIEWS_PLACEHOLDER_EXPANDED;
+  const source: 'google' | 'manual' | 'placeholder' = googleReviews ? 'google' : manualReviews ? 'manual' : 'placeholder';
+
+  const reviews: DisplayReview[] =
+    source === 'google'
+      ? googleReviews!.map((r, i) => ({
+          key: i, autor: r.author_name, rating: r.rating, comentario: r.text,
+          fecha: r.relative_time_description, avatarUrl: r.profile_photo_url,
+        }))
+      : source === 'manual'
+        ? manualReviews!.map((r) => ({
+            key: r.id, autor: r.autor_nombre, rating: r.rating, comentario: r.comentario,
+            fecha: new Date(r.created_at).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
+          }))
+        : REVIEWS_PLACEHOLDER_EXPANDED.map((r) => ({
+            key: r.id, autor: r.autor, rating: r.rating, comentario: r.comentario, fecha: r.fecha,
+          }));
 
   return (
     <>
@@ -182,7 +218,7 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
           Lo que dicen de nosotros
         </h3>
         <p className="mt-3 text-lg leading-[170%] text-[#68707F]">
-          {googleReviews ? 'Opiniones verificadas de Google' : 'La confianza de quienes ya han vendido con nosotros.'}
+          {source === 'google' ? 'Opiniones verificadas de Google' : 'La confianza de quienes ya han vendido con nosotros.'}
         </p>
       </div>
 
@@ -192,7 +228,7 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
         )}
         {!loading && reviews.map((review, i) => (
           <motion.div
-            key={googleReviews ? i : (review as any).id ?? i}
+            key={review.key}
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-40px' }}
@@ -201,40 +237,30 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
-                {googleReviews ? (
-                  <img
-                    src={(review as GoogleReview).profile_photo_url}
-                    alt={(review as GoogleReview).author_name}
-                    className="h-8 w-8 shrink-0 rounded-full"
-                  />
+                {review.avatarUrl ? (
+                  <img src={review.avatarUrl} alt={review.autor} className="h-8 w-8 shrink-0 rounded-full" />
                 ) : (
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/8 text-sm font-bold text-primary">
-                    {(review as any).autor?.charAt(0) ?? '?'}
+                    {review.autor.charAt(0) || '?'}
                   </div>
                 )}
                 <div>
-                  <p className="text-lg font-semibold text-[#0F172A]">
-                    {googleReviews ? (review as GoogleReview).author_name : (review as any).autor}
-                  </p>
+                  <p className="text-lg font-semibold text-[#0F172A]">{review.autor}</p>
                 </div>
               </div>
-              {!googleReviews && (
-                <span className="inline-flex shrink-0 items-center rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
-                  {(review as any).fecha}
-                </span>
-              )}
+              <span className="inline-flex shrink-0 items-center rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
+                {review.fecha}
+              </span>
             </div>
 
-            <p className="mt-3 text-sm leading-[160%] text-[#68707F]">
-              &ldquo;{googleReviews ? (review as GoogleReview).text : (review as any).comentario}&rdquo;
-            </p>
+            <p className="mt-3 text-sm leading-[160%] text-[#68707F]">&ldquo;{review.comentario}&rdquo;</p>
 
             <div className="mt-3 flex items-center gap-0.5">
               {Array.from({ length: 5 }).map((_, s) => (
                 <Star
                   key={s}
                   size={15}
-                  className={s < (googleReviews ? (review as GoogleReview).rating : (review as any).rating) ? 'fill-[#F5A524] text-[#F5A524]' : 'text-[#E2DCD3]'}
+                  className={s < review.rating ? 'fill-[#F5A524] text-[#F5A524]' : 'text-[#E2DCD3]'}
                 />
               ))}
             </div>
@@ -242,7 +268,7 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
         ))}
       </div>
 
-      {googleReviews && googleReviews.length > 0 && (
+      {source === 'google' && (
         <p className="mt-6 text-xs text-ink-faint text-center">
           Reseñas obtenidas de Google Places
         </p>
@@ -341,6 +367,17 @@ function Accordion({ items }: { items: { q: string; a: string }[] }) {
   return (
     <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
       <div className="space-y-2.5">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 1, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          className="mb-2 flex items-center gap-2 pl-1 text-[11px] font-medium text-[#FF8000]/70"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 3L19 10L12 12L12 19L9 15L5 3Z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+          </svg>
+          Haz clic en cada pregunta
+        </motion.div>
         {items.map((item, i) => (
           <motion.button
             key={item.q}
@@ -352,7 +389,7 @@ function Accordion({ items }: { items: { q: string; a: string }[] }) {
             transition={{ duration: 0.35, delay: i * 0.06, ease: [0.19, 1, 0.22, 1] }}
             className={`w-full rounded-xl border px-5 py-4 text-left text-body-sm font-semibold shadow-soft transition-all duration-200 ${
               openIndex === i
-                ? 'border-primary bg-primary text-white shadow-[0_8px_24px_rgb(var(--color-primary-rgb)/0.25)]'
+                ? 'border-primary bg-primary text-white shadow-[0_8px_24px_rgba(255,128,0,0.25)]'
                 : 'border-border bg-white text-foreground hover:border-primary/30'
             }`}
           >
@@ -551,12 +588,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
   }
 
   return (
-    // Tematización dinámica: cada bg-primary/text-primary/border-primary/etc.
-    // dentro de este árbol usa el color_hex elegido por esta inmobiliaria en
-    // el CRM (Perfil → Directorio público → Color del tema) en vez del
-    // naranja fijo de Cosiris — ver src/lib/color.ts y tailwind.config.js.
-    // La mancha decorativa y el panal (SVG) del hero también usan ese color.
-    <div className="min-h-screen bg-white font-sans text-slate-900 antialiased" style={agencyThemeStyle(agency.color_hex)}>
+    <div className="min-h-screen bg-white font-sans text-slate-900 antialiased">
       <div className="sticky top-0 z-30 border-b border-slate-100 bg-white/90 backdrop-blur-sm">
         <div className="flex h-14 w-full items-center justify-between px-1 sm:px-2">
           <button
@@ -586,7 +618,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
               aria-hidden="true"
               className="absolute -left-20 -top-20 h-[500px] w-[500px] rounded-full opacity-[0.08]"
               style={{
-                background: 'radial-gradient(circle, rgb(var(--color-primary-rgb)), rgb(var(--color-primary-rgb) / 0.35), transparent 70%)',
+                background: 'radial-gradient(circle, #FF8000, rgba(255,128,0,0.35), transparent 70%)',
                 filter: 'blur(100px)',
                 animation: 'float-blob 22s ease-in-out infinite',
               }}

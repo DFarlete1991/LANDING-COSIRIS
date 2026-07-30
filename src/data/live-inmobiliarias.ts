@@ -31,6 +31,7 @@ type DirectorioRow = {
   lat: number | null;
   lng: number | null;
   hero_image_url: string | null;
+  google_place_id: string | null;
 };
 
 function mapRow(row: DirectorioRow): InmobiliariaPublica {
@@ -53,7 +54,10 @@ function mapRow(row: DirectorioRow): InmobiliariaPublica {
     foto_url: row.foto_agente_url,
     foto_pos: row.foto_agente_pos,
     banner_url: row.banner_url,
-    color_hex: row.color_hex ?? '#FF8000',
+    // Fijo en naranja Cosiris para todas — la tematización por inmobiliaria
+    // se probó y se descartó (ver tailwind.config.js), así que se ignora
+    // cualquier color_hex guardado en la fila en vez de usarlo.
+    color_hex: '#FF8000',
     texto_presentacion: row.texto_presentacion ?? '',
     media_presentacion_url: row.media_presentacion_url,
     anos_experiencia: row.anos_experiencia ?? 0,
@@ -65,6 +69,7 @@ function mapRow(row: DirectorioRow): InmobiliariaPublica {
     lat: row.lat,
     lng: row.lng,
     hero_image_url: row.hero_image_url,
+    google_place_id: row.google_place_id,
   };
 }
 

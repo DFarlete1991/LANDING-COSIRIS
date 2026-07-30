@@ -147,7 +147,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             <span className="text-white/70">en tu zona</span>
           </h1>
           <p className="mx-auto mt-5 max-w-lg text-sm text-white/85 sm:mt-6 sm:text-base md:text-lg">
-            Conectamos personas con inmobiliarias reales, cercanas y de confianza en toda España.
+            Conectamos personas con inmobiliarias profesionales, verificadas y de confianza en toda España.
           </p>
 
           <div className="mt-9">
@@ -175,6 +175,16 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
       {/* 1. RED DE INMOBILIARIAS + POR QUÉ BUSCAR CON COSIRIS — en columnas, para no repetir el mismo formato centrado dos veces */}
       <section className="bg-white py-14 sm:py-28">
         <div className="mx-auto max-w-6xl px-4">
+          <Reveal>
+            <div className="mb-12 text-center md:mb-16">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
+                El directorio
+              </p>
+              <h2 className="mt-3 text-3xl font-black leading-[1.1] tracking-[-0.02em] text-[#0F172A] sm:text-4xl md:text-5xl">
+                La red de confianza para<br className="sm:hidden" /> propietarios e inmobiliarias
+              </h2>
+            </div>
+          </Reveal>
           <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2 md:gap-8 lg:gap-10">
             {/* IZQUIERDA: carrusel de logos */}
             <Reveal>
@@ -331,6 +341,16 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-relaxed text-slate-500 sm:text-base">
               Desde aparecer en nuestro directorio hasta automatizar el seguimiento de cada cliente. Todo desde una única plataforma.
             </p>
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => { document.getElementById('recorrido')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
+                className="group inline-flex items-center gap-2 rounded-full bg-[#FF8000] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#FF8000]/20 transition-all duration-200 hover:bg-[#E67300] hover:shadow-lg hover:shadow-[#FF8000]/25 active:scale-95"
+              >
+                Más información
+                <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </div>
           </Reveal>
 
           {/* ¿POR QUÉ CONFIAR? */}

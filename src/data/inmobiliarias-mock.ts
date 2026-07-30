@@ -59,7 +59,7 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     logo_url: 'https://picsum.photos/seed/inmoacierta/200',
     foto_url: 'https://picsum.photos/seed/carlos/200',
     banner_url: null,
-    color_hex: '#E85D2A',
+    color_hex: '#FF8000',
     texto_presentacion:
       'Especialistas en compraventa residencial en el centro de Madrid, con más de una década ayudando a familias a encontrar su próxima casa.',
     media_presentacion_url: null,
@@ -88,7 +88,7 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     logo_url: null,
     foto_url: 'https://picsum.photos/seed/laura/200',
     banner_url: null,
-    color_hex: '#1E3A5F',
+    color_hex: '#FF8000',
     texto_presentacion:
       'Boutique inmobiliaria enfocada en pisos de alto standing en Chamberí y alrededores.',
     media_presentacion_url: null,
@@ -116,7 +116,7 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     logo_url: 'https://picsum.photos/seed/mbgestors/200',
     foto_url: 'https://picsum.photos/seed/marc/200',
     banner_url: null,
-    color_hex: '#B8860B',
+    color_hex: '#FF8000',
     texto_presentacion:
       'Gestión integral de compra, venta y alquiler en el Eixample barcelonés desde 2015.',
     media_presentacion_url: null,
@@ -144,7 +144,7 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     logo_url: null,
     foto_url: null,
     banner_url: null,
-    color_hex: '#2E8B57',
+    color_hex: '#FF8000',
     texto_presentacion:
       'Equipo local de Gràcia especializado en pisos con encanto y reformas integrales.',
     media_presentacion_url: null,
@@ -172,7 +172,7 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     logo_url: null,
     foto_url: null,
     banner_url: null,
-    color_hex: '#D4A017',
+    color_hex: '#FF8000',
     texto_presentacion:
       'Referentes en el barrio de Ruzafa, con foco en inversión y alquiler de larga estancia.',
     media_presentacion_url: null,
@@ -200,7 +200,7 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     logo_url: null,
     foto_url: null,
     banner_url: null,
-    color_hex: '#C44536',
+    color_hex: '#FF8000',
     texto_presentacion:
       'Más de 15 años acompañando a familias sevillanas en la compra de su vivienda habitual.',
     media_presentacion_url: null,
@@ -228,7 +228,7 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     logo_url: null,
     foto_url: null,
     banner_url: null,
-    color_hex: '#2C3E50',
+    color_hex: '#FF8000',
     texto_presentacion:
       'Agencia familiar bilbaína con trato cercano y conocimiento profundo del mercado del Casco Viejo y Abando.',
     media_presentacion_url: null,
@@ -256,7 +256,7 @@ export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [
     logo_url: null,
     foto_url: null,
     banner_url: null,
-    color_hex: '#E67E22',
+    color_hex: '#FF8000',
     texto_presentacion:
       'Especialistas en segunda residencia y venta a compradores internacionales en la Costa del Sol.',
     media_presentacion_url: null,

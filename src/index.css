@@ -7,12 +7,6 @@
     --color-primary: #FF8000;
     --color-background: #FFFFFF;
     --color-ink: #0F172A;
-    /* Naranja por defecto, en formato "R G B" (sin comas) para poder usar
-       rgb(var(--x) / <alpha-value>) con soporte de opacidad de Tailwind. El
-       perfil público de cada inmobiliaria (InmobiliariaPerfilPage) sobrescribe
-       esto inline con agencyThemeStyle(agency.color_hex) — ver src/lib/color.ts. */
-    --color-primary-rgb: 255 128 0;
-    --color-primary-hover-rgb: 230 115 0;
   }
 
   html {

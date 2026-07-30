@@ -7,13 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Basado en variables CSS (ver :root en index.css) en vez de hex fijo,
-        // para poder tematizar el perfil público de cada inmobiliaria con su
-        // color_hex sin perder el soporte de opacidad (bg-primary/10, etc.) —
-        // ver src/lib/color.ts (agencyThemeStyle).
+        // Naranja fijo de Cosiris — se probó tematizar por inmobiliaria
+        // (color_hex elegido en el CRM) y no gustó, así que ya no es
+        // configurable: todo el sitio usa siempre este mismo naranja.
         primary: {
-          DEFAULT: 'rgb(var(--color-primary-rgb) / <alpha-value>)',
-          hover:   'rgb(var(--color-primary-hover-rgb) / <alpha-value>)',
+          DEFAULT: '#FF8000',
+          hover:   '#E67300',
           foreground: '#FFFFFF',
         },
         foreground: '#0F172A',
