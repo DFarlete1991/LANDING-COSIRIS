@@ -164,11 +164,11 @@ export function InmobiliariasNavbar({
         </button>
       )}
       <a
-        href='/inmobiliarias'
-        onClick={(e) => { e.preventDefault(); navigateTo('/inmobiliarias'); }}
+        href='/'
+        onClick={(e) => { e.preventDefault(); navigateTo('/'); }}
         className="shrink-0 transition-transform duration-200 hover:scale-105 active:scale-90"
       >
-        <img src="/assets/logo_orange.png" alt="Cosiris" className="h-8 w-auto" />
+        <img src="/assets/logo_orange.png" alt="Cosiris" className="h-10 w-auto" />
       </a>
 
       <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center justify-center gap-0.5 md:flex md:gap-1">

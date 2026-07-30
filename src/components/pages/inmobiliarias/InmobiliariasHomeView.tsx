@@ -183,7 +183,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                   Red de inmobiliarias
                 </p>
                 <h2 className="mt-3 text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
-                  Inmobiliarias de toda España ya confían en Cosiris para encontrar su inmobiliaria ideal y vender con confianza
+                  Propietarios de toda España ya confían en nosotros para encontrar su inmobiliaria ideal que les ayude a vender su propiedad
                 </h2>
               </div>
               <div className="mt-6">
@@ -275,7 +275,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.2 }}
                   onClick={() => navigateTo(`/inmobiliarias/${agency.id}`)}
-                  className="group relative w-28 shrink-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-36 md:w-40 lg:w-52"
+                  className="group relative w-36 shrink-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-44 md:w-56 lg:w-64"
                   style={{ aspectRatio: '9/16' }}
                 >
                   <video
@@ -301,6 +301,19 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                 </motion.button>
             ))}
           </div>
+
+          <Reveal delay={0.15}>
+            <div className="mt-10 text-center">
+              <button
+                type="button"
+                onClick={() => navigateTo('/inmobiliarias')}
+                className="group inline-flex items-center gap-2 rounded-full bg-[#FF8000] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#FF8000]/20 transition-all duration-200 hover:bg-[#E67300] hover:shadow-lg hover:shadow-[#FF8000]/25 active:scale-95"
+              >
+                Más información
+                <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -520,7 +533,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                 onClick={() => navigateTo('/inmobiliarias/registro')}
                 className="group inline-flex items-center gap-2.5 rounded-full bg-[#FF8000] px-8 py-4 text-base font-bold text-white shadow-lg shadow-[#FF8000]/25 transition-all duration-200 hover:bg-[#E67300] hover:shadow-xl hover:shadow-[#FF8000]/30 active:scale-95"
               >
-                Empieza gratis durante 30 días
+                Inmobiliaria, aparece en el buscador gratis 30 días
                 <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
               </button>
             </div>

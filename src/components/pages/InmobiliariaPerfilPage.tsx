@@ -573,7 +573,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
             onClick={(e) => { e.preventDefault(); navigateTo('/'); }}
             className="shrink-0 transition-transform duration-200 hover:scale-105 active:scale-90"
           >
-            <img src="/assets/logo_orange.png" alt="Cosiris" className="h-8 w-auto" />
+            <img src="/assets/logo_orange.png" alt="Cosiris" className="h-10 w-auto" />
           </a>
         </div>
       </div>
