@@ -312,18 +312,6 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             ))}
           </div>
 
-          <Reveal delay={0.15}>
-            <div className="mt-10 text-center">
-              <button
-                type="button"
-                onClick={() => { document.getElementById('recorrido')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
-                className="group inline-flex items-center gap-2 rounded-full bg-[#FF8000] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#FF8000]/20 transition-all duration-200 hover:bg-[#E67300] hover:shadow-lg hover:shadow-[#FF8000]/25 active:scale-95"
-              >
-                Más información
-                <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-              </button>
-            </div>
-          </Reveal>
         </div>
       </section>
 
