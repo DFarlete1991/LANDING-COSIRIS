@@ -5,6 +5,13 @@ import { AgencyResultRow } from '../../ui/AgencyCard';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { haversineKm } from '@/lib/geo';
 
+// Antes había un selector de "distancia máxima" (10/25/50/100 km) que se quitó
+// de la UI — sin él, mostrar TODAS las inmobiliarias con ubicación (solo
+// reordenadas por cercanía, sin límite) hacía que una búsqueda en Madrid
+// devolviera resultados a 350+ km. Mientras no vuelva ese selector, se aplica
+// un radio fijo razonable para "tu zona".
+const MAX_DISTANCE_KM = 50;
+
 export function InmobiliariasResultsView({
   initialQuery,
   searchPoint,
@@ -41,7 +48,9 @@ export function InmobiliariasResultsView({
   }, [distances]);
 
   const visibleAgencies = useMemo(
-    () => [...agencies].sort((a, b) => (distances.get(a.id) ?? Infinity) - (distances.get(b.id) ?? Infinity)),
+    () => agencies
+      .filter((a) => (distances.get(a.id) ?? Infinity) <= MAX_DISTANCE_KM)
+      .sort((a, b) => (distances.get(a.id) ?? Infinity) - (distances.get(b.id) ?? Infinity)),
     [agencies, distances],
   );
 
@@ -86,8 +95,8 @@ export function InmobiliariasResultsView({
           {visibleAgencies.length === 0 && (
             <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center shadow-sm">
               <Building2 size={36} className="mx-auto text-slate-300" />
-              <p className="mt-3 font-semibold text-slate-700">No hay inmobiliarias en este rango</p>
-              <p className="mt-1 text-sm text-slate-400">Prueba a ampliar la distancia máxima de búsqueda.</p>
+              <p className="mt-3 font-semibold text-slate-700">No hay inmobiliarias cerca de esta zona todavía</p>
+              <p className="mt-1 text-sm text-slate-400">Prueba a buscar otra ciudad cercana.</p>
             </div>
           )}
           {visibleAgencies.map((agency, index) => (
