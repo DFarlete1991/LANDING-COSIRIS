@@ -1,12 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Building2, MapPin } from 'lucide-react';
 import { AgencyResultRow } from '../../ui/AgencyCard';
-import { FilterChips, type SortOption } from '../../ui/FilterChips';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { haversineKm } from '@/lib/geo';
-
-const NAVBAR_HEIGHT = 72;
 
 export function InmobiliariasResultsView({
   initialQuery,
@@ -16,9 +13,6 @@ export function InmobiliariasResultsView({
   searchPoint: { lat: number; lng: number };
 }) {
   const { agencies: allAgencies, isLive } = useInmobiliarias();
-  const [sort, setSort] = useState<SortOption>('distancia');
-  const [maxDistanceKm, setMaxDistanceKm] = useState<number | null>(null);
-  const [specialty, setSpecialty] = useState<string | null>(null);
 
   // Esta vista filtra por lugar (distancia a un punto buscado) — las
   // inmobiliarias sin ubicación fijada no tienen cómo calcularse aquí, se
@@ -29,11 +23,6 @@ export function InmobiliariasResultsView({
   );
 
   const cityName = initialQuery.split(',')[0];
-
-  const specialtyOptions = useMemo(
-    () => [...new Set(agencies.flatMap((a) => a.especialidades))].sort(),
-    [agencies],
-  );
 
   const distances = useMemo(() => {
     const map = new Map<string, number>();
@@ -51,22 +40,10 @@ export function InmobiliariasResultsView({
     return best?.id ?? null;
   }, [distances]);
 
-  const visibleAgencies = useMemo(() => {
-    let list = agencies;
-    if (maxDistanceKm != null) {
-      list = list.filter((a) => (distances.get(a.id) ?? Infinity) <= maxDistanceKm);
-    }
-    if (specialty) {
-      list = list.filter((a) => a.especialidades.includes(specialty));
-    }
-    list = [...list];
-    if (sort === 'distancia') list.sort((a, b) => (distances.get(a.id) ?? Infinity) - (distances.get(b.id) ?? Infinity));
-    else if (sort === 'experiencia') list.sort((a, b) => b.anos_experiencia - a.anos_experiencia);
-    else if (sort === 'valoracion') list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-    else if (sort === 'propiedades') list.sort((a, b) => b.num_propiedades - a.num_propiedades);
-    else list.sort((a, b) => a.nombre_comercial.localeCompare(b.nombre_comercial));
-    return list;
-  }, [agencies, sort, maxDistanceKm, specialty, distances]);
+  const visibleAgencies = useMemo(
+    () => [...agencies].sort((a, b) => (distances.get(a.id) ?? Infinity) - (distances.get(b.id) ?? Infinity)),
+    [agencies, distances],
+  );
 
   return (
     <div>
@@ -100,24 +77,6 @@ export function InmobiliariasResultsView({
               <strong className="font-bold text-white">{visibleAgencies.length}</strong> {visibleAgencies.length === 1 ? 'inmobiliaria encontrada' : 'inmobiliarias encontradas'}
             </span>
           </div>
-        </div>
-      </div>
-
-      {/* Filtros — sticky justo debajo del navbar */}
-      <div
-        className="z-30 border-b border-slate-100 bg-white px-6 py-4"
-        style={{ position: 'sticky', top: NAVBAR_HEIGHT }}
-      >
-        <div className="mx-auto w-full max-w-[1400px]">
-          <FilterChips
-            sort={sort}
-            onSortChange={setSort}
-            maxDistanceKm={maxDistanceKm}
-            onMaxDistanceChange={setMaxDistanceKm}
-            specialties={specialtyOptions}
-            selectedSpecialty={specialty}
-            onSpecialtyChange={setSpecialty}
-          />
         </div>
       </div>
 

@@ -355,7 +355,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             type="button"
             onClick={goPrev}
             aria-label="Ver inmobiliarias anteriores"
-            className="absolute left-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-[#FF8000] shadow-lg shadow-black/30 transition-all duration-200 hover:bg-[#FF8000] hover:text-white active:scale-90 sm:h-12 sm:w-12 md:left-6 md:right-auto"
+            className="absolute left-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-[#FF8000] shadow-lg shadow-black/30 transition-all duration-200 hover:bg-[#FF8000] hover:text-white active:scale-90 sm:h-12 sm:w-12 md:left-[max(1.5rem,calc(50%_-_41.5rem))] lg:left-[max(1.5rem,calc(50%_-_46.5rem))]"
           >
             <ChevronLeft size={20} />
           </button>
@@ -363,7 +363,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             type="button"
             onClick={goNext}
             aria-label="Ver más inmobiliarias"
-            className="absolute right-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-[#FF8000] shadow-lg shadow-black/30 transition-all duration-200 hover:bg-[#FF8000] hover:text-white active:scale-90 sm:h-12 sm:w-12 md:right-6 md:left-auto"
+            className="absolute right-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-[#FF8000] shadow-lg shadow-black/30 transition-all duration-200 hover:bg-[#FF8000] hover:text-white active:scale-90 sm:h-12 sm:w-12 md:right-[max(1.5rem,calc(50%_-_41.5rem))] lg:right-[max(1.5rem,calc(50%_-_46.5rem))]"
           >
             <ChevronRight size={20} />
           </button>
