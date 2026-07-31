@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Footer } from '../Footer';
-import type { SearchSuggestion } from './inmobiliarias/InmobiliariasNavbar';
-import { InmobiliariasNavbar } from './inmobiliarias/InmobiliariasNavbar';
+import { LandingNavbar } from './landing-navbar';
+import type { SearchSuggestion } from '../ui/AgencySearchBar';
 import { InmobiliariasHomeView } from './inmobiliarias/InmobiliariasHomeView';
 import { InmobiliariasResultsView } from './inmobiliarias/InmobiliariasResultsView';
 
@@ -30,9 +30,7 @@ export function BuscadorInmobiliariasPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased">
-      <InmobiliariasNavbar
-        searchProps={searchPoint ? { initialValue: query, onSelect: handleSearch } : undefined}
-      />
+      <LandingNavbar invertOnScroll />
 
       {searchPoint ? (
         <InmobiliariasResultsView initialQuery={query} searchPoint={searchPoint} />

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  ArrowLeft, BadgeCheck, Globe, Home, MapPin, MapPinned,
+  ArrowLeft, BadgeCheck, ChevronLeft, ChevronRight, Globe, Home, MapPin, MapPinned,
   MessageCircle, Phone, ShieldCheck, Star, Users, Wallet, Briefcase, Zap, X,
 } from 'lucide-react';
 import { Footer } from '../Footer';
@@ -15,6 +15,7 @@ import { navigateTo } from '@/lib/utils';
 import { haversineKm, formatDistanceKm } from '@/lib/geo';
 import { fetchPlaceReviews, type GoogleReview } from '@/lib/google-places';
 import { fetchResenasManuales, type ResenaManual } from '@/data/live-resenas';
+import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -96,6 +97,28 @@ function WhyUsGrid() {
   );
 }
 
+type VideoOrientation = 'horizontal' | 'vertical' | null;
+
+// Para un embed (YouTube/Vimeo) no hay forma de leer las dimensiones reales
+// del vídeo sin llamar a su API oEmbed — a diferencia de un <video> propio,
+// donde el navegador ya conoce el tamaño real vía onLoadedMetadata. Sin
+// esto, un Short/Reel vertical quedaría forzado en una caja horizontal
+// 16:9 con franjas negras enormes arriba y abajo.
+async function fetchEmbedOrientation(embed: { platform: 'youtube' | 'vimeo'; id: string }): Promise<VideoOrientation> {
+  try {
+    const oembedUrl = embed.platform === 'youtube'
+      ? `https://www.youtube.com/oembed?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${embed.id}`)}&format=json`
+      : `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(`https://vimeo.com/${embed.id}`)}`;
+    const res = await fetch(oembedUrl);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (typeof data.width !== 'number' || typeof data.height !== 'number' || !data.width || !data.height) return null;
+    return data.height > data.width ? 'vertical' : 'horizontal';
+  } catch {
+    return null;
+  }
+}
+
 function VideoCard({
   url,
   nombre,
@@ -111,6 +134,20 @@ function VideoCard({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
+  const embed = useMemo(() => getVideoEmbed(url), [url]);
+  // null mientras se detecta (o si no se pudo saber) — de momento se trata
+  // como horizontal, el caso más común, hasta que llegue la respuesta.
+  const [orientation, setOrientation] = useState<VideoOrientation>(null);
+
+  useEffect(() => {
+    setOrientation(null);
+    if (!embed) return;
+    let cancelled = false;
+    fetchEmbedOrientation(embed).then((o) => { if (!cancelled) setOrientation(o); });
+    return () => { cancelled = true; };
+  }, [embed]);
+
+  const isVertical = orientation === 'vertical';
 
   return (
     <motion.div
@@ -125,34 +162,52 @@ function VideoCard({
       </div>
 
       <div className="rounded-[24px] bg-white p-2 shadow-[0_10px_40px_rgba(30,35,50,.08)]">
-        <div className="relative mx-auto w-fit overflow-hidden rounded-[16px] bg-black">
-          <video
-            ref={videoRef}
-            controls={playing}
-            className="max-h-[520px] w-auto"
-            src={url}
-            onPlay={() => setPlaying(true)}
-            onPause={() => setPlaying(false)}
-          />
+        {embed ? (
+          <div className={`mx-auto overflow-hidden rounded-[16px] bg-black ${isVertical ? 'aspect-[9/16] w-full max-w-[300px]' : 'aspect-video w-full max-w-[640px]'}`}>
+            <iframe
+              src={`${embed.embedUrl}?rel=0`}
+              title={`Vídeo de presentación de ${nombre}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="h-full w-full"
+            />
+          </div>
+        ) : (
+          <div className={`relative mx-auto overflow-hidden rounded-[16px] bg-black ${isVertical ? 'aspect-[9/16] w-full max-w-[300px]' : 'aspect-video w-full max-w-[640px]'}`}>
+            <video
+              ref={videoRef}
+              controls={playing}
+              className="h-full w-full object-contain"
+              src={url}
+              onPlay={() => setPlaying(true)}
+              onPause={() => setPlaying(false)}
+              onLoadedMetadata={(e) => {
+                const v = e.currentTarget;
+                if (v.videoWidth && v.videoHeight) {
+                  setOrientation(v.videoHeight > v.videoWidth ? 'vertical' : 'horizontal');
+                }
+              }}
+            />
 
-          {!playing && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-transparent via-transparent to-black/55">
-              <p className="mb-4 max-w-[200px] text-center text-sm font-semibold leading-snug text-white drop-shadow-md">
-                Conoce nuestra inmobiliaria<br />y cómo trabajamos por ti.
-              </p>
-              <button
-                type="button"
-                onClick={() => { videoRef.current?.play(); }}
-                className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-white shadow-lg shadow-black/20 transition-transform duration-200 hover:scale-105 active:scale-95"
-                aria-label="Reproducir vídeo"
-              >
-                <svg viewBox="0 0 24 24" className="ml-0.5 h-7 w-7 fill-primary">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </button>
-            </div>
-          )}
-        </div>
+            {!playing && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-transparent via-transparent to-black/55">
+                <p className="mb-4 max-w-[200px] text-center text-sm font-semibold leading-snug text-white drop-shadow-md">
+                  Conoce nuestra inmobiliaria<br />y cómo trabajamos por ti.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => { videoRef.current?.play(); }}
+                  className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-white shadow-lg shadow-black/20 transition-transform duration-200 hover:scale-105 active:scale-95"
+                  aria-label="Reproducir vídeo"
+                >
+                  <svg viewBox="0 0 24 24" className="ml-0.5 h-7 w-7 fill-primary">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {logoUrl && (
@@ -247,9 +302,14 @@ function ReviewsCarousel({ reviews }: { reviews: DisplayReview[] }) {
     return () => clearTimeout(t);
   }, [reducedMotion, paused, inView, isTouch, wasTouched, index, reviews.length]);
 
-  const goTo = (i: number) => {
+  const goPrev = () => {
     setPaused(true);
-    setIndex(i);
+    setIndex((i) => (i - 1 + reviews.length) % reviews.length);
+  };
+
+  const goNext = () => {
+    setPaused(true);
+    setIndex((i) => (i + 1) % reviews.length);
   };
 
   return (
@@ -271,24 +331,24 @@ function ReviewsCarousel({ reviews }: { reviews: DisplayReview[] }) {
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -84, opacity: 0, scale: 0.94 }}
             transition={{ duration: 0.5, ease: EASE }}
-            className="group rounded-[24px] border border-[#ECE8E1] bg-white p-6 shadow-[0_8px_28px_rgba(24,35,52,.04)]"
+            className="group overflow-hidden rounded-[24px] border border-[#ECE8E1] bg-white p-6 shadow-[0_8px_28px_rgba(24,35,52,.04)]"
           >
             <motion.div
               initial={{ scale: 1 }}
-              animate={{ scale: paused || reducedMotion ? 1 : 1.06 }}
+              animate={{ scale: paused || reducedMotion ? 1 : 1.04 }}
               transition={{ duration: 3.9, ease: 'easeOut', delay: 0.6 }}
             >
               <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 items-center gap-3">
                   {active.avatarUrl ? (
                     <img src={active.avatarUrl} alt={active.autor} className="h-8 w-8 shrink-0 rounded-full" />
                   ) : (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/8 text-sm font-bold text-primary">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/8 text-sm font-bold text-primary">
                       {active.autor.charAt(0) || '?'}
                     </div>
                   )}
-                  <div>
-                    <p className="text-lg font-semibold text-[#0F172A]">{active.autor}</p>
+                  <div className="min-w-0">
+                    <p className="truncate text-lg font-semibold text-[#0F172A]">{active.autor}</p>
                   </div>
                 </div>
                 <span className="inline-flex shrink-0 items-center rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
@@ -312,17 +372,23 @@ function ReviewsCarousel({ reviews }: { reviews: DisplayReview[] }) {
         </AnimatePresence>
       </div>
 
-      <div className="mt-6 flex items-center justify-center gap-2">
-        {reviews.map((r, i) => (
-          <button
-            key={String(r.key)}
-            type="button"
-            onClick={() => goTo(i)}
-            aria-label={`Ver reseña ${i + 1} de ${reviews.length}`}
-            aria-current={i === index}
-            className={`h-2 rounded-full transition-all duration-300 ${i === index ? 'w-6 bg-primary' : 'w-2 bg-[#E2DCD3] hover:bg-primary/40'}`}
-          />
-        ))}
+      <div className="mt-5 flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={goPrev}
+          aria-label="Ver comentario anterior"
+          className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary/35 bg-white text-primary shadow-[0_6px_20px_rgba(255,128,0,0.22)] transition-all duration-200 hover:border-primary hover:bg-primary hover:text-white hover:shadow-[0_10px_28px_rgba(255,128,0,0.45)] active:scale-90"
+        >
+          <ChevronLeft size={19} />
+        </button>
+        <button
+          type="button"
+          onClick={goNext}
+          aria-label="Ver comentario siguiente"
+          className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary/35 bg-white text-primary shadow-[0_6px_20px_rgba(255,128,0,0.22)] transition-all duration-200 hover:border-primary hover:bg-primary hover:text-white hover:shadow-[0_10px_28px_rgba(255,128,0,0.45)] active:scale-90"
+        >
+          <ChevronRight size={19} />
+        </button>
       </div>
     </div>
   );
@@ -370,10 +436,27 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
             key: r.id, autor: r.autor, rating: r.rating, comentario: r.comentario, fecha: r.fecha,
           }));
 
+  // El carrusel entra no solo cuando hay muchas reseñas, sino también cuando
+  // pocas (2-3) son tan largas juntas que la columna quedaría mucho más alta
+  // que el mapa de al lado — se estima por longitud de texto combinada, ya
+  // que es lo que determina la altura real de las tarjetas apiladas.
+  const combinedLength = reviews.reduce((sum, r) => sum + r.comentario.length, 0);
+  const useCarousel = reviews.length > 3 || (reviews.length > 1 && combinedLength > 600);
+
   return (
-    <>
+    <div className="flex w-full flex-col">
       <div className="mb-10">
-        <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">⭐ Reseñas de clientes</span>
+        <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-primary">
+          <motion.span
+            aria-hidden="true"
+            animate={prefersReducedMotion() ? {} : { y: [0, -1.5, 0], rotate: [0, -7, 7, 0] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+            className="inline-flex shrink-0"
+          >
+            <MessageCircle size={15} />
+          </motion.span>
+          Reseñas de clientes
+        </span>
         <h3 className="mt-4 text-[42px] font-bold leading-[110%] tracking-[-0.02em] text-[#0F172A]">
           Lo que dicen de nosotros
         </h3>
@@ -386,12 +469,14 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
         <div className="flex items-center justify-center py-12 text-sm text-ink-muted">Cargando reseñas…</div>
       )}
 
-      {!loading && reviews.length > 3 && !prefersReducedMotion() && (
-        <ReviewsCarousel reviews={reviews} />
+      {!loading && useCarousel && !prefersReducedMotion() && (
+        <div className="my-auto flex w-full flex-col">
+          <ReviewsCarousel reviews={reviews} />
+        </div>
       )}
 
       <div className="space-y-5">
-        {!loading && (reviews.length <= 3 || prefersReducedMotion()) && reviews.map((review, i) => (
+        {!loading && (!useCarousel || prefersReducedMotion()) && reviews.map((review, i) => (
           <motion.div
             key={review.key}
             initial={{ opacity: 0, y: 16 }}
@@ -438,7 +523,7 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
           Reseñas obtenidas de Google Places
         </p>
       )}
-    </>
+    </div>
   );
 }
 
@@ -752,6 +837,13 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
     );
   }
 
+  // Un cliente puede haber pegado por error un link que no es de YouTube,
+  // Vimeo, ni un archivo de vídeo (por ejemplo, la URL de su propia página
+  // web) — mejor no mostrar la sección de vídeo que mostrar un reproductor
+  // roto sin sonido ni imagen.
+  const hasPlayableVideo = !!agency.media_presentacion_url
+    && (!!getVideoEmbed(agency.media_presentacion_url) || isDirectVideoUrl(agency.media_presentacion_url));
+
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 antialiased">
       <div className="sticky top-0 z-30 border-b border-slate-100 bg-white/90 backdrop-blur-sm">
@@ -938,8 +1030,8 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
       {/* Bloque 2 — por qué elegirnos + video */}
       <section className="bg-surface">
         <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
-          <div className={`grid grid-cols-1 gap-10 ${agency.media_presentacion_url ? 'lg:grid-cols-[2fr_3fr] lg:gap-16' : ''}`}>
-            {agency.media_presentacion_url && (
+          <div className={`grid grid-cols-1 gap-10 ${hasPlayableVideo ? 'lg:grid-cols-[2fr_3fr] lg:gap-16' : ''}`}>
+            {hasPlayableVideo && agency.media_presentacion_url && (
               <div className="lg:pt-16">
                 <VideoCard
                   url={agency.media_presentacion_url}
@@ -986,7 +1078,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
                 <LocationSection agency={agency} searchPoint={searchPoint} />
               </div>
             )}
-            <div className="lg:self-start">
+            <div className="flex">
               <ReviewsList agency={agency} />
             </div>
           </div>

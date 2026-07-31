@@ -5,10 +5,17 @@ import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { useScroll } from '@/components/ui/use-scroll';
 import { useUI } from '@/context/UIContext';
 
-export function LandingNavbar() {
+export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boolean } = {}) {
   const [open, setOpen] = React.useState(false);
   const scrolled = useScroll(10);
   const { isContactModalOpen } = useUI();
+
+  // Por defecto el header no tiene fondo propio hasta hacer scroll — pensado
+  // para páginas que empiezan con una sección clara. `invertOnScroll` es para
+  // páginas con hero oscuro (video, imagen): arranca sólido (fondo blanco,
+  // colores normales) para quedar legible sobre el hero, y al hacer scroll
+  // pasa al mismo look difuminado que ya usa el resto del sitio.
+  const isSolidAtTop = invertOnScroll && !scrolled && !open;
 
   const links = [
     { label: 'Servicios', href: '/servicios' },
@@ -50,6 +57,7 @@ export function LandingNavbar() {
         {
           'border-white/25 bg-white/50 shadow-sm backdrop-blur-xl md:top-4 md:border md:shadow-md':
             scrolled && !open,
+          'border-slate-100 bg-white shadow-sm md:top-4 md:border md:shadow-md': isSolidAtTop,
           'pointer-events-none': isContactModalOpen,
           'bg-white': open,
         },

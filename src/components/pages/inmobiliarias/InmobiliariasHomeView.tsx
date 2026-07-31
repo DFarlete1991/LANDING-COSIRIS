@@ -4,6 +4,9 @@ import {
   ArrowRight,
   Bot,
   Check,
+  ChevronLeft,
+  ChevronRight,
+  Home,
   Inbox,
   LayoutDashboard,
   MapPin,
@@ -21,9 +24,11 @@ import {
 } from 'lucide-react';
 import { AgencyNetworkIllustration } from '../../ui/AgencyNetworkIllustration';
 import { AgencySearchBar, type SearchSuggestion } from '../../ui/AgencySearchBar';
+import { ValorarPropiedadModal } from '../../ui/ValorarPropiedadModal';
 import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo } from '@/lib/utils';
+import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -43,15 +48,22 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSuggestion) => void }) {
   const { agencies } = useInmobiliarias();
   const allCities = useMemo(() => getAllCitiesWithCounts(agencies), [agencies]);
+  const [valorarOpen, setValorarOpen] = useState(false);
 
   const VIDEO_COUNT = 5;
   const shuffledForVideo = useMemo(() => [...agencies].sort(() => Math.random() - 0.5), [agencies]);
   const [videoStartIdx, setVideoStartIdx] = useState(0);
 
+  // La rotación automática reinicia el contador cada vez que cambia el índice
+  // (por flecha o por el propio temporizador), así tras navegar manualmente
+  // no salta a otro grupo a los pocos segundos.
   useEffect(() => {
     const t = setInterval(() => setVideoStartIdx((prev) => (prev + 1) % shuffledForVideo.length), 15000);
     return () => clearInterval(t);
-  }, [shuffledForVideo.length]);
+  }, [shuffledForVideo.length, videoStartIdx]);
+
+  const goNext = () => setVideoStartIdx((prev) => (prev + 1) % shuffledForVideo.length);
+  const goPrev = () => setVideoStartIdx((prev) => (prev - 1 + shuffledForVideo.length) % shuffledForVideo.length);
 
   const visibleForVideo = useMemo(() => {
     const result: typeof agencies = [];
@@ -116,7 +128,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE }}
-          className="relative z-10 mx-auto w-full max-w-2xl"
+          className="relative z-10 mx-auto w-full max-w-3xl"
         >
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 backdrop-blur-md">
             <MapPin size={13} className="text-[#FF8000]" />
@@ -153,11 +165,43 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           </p>
 
           <div className="mt-9">
-            <AgencySearchBar size="hero" onSelect={onSearch} placeholder="Ej. Madrid, Ruzafa Valencia..." />
+            <AgencySearchBar size="hero" onSelect={onSearch} placeholder="Buscar inmobiliaria en tu zona" />
           </div>
 
+          {/* CTA de baja jerarquía — enlace, no botón: no debe competir con el buscador. */}
+          <button
+            type="button"
+            onClick={() => setValorarOpen(true)}
+            className="group mx-auto mt-[18px] flex flex-col items-center justify-center gap-1.5 sm:flex-row sm:gap-0"
+          >
+            <span className="flex items-center gap-3.5">
+              <Home
+                size={20}
+                strokeWidth={2}
+                className="shrink-0 text-[#F58B2A] transition-transform duration-[250ms] ease-out group-hover:scale-105"
+              />
+              <span className="text-[15px] font-medium leading-[26px] text-white/[.92] sm:text-[17px]">
+                ¿Quieres vender tu inmueble?
+              </span>
+            </span>
+
+            <span aria-hidden="true" className="mx-[22px] hidden h-[22px] w-px bg-white/[.18] sm:block" />
+
+            <span className="flex items-center">
+              <span className="text-[18px] font-bold text-[#F58B2A] transition-colors duration-[250ms] ease-out group-hover:text-[#FF9B3A]">
+                Valora tu propiedad
+              </span>
+              <ArrowRight
+                size={18}
+                className="ml-2 text-[#F58B2A] transition-[transform,color] duration-[250ms] ease-out group-hover:translate-x-1 group-hover:text-[#FF9B3A]"
+              />
+            </span>
+          </button>
+
+          <p className="mt-[14px] text-center text-[11px] font-medium text-white/50">Gratis y sin compromiso · lo reciben las inmobiliarias de tu zona</p>
+
           {allCities.length > 0 && (
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5 sm:mt-5 sm:gap-2">
+            <div className="mt-[22px] flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
               <span className="hidden text-xs text-white/50 sm:inline">Ciudades:</span>
               {allCities.map((c) => (
                 <button
@@ -306,46 +350,104 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
               Conoce a nuestras inmobiliarias
             </p>
           </Reveal>
+        </div>
 
-          <div
-            className="mt-6 flex items-end gap-2 overflow-x-auto overscroll-x-contain px-4 sm:mt-8 sm:gap-3 md:gap-4 md:justify-center md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        <div className="relative z-10 mt-6 sm:mt-8">
+          <button
+            type="button"
+            onClick={goPrev}
+            aria-label="Ver inmobiliarias anteriores"
+            className="absolute left-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-[#FF8000] shadow-lg shadow-black/30 transition-all duration-200 hover:bg-[#FF8000] hover:text-white active:scale-90 sm:h-12 sm:w-12 md:left-6 md:right-auto"
           >
-            {visibleForVideo.map((agency, i) => (
-                <motion.button
-                  key={`${agency.id}-${videoStartIdx + i}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.2 }}
-                  onClick={() => navigateTo(`/inmobiliarias/${agency.id}`)}
-                  className="group relative w-36 shrink-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-44 md:w-56 lg:w-64"
-                  style={{ aspectRatio: '9/16' }}
-                >
-                  <video
-                    className="absolute inset-0 h-full w-full object-cover"
-                    src={agency.media_presentacion_url ?? '/assets/inmobiliarias/hero-bg.mp4'}
-                    poster="/assets/inmobiliarias/ciudades/madrid.jpg"
-                    autoPlay muted loop playsInline
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-3 text-left sm:p-4">
-                    <div
-                      className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold text-white sm:h-10 sm:w-10 sm:text-sm"
-                      style={{ backgroundColor: agency.color_hex ?? '#FF8000' }}
-                    >
-                      {agency.nombre_comercial.split(' ').map((w: string) => w[0]).slice(0, 2).join('')}
+            <ChevronLeft size={20} />
+          </button>
+          <button
+            type="button"
+            onClick={goNext}
+            aria-label="Ver más inmobiliarias"
+            className="absolute right-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-[#FF8000] shadow-lg shadow-black/30 transition-all duration-200 hover:bg-[#FF8000] hover:text-white active:scale-90 sm:h-12 sm:w-12 md:right-6 md:left-auto"
+          >
+            <ChevronRight size={20} />
+          </button>
+
+            <div
+              className="flex items-end gap-2 overflow-x-auto overscroll-x-contain px-4 sm:gap-3 md:gap-4 md:justify-center md:overflow-visible md:px-10 [&::-webkit-scrollbar]:hidden"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {visibleForVideo.map((agency, i) => {
+                const embed = agency.media_presentacion_url ? getVideoEmbed(agency.media_presentacion_url) : null;
+                // Si no es ni YouTube/Vimeo ni un archivo de vídeo reproducible
+                // (por ejemplo, quedó guardado un link a una página web), se
+                // muestra la foto de perfil de la agencia en vez de repetir el
+                // vídeo genérico — y solo si tampoco hay foto cae al vídeo de
+                // fondo como último recurso.
+                const directVideoSrc = !embed && agency.media_presentacion_url && isDirectVideoUrl(agency.media_presentacion_url)
+                  ? agency.media_presentacion_url
+                  : null;
+                const showProfilePhoto = !embed && !directVideoSrc && !!agency.foto_url;
+                return (
+                  <motion.button
+                    key={`${agency.id}-${videoStartIdx + i}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                    onClick={() => navigateTo(`/inmobiliarias/${agency.id}`)}
+                    className="group relative w-36 shrink-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-44 md:w-56 lg:w-64"
+                    style={{ aspectRatio: '9/16' }}
+                  >
+                    {embed ? (
+                      <iframe
+                        className="pointer-events-none absolute inset-0 h-full w-full"
+                        src={
+                          embed.platform === 'youtube'
+                            ? `${embed.embedUrl}?autoplay=1&mute=1&loop=1&playlist=${embed.id}&controls=0&modestbranding=1&playsinline=1&rel=0`
+                            : `${embed.embedUrl}?autoplay=1&loop=1&muted=1&background=1&controls=0`
+                        }
+                        title={agency.nombre_comercial}
+                        allow="autoplay; encrypted-media"
+                      />
+                    ) : directVideoSrc ? (
+                      <video
+                        className="absolute inset-0 h-full w-full object-cover"
+                        src={directVideoSrc}
+                        poster="/assets/inmobiliarias/ciudades/madrid.jpg"
+                        autoPlay muted loop playsInline
+                      />
+                    ) : showProfilePhoto ? (
+                      <img
+                        src={agency.foto_url!}
+                        alt={agency.nombre_comercial}
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <video
+                        className="absolute inset-0 h-full w-full object-cover"
+                        src="/assets/inmobiliarias/hero-bg.mp4"
+                        poster="/assets/inmobiliarias/ciudades/madrid.jpg"
+                        autoPlay muted loop playsInline
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 p-3 text-left sm:p-4">
+                      <div
+                        className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold text-white sm:h-10 sm:w-10 sm:text-sm"
+                        style={{ backgroundColor: agency.color_hex ?? '#FF8000' }}
+                      >
+                        {agency.nombre_comercial.split(' ').map((w: string) => w[0]).slice(0, 2).join('')}
+                      </div>
+                      <h3 className="mt-2 text-xs font-bold text-white sm:text-sm">{agency.nombre_comercial}</h3>
+                      <p className="mt-0.5 text-[10px] text-white/50 sm:text-xs">{agency.poblacion}</p>
                     </div>
-                    <h3 className="mt-2 text-xs font-bold text-white sm:text-sm">{agency.nombre_comercial}</h3>
-                    <p className="mt-0.5 text-[10px] text-white/50 sm:text-xs">{agency.poblacion}</p>
-                  </div>
-                  <div className="absolute right-2 top-2 rounded-full bg-black/40 px-1.5 py-0.5 text-[10px] font-semibold text-white/70 backdrop-blur-sm">
-                    {(videoStartIdx + i) % shuffledForVideo.length + 1}/{shuffledForVideo.length}
-                  </div>
-                </motion.button>
-            ))}
+                    <div className="absolute right-2 top-2 rounded-full bg-black/40 px-1.5 py-0.5 text-[10px] font-semibold text-white/70 backdrop-blur-sm">
+                      {(videoStartIdx + i) % shuffledForVideo.length + 1}/{shuffledForVideo.length}
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="mt-10 text-center">
+          <div className="relative z-10 mx-auto mt-10 max-w-6xl px-4 text-center">
             <button
               type="button"
               onClick={() => { document.getElementById('inicio-directorio')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
@@ -355,7 +457,6 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
               <Search size={16} className="transition-transform group-hover:translate-x-0.5" />
             </button>
           </div>
-        </div>
       </section>
 
       {/* 3. PARA INMOBILIARIAS — header + confianza */}
@@ -622,6 +723,8 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           </Reveal>
         </div>
       </section>
+
+      <ValorarPropiedadModal open={valorarOpen} onClose={() => setValorarOpen(false)} agencies={agencies} />
     </div>
   );
 }
