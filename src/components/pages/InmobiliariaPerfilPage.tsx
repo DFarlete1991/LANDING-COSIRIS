@@ -29,6 +29,14 @@ function excerpt(text: string, max = 168): string {
   return `${text.slice(0, max).replace(/\s+\S*$/, '')}…`;
 }
 
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
 function ProofStrip({ agency, poblacion }: { agency: InmobiliariaPublica; poblacion: string }) {
   const stats = [
     { icon: Home, value: String(agency.num_propiedades), label: `Propiedades vendidas en ${poblacion}` },
@@ -204,6 +212,122 @@ type DisplayReview = {
   avatarUrl?: string;
 };
 
+/** Carrusel tipo ruleta vertical para cuando hay más de 3 reseñas: cada
+    reseña entra desde abajo, hace un pequeño zoom mientras se muestra y
+    después sube para dejar paso a la siguiente. Se queda estático al pasar
+    el cursor (o al tocarlo en móvil). */
+function ReviewsCarousel({ reviews }: { reviews: DisplayReview[] }) {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [inView, setInView] = useState(true);
+  const [wasTouched, setWasTouched] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const isTouch =
+    typeof window !== 'undefined' &&
+    ((typeof window.matchMedia === 'function' && window.matchMedia('(hover: none)').matches) || navigator.maxTouchPoints > 0);
+
+  const reducedMotion = prefersReducedMotion();
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.2 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const active = reviews[index];
+
+  // Avanza la ruleta solo si está visible, no está en pausa y el usuario no ha
+  // interactuado con ella. En táctil, en cuanto se toca, queda estática.
+  useEffect(() => {
+    if (reducedMotion || paused || !inView || (isTouch && wasTouched)) return;
+    const t = setTimeout(() => setIndex((i) => (i + 1) % reviews.length), 4600);
+    return () => clearTimeout(t);
+  }, [reducedMotion, paused, inView, isTouch, wasTouched, index, reviews.length]);
+
+  const goTo = (i: number) => {
+    setPaused(true);
+    setIndex(i);
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onTouchStart={() => { setPaused(true); setWasTouched(true); }}
+      onTouchEnd={() => setPaused(false)}
+      className="relative"
+      aria-roledescription="carrusel"
+      aria-label="Reseñas de clientes"
+    >
+      <div className="min-h-[300px]">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={active.key}
+            initial={{ y: 84, opacity: 0, scale: 0.94 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: -84, opacity: 0, scale: 0.94 }}
+            transition={{ duration: 0.5, ease: EASE }}
+            className="group rounded-[24px] border border-[#ECE8E1] bg-white p-6 shadow-[0_8px_28px_rgba(24,35,52,.04)]"
+          >
+            <motion.div
+              initial={{ scale: 1 }}
+              animate={{ scale: paused || reducedMotion ? 1 : 1.06 }}
+              transition={{ duration: 3.9, ease: 'easeOut', delay: 0.6 }}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  {active.avatarUrl ? (
+                    <img src={active.avatarUrl} alt={active.autor} className="h-8 w-8 shrink-0 rounded-full" />
+                  ) : (
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/8 text-sm font-bold text-primary">
+                      {active.autor.charAt(0) || '?'}
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-lg font-semibold text-[#0F172A]">{active.autor}</p>
+                  </div>
+                </div>
+                <span className="inline-flex shrink-0 items-center rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
+                  {active.fecha}
+                </span>
+              </div>
+
+              <p className="mt-3 text-sm leading-[160%] text-[#68707F]">&ldquo;{active.comentario}&rdquo;</p>
+
+              <div className="mt-3 flex items-center gap-0.5">
+                {Array.from({ length: 5 }).map((_, s) => (
+                  <Star
+                    key={s}
+                    size={15}
+                    className={s < active.rating ? 'fill-[#F5A524] text-[#F5A524]' : 'text-[#E2DCD3]'}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div className="mt-6 flex items-center justify-center gap-2">
+        {reviews.map((r, i) => (
+          <button
+            key={String(r.key)}
+            type="button"
+            onClick={() => goTo(i)}
+            aria-label={`Ver reseña ${i + 1} de ${reviews.length}`}
+            aria-current={i === index}
+            className={`h-2 rounded-full transition-all duration-300 ${i === index ? 'w-6 bg-primary' : 'w-2 bg-[#E2DCD3] hover:bg-primary/40'}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
   const [googleReviews, setGoogleReviews] = useState<GoogleReview[] | null>(null);
   const [manualReviews, setManualReviews] = useState<ResenaManual[] | null>(null);
@@ -258,11 +382,16 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
         </p>
       </div>
 
+      {loading && (
+        <div className="flex items-center justify-center py-12 text-sm text-ink-muted">Cargando reseñas…</div>
+      )}
+
+      {!loading && reviews.length > 3 && !prefersReducedMotion() && (
+        <ReviewsCarousel reviews={reviews} />
+      )}
+
       <div className="space-y-5">
-        {loading && (
-          <div className="flex items-center justify-center py-12 text-sm text-ink-muted">Cargando reseñas…</div>
-        )}
-        {!loading && reviews.map((review, i) => (
+        {!loading && (reviews.length <= 3 || prefersReducedMotion()) && reviews.map((review, i) => (
           <motion.div
             key={review.key}
             initial={{ opacity: 0, y: 16 }}
