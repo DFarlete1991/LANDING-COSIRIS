@@ -24,7 +24,6 @@ import {
 } from 'lucide-react';
 import { AgencyNetworkIllustration } from '../../ui/AgencyNetworkIllustration';
 import { AgencySearchBar, type SearchSuggestion } from '../../ui/AgencySearchBar';
-import { ValorarPropiedadModal } from '../../ui/ValorarPropiedadModal';
 import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo } from '@/lib/utils';
@@ -48,7 +47,6 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSuggestion) => void }) {
   const { agencies } = useInmobiliarias();
   const allCities = useMemo(() => getAllCitiesWithCounts(agencies), [agencies]);
-  const [valorarOpen, setValorarOpen] = useState(false);
 
   const VIDEO_COUNT = 5;
   const shuffledForVideo = useMemo(() => [...agencies].sort(() => Math.random() - 0.5), [agencies]);
@@ -171,7 +169,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           {/* CTA de baja jerarquía — enlace, no botón: no debe competir con el buscador. */}
           <button
             type="button"
-            onClick={() => setValorarOpen(true)}
+            onClick={() => navigateTo('/inmobiliarias/valorar')}
             className="group mx-auto mt-[18px] flex flex-col items-center justify-center gap-1.5 sm:flex-row sm:gap-0"
           >
             <span className="flex items-center gap-3.5">
@@ -437,9 +435,6 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                       </div>
                       <h3 className="mt-2 text-xs font-bold text-white sm:text-sm">{agency.nombre_comercial}</h3>
                       <p className="mt-0.5 text-[10px] text-white/50 sm:text-xs">{agency.poblacion}</p>
-                    </div>
-                    <div className="absolute right-2 top-2 rounded-full bg-black/40 px-1.5 py-0.5 text-[10px] font-semibold text-white/70 backdrop-blur-sm">
-                      {(videoStartIdx + i) % shuffledForVideo.length + 1}/{shuffledForVideo.length}
                     </div>
                   </motion.button>
                 );
@@ -723,8 +718,6 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           </Reveal>
         </div>
       </section>
-
-      <ValorarPropiedadModal open={valorarOpen} onClose={() => setValorarOpen(false)} agencies={agencies} />
     </div>
   );
 }

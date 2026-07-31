@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, BadgeCheck, Briefcase, Clock, Home, MapPin, Phone, Star, Users, X } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Briefcase, Check, Clock, Home, MapPin, Phone, Star, Users, X } from 'lucide-react';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { formatDistanceKm } from '@/lib/geo';
 import { navigateTo } from '@/lib/utils';
@@ -124,11 +124,17 @@ export function AgencyResultRow({
   distanceKm,
   isNearest,
   searchPoint,
+  selectable = false,
+  selected = false,
+  onToggle,
 }: {
   agency: InmobiliariaPublica;
   distanceKm: number | null;
   isNearest: boolean;
   searchPoint?: { lat: number; lng: number } | null;
+  selectable?: boolean;
+  selected?: boolean;
+  onToggle?: (id: string) => void;
 }) {
   const [showPhone, setShowPhone] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -149,6 +155,11 @@ export function AgencyResultRow({
     navigateTo(href);
   };
 
+  const handleActivate = () => {
+    if (selectable && onToggle) onToggle(agency.id);
+    else goToProfile();
+  };
+
   const filledStars = agency.rating != null ? Math.round(agency.rating) : 0;
 
   const metrics = [
@@ -162,14 +173,16 @@ export function AgencyResultRow({
     <div
       role="button"
       tabIndex={0}
-      onClick={goToProfile}
+      onClick={handleActivate}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          goToProfile();
+          handleActivate();
         }
       }}
-      className="flex cursor-pointer flex-col gap-4 rounded-[24px] border border-slate-100 bg-white p-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-[transform,box-shadow] duration-[250ms] ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(15,23,42,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000] sm:flex-row sm:gap-6 sm:p-6"
+      className={`flex cursor-pointer flex-col gap-4 rounded-[24px] border p-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-[transform,border-color,box-shadow] duration-[250ms] ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(15,23,42,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000] sm:flex-row sm:gap-6 sm:p-6 ${
+        selected ? 'border-[#FF8000] bg-orange-50/40 ring-2 ring-[#FF8000]/20' : 'border-slate-100 bg-white'
+      }`}
     >
       {/* En móvil: avatar + nombre lado a lado. En sm+: display:contents hace que
           este wrapper "desaparezca" y avatar/central vuelvan a ser columnas
@@ -240,38 +253,65 @@ export function AgencyResultRow({
 
       {/* Derecha: acciones — solo desktop */}
       <div className="hidden shrink-0 flex-col items-stretch gap-2 self-center sm:flex sm:w-[160px]">
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); goToProfile(); }}
-          className="flex h-[48px] w-full items-center justify-center gap-1.5 rounded-full bg-[#FF8000] text-[14px] font-bold text-white shadow-sm shadow-[#FF8000]/20 transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#E67300] hover:shadow-md hover:shadow-[#FF8000]/30 active:scale-95"
-        >
-          Ver perfil <ArrowRight size={15} />
-        </button>
-        {showPhone ? (
-          <a
-            href={`tel:${agency.telefono}`}
-            onClick={(e) => e.stopPropagation()}
-            className="flex items-center justify-center gap-1.5 py-1 text-center text-[13px] font-bold text-green-700 underline decoration-green-300 underline-offset-2 transition-colors hover:text-green-800 hover:decoration-green-500"
-          >
-            <Phone size={12} /> {agency.telefono}
-          </a>
+        {selectable ? (
+          <div className="flex flex-col items-center gap-2">
+            <span
+              className={`flex h-12 w-12 items-center justify-center rounded-full border-2 transition-colors duration-200 ${
+                selected ? 'border-[#FF8000] bg-[#FF8000]' : 'border-slate-300 bg-white'
+              }`}
+            >
+              {selected && <Check size={22} strokeWidth={2.5} className="text-white" />}
+            </span>
+            <span className={`text-[13px] font-bold ${selected ? 'text-[#FF8000]' : 'text-slate-500'}`}>
+              {selected ? 'Seleccionada' : 'Seleccionar'}
+            </span>
+          </div>
         ) : (
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
-            className="flex cursor-pointer items-center justify-center gap-1.5 py-1 text-center text-[13px] font-semibold text-slate-500 underline decoration-slate-300 underline-offset-2 transition-colors hover:text-[#FF8000] hover:decoration-[#FF8000]"
-          >
-            <Phone size={12} /> Ver teléfono
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); goToProfile(); }}
+              className="flex h-[48px] w-full items-center justify-center gap-1.5 rounded-full bg-[#FF8000] text-[14px] font-bold text-white shadow-sm shadow-[#FF8000]/20 transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#E67300] hover:shadow-md hover:shadow-[#FF8000]/30 active:scale-95"
+            >
+              Ver perfil <ArrowRight size={15} />
+            </button>
+            {showPhone ? (
+              <a
+                href={`tel:${agency.telefono}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center justify-center gap-1.5 py-1 text-center text-[13px] font-bold text-green-700 underline decoration-green-300 underline-offset-2 transition-colors hover:text-green-800 hover:decoration-green-500"
+              >
+                <Phone size={12} /> {agency.telefono}
+              </a>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
+                className="flex cursor-pointer items-center justify-center gap-1.5 py-1 text-center text-[13px] font-semibold text-slate-500 underline decoration-slate-300 underline-offset-2 transition-colors hover:text-[#FF8000] hover:decoration-[#FF8000]"
+              >
+                <Phone size={12} /> Ver teléfono
+              </button>
+            )}
+          </>
         )}
       </div>
       {/* En móvil: botón compacto */}
       <button
         type="button"
-        onClick={(e) => { e.stopPropagation(); goToProfile(); }}
-        className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-[#FF8000] px-5 text-sm font-bold text-white shadow-sm shadow-[#FF8000]/20 transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#E67300] hover:shadow-md hover:shadow-[#FF8000]/30 active:scale-95 sm:hidden"
+        onClick={(e) => { e.stopPropagation(); handleActivate(); }}
+        className={`flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full px-5 text-sm font-bold shadow-sm transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out active:scale-95 sm:hidden ${
+          selectable
+            ? selected
+              ? 'bg-[#FF8000] text-white'
+              : 'border border-slate-200 bg-white text-slate-600'
+            : 'bg-[#FF8000] text-white shadow-[#FF8000]/20 hover:bg-[#E67300] hover:shadow-md hover:shadow-[#FF8000]/30'
+        }`}
       >
-        Ver perfil <ArrowRight size={15} />
+        {selectable ? (
+          selected ? (<><Check size={16} /> Elegida</>) : 'Elegir'
+        ) : (
+          <>Ver perfil <ArrowRight size={15} /></>
+        )}
       </button>
 
       {createPortal(

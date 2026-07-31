@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  ArrowLeft, BadgeCheck, ChevronLeft, ChevronRight, Globe, Home, MapPin, MapPinned,
+  ArrowLeft, BadgeCheck, ChevronLeft, ChevronRight, Home, MapPin, MapPinned,
   MessageCircle, Phone, ShieldCheck, Star, Users, Wallet, Briefcase, Zap, X,
 } from 'lucide-react';
 import { Footer } from '../Footer';
@@ -989,36 +989,6 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
         >
           <ProofStrip agency={agency} poblacion={agency.poblacion} />
         </motion.div>
-
-        <div className="mt-8 flex flex-wrap gap-4">
-          {agency.idiomas.length > 0 && (
-            <div className="flex items-center gap-4 rounded-card border border-border bg-white px-4 py-3 shadow-soft">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/8 text-primary">
-                <Globe size={18} />
-              </div>
-              <div>
-                <p className="text-sm font-bold leading-none text-foreground">{agency.idiomas.join(' · ')}</p>
-                <p className="mt-0.5 text-xs text-ink-muted">Idiomas</p>
-              </div>
-            </div>
-          )}
-          {agency.pagina_web && (
-            <a
-              href={agency.pagina_web}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-4 rounded-card border border-border bg-white px-4 py-3 shadow-soft transition-all duration-200 hover:border-primary/30 hover:shadow-card"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/8 text-primary">
-                <Globe size={18} />
-              </div>
-              <div>
-                <p className="text-sm font-bold leading-none text-foreground">Sitio web</p>
-                <p className="mt-0.5 text-xs text-ink-muted truncate max-w-[140px]">{agency.pagina_web.replace(/^https?:\/\//, '')}</p>
-              </div>
-            </a>
-          )}
-        </div>
 
       </main>
 

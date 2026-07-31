@@ -5,7 +5,7 @@ export const FIXED_CITIES: { city: string; province: string; lat: number; lng: n
   { city: 'Barcelona', province: 'Barcelona', lat: 41.3874, lng: 2.1686 },
   { city: 'Valencia', province: 'Valencia', lat: 39.4699, lng: -0.3763 },
   { city: 'Sevilla', province: 'Sevilla', lat: 37.3891, lng: -5.9845 },
-  { city: 'Bilbao', province: 'Vizcaya', lat: 43.2630, lng: -2.9350 },
+  { city: 'Bilbao', province: 'Bizkaia', lat: 43.2630, lng: -2.9350 },
   { city: 'Málaga', province: 'Málaga', lat: 36.7213, lng: -4.4214 },
 ];
 

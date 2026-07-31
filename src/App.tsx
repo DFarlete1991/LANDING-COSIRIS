@@ -15,6 +15,7 @@ import { CaptacionInmobiliariasPage } from './components/pages/CaptacionInmobili
 import { GraciasVenderPage } from './components/pages/GraciasVenderPage';
 import { GraciasPage } from './components/pages/GraciasPage';
 import { BuscadorInmobiliariasPage } from './components/pages/BuscadorInmobiliariasPage';
+import { ValorarPropiedadPage } from './components/pages/ValorarPropiedadPage';
 import { InmobiliariaPerfilPage } from './components/pages/InmobiliariaPerfilPage';
 import { PlanesInmobiliariasPage } from './components/pages/PlanesInmobiliariasPage';
 import { RegistroInmobiliariaPage } from './components/pages/RegistroInmobiliariaPage';
@@ -103,6 +104,15 @@ export default function App() {
 
   if (currentPath === '/inmobiliarias/registro') {
     return <RegistroInmobiliariaPage />;
+  }
+
+  if (currentPath === '/inmobiliarias/valorar') {
+    return (
+      <InmobiliariasProvider>
+        <ValorarPropiedadPage />
+        <ContactModal />
+      </InmobiliariasProvider>
+    );
   }
 
   if (currentPath.startsWith('/inmobiliarias/')) {
