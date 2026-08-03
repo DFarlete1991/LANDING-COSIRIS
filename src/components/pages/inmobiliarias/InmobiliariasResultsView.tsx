@@ -125,7 +125,6 @@ export function InmobiliariasResultsView({
             >
               <AgencyResultRow
                 agency={agency}
-                distanceKm={distances.get(agency.id) ?? null}
                 isNearest={agency.id === nearestId}
                 searchPoint={searchPoint}
               />

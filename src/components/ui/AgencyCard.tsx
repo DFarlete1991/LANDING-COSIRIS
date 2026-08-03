@@ -126,7 +126,6 @@ export function AgencyCard({
 
 export function AgencyResultRow({
   agency,
-  distanceKm,
   isNearest,
   searchPoint,
   selectable = false,
@@ -134,7 +133,6 @@ export function AgencyResultRow({
   onToggle,
 }: {
   agency: InmobiliariaPublica;
-  distanceKm: number | null;
   isNearest: boolean;
   searchPoint?: { lat: number; lng: number } | null;
   selectable?: boolean;
@@ -172,7 +170,6 @@ export function AgencyResultRow({
   const metrics = [
     agency.num_propiedades > 0 && { icon: Home, value: String(agency.num_propiedades), label: 'Propiedades' },
     agency.anos_experiencia > 0 && { icon: Clock, value: `${agency.anos_experiencia} años`, label: 'Experiencia' },
-    distanceKm != null && { icon: MapPin, value: formatDistanceKm(distanceKm), label: 'De tu ubicación' },
     agency.num_empleados > 0 && { icon: Users, value: String(agency.num_empleados), label: 'Agentes' },
   ].filter((m): m is { icon: typeof Home; value: string; label: string } => Boolean(m));
 
