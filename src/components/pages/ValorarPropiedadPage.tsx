@@ -7,6 +7,7 @@ import { Footer } from '../Footer';
 import { LandingNavbar } from './landing-navbar';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo } from '@/lib/utils';
+import { haversineKm } from '@/lib/geo';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 
 const EXPO = [0.19, 1, 0.22, 1] as const;
@@ -27,7 +28,7 @@ const TIEMPOS: Tiempo[] = [
 
 type Phase = 'form' | 'select' | 'sending' | 'sent' | 'error';
 
-type ZoneDetails = { postalCode?: string; city?: string; province?: string };
+type ZoneDetails = { postalCode?: string; city?: string; province?: string; lat?: number; lng?: number };
 
 // El CRM es quien crea el lead real por inmobiliaria (mismo endpoint público
 // que usa AgencyLeadForm en el perfil de cada agencia). Si el usuario elige
@@ -35,11 +36,27 @@ type ZoneDetails = { postalCode?: string; city?: string; province?: string };
 // tipo_origen para que el admin pueda distinguir de dónde vienen.
 const CRM_API_URL = import.meta.env.VITE_CRM_API_URL ?? 'http://localhost:3000';
 
-// Coincide las inmobiliarias de la zona de la dirección introducida. La
-// dirección autocompletada devuelve CP, ciudad y provincia (OSM), así que se
-// prioriza el prefijo del código postal (mismo sector), luego la ciudad y por
-// último la provincia. Se ordena por relevancia y se limita a 8.
+// Mismo radio que usa el listado del directorio (InmobiliariasResultsView),
+// para que "tu zona" signifique lo mismo en todo el sitio.
+const MAX_ZONE_DISTANCE_KM = 50;
+
+// Coincide las inmobiliarias realmente cercanas a la dirección introducida,
+// usando distancia real (haversine) — igual que el buscador principal del
+// directorio — en vez de comparar texto de CP/ciudad/provincia: ese método
+// podía matchear inmobiliarias lejanas por una coincidencia parcial de
+// provincia. Si el geocoder no devolvió coordenadas, cae al match por texto.
 function matchAgenciesInZone(agencies: InmobiliariaPublica[], zone: ZoneDetails): InmobiliariaPublica[] {
+  if (zone.lat != null && zone.lng != null) {
+    const point = { lat: zone.lat, lng: zone.lng };
+    return agencies
+      .filter((a) => a.lat != null && a.lng != null)
+      .map((a) => ({ agency: a, km: haversineKm(point, { lat: a.lat as number, lng: a.lng as number }) }))
+      .filter((s) => s.km <= MAX_ZONE_DISTANCE_KM)
+      .sort((a, b) => a.km - b.km)
+      .slice(0, 8)
+      .map((s) => s.agency);
+  }
+
   const cp = zone.postalCode?.replace(/\D/g, '') ?? '';
   const cp3 = cp.slice(0, 3);
   const cp2 = cp.slice(0, 2);
@@ -350,7 +367,13 @@ export function ValorarPropiedadPage() {
                         error={Boolean(errors.address)}
                         onSelectDetails={(details) => {
                           if (details.postalCode) setPostalCode(details.postalCode);
-                          setZone({ postalCode: details.postalCode, city: details.city, province: details.province });
+                          setZone({
+                            postalCode: details.postalCode,
+                            city: details.city,
+                            province: details.province,
+                            lat: details.lat,
+                            lng: details.lng,
+                          });
                         }}
                       />
                       {errors.address && <p className="mt-1 text-xs text-red-500">{errors.address}</p>}

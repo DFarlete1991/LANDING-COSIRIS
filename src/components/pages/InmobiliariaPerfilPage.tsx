@@ -38,18 +38,18 @@ function prefersReducedMotion(): boolean {
   );
 }
 
-function ProofStrip({ agency, poblacion }: { agency: InmobiliariaPublica; poblacion: string }) {
+function ProofStrip({ agency }: { agency: InmobiliariaPublica }) {
   const stats = [
-    { icon: Home, value: String(agency.num_propiedades), label: `Propiedades vendidas en ${poblacion}` },
-    { icon: Wallet, value: formatPrice(agency.precio_medio), label: 'Precio medio de venta' },
-    { icon: Briefcase, value: String(agency.anos_experiencia), label: 'De experiencia en el mercado local' },
-    { icon: Users, value: String(agency.num_empleados), label: `Agentes especialistas en ${poblacion}` },
-  ];
+    { icon: Home, value: String(agency.num_propiedades), label: 'PROPIEDADES VENDIDAS', raw: agency.num_propiedades },
+    { icon: Wallet, value: formatPrice(agency.precio_medio), label: 'PRECIO MEDIO', raw: agency.precio_medio },
+    { icon: Briefcase, value: String(agency.anos_experiencia), label: 'AÑOS DE EXPERIENCIA', raw: agency.anos_experiencia },
+    { icon: Users, value: String(agency.num_empleados), label: 'EQUIPO', raw: agency.num_empleados },
+  ].filter((s) => s.raw > 0);
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+    <div className="flex flex-wrap gap-4">
       {stats.map(({ icon: Icon, value, label }) => (
-        <div key={label} className="rounded-card border border-border bg-white px-6 py-4 shadow-soft">
+        <div key={label} className="min-w-[150px] flex-1 rounded-card border border-border bg-white px-6 py-4 shadow-soft">
           <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/8 text-primary">
               <Icon size={18} />
@@ -898,14 +898,15 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
               transition={{ duration: 0.5, ease: EASE }}
               className="relative"
             >
-              {/* Foto del agente — flota en el hueco a la derecha del texto, solo cuando hay
-                  espacio real para ella (columna del formulario ya al lado en lg+). */}
+              {/* Foto del agente — en móvil se muestra centrada encima del contenido;
+                  en lg+ flota en el hueco a la derecha del texto (la columna del
+                  formulario ya está al lado). */}
               {agency.foto_url && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
-                  className="pointer-events-none absolute -right-2 top-1/2 hidden -translate-y-1/2 xl:-right-8 lg:block"
+                  className="pointer-events-none relative z-10 mb-8 flex justify-center lg:absolute lg:-right-2 lg:top-1/2 lg:mb-0 lg:-translate-y-1/2 lg:justify-start xl:-right-8"
                 >
                   <div className="relative">
                     <span className="absolute -left-7 -top-6 h-14 w-14 rounded-full bg-primary/10" aria-hidden="true" />
@@ -915,7 +916,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
                       src={agency.foto_url}
                       alt={agency.nombre_agente}
                       style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
-                      className="relative h-52 w-52 rounded-full border-4 border-white object-cover shadow-2xl shadow-slate-900/15 xl:h-60 xl:w-60"
+                      className="relative h-40 w-40 rounded-full border-4 border-white object-cover shadow-2xl shadow-slate-900/15 sm:h-52 sm:w-52 xl:h-60 xl:w-60"
                     />
                   </div>
                 </motion.div>
@@ -987,7 +988,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
           transition={{ duration: 0.5, ease: EASE, delay: 0.14 }}
           className="mt-12"
         >
-          <ProofStrip agency={agency} poblacion={agency.poblacion} />
+          <ProofStrip agency={agency} />
         </motion.div>
 
       </main>

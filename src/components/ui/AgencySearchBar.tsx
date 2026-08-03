@@ -1,18 +1,16 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
-import { Building2, Loader2, MapPin, MapPinned, Search, X } from 'lucide-react';
+import { Loader2, MapPin, MapPinned, Search, X } from 'lucide-react';
 import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
-import { navigateTo } from '@/lib/utils';
 import { PlaceholderImage } from './PlaceholderImage';
 
 export type SearchSuggestion = { label: string; lat: number; lng: number };
 
 type Suggestion =
   | { type: 'city'; label: string; city: string; province: string; count: number; lat: number; lng: number }
-  | { type: 'address'; label: string; lat: number; lng: number }
-  | { type: 'agency'; label: string; id: string; poblacion: string };
+  | { type: 'address'; label: string; lat: number; lng: number };
 
 function useGeocodeFallback() {
   const provider = useMemo(
@@ -68,21 +66,9 @@ export function AgencySearchBar({
       .map((c) => ({ type: 'city' as const, label: `${c.city}, ${c.province}`, city: c.city, province: c.province, count: c.count, lat: c.lat, lng: c.lng }));
   }, [query, allCities]);
 
-  // Búsqueda por nombre de inmobiliaria — funciona con o sin ubicación fijada,
-  // ya que navega directo al perfil en vez de pasar por el flujo de resultados
-  // por distancia (que sí requiere coordenadas).
-  const agencyMatches: Suggestion[] = useMemo(() => {
-    const trimmed = query.trim().toLowerCase();
-    if (trimmed.length < 2) return [];
-    return agencies
-      .filter((a) => a.nombre_comercial.toLowerCase().includes(trimmed))
-      .slice(0, 5)
-      .map((a) => ({ type: 'agency' as const, label: a.nombre_comercial, id: a.id, poblacion: a.poblacion }));
-  }, [query, agencies]);
-
   const suggestions = useMemo(
-    () => [...agencyMatches, ...cityMatches, ...addressResults],
-    [agencyMatches, cityMatches, addressResults],
+    () => [...cityMatches, ...addressResults],
+    [cityMatches, addressResults],
   );
 
   useEffect(() => {
@@ -95,10 +81,10 @@ export function AgencySearchBar({
 
   useEffect(() => {
     const trimmed = query.trim();
-    if (trimmed.length < 3 || cityMatches.length > 0 || agencyMatches.length > 0) {
-      // Si ya hay match de ciudad o inmobiliaria conocida, no hace falta golpear la API de geocoding.
+    if (trimmed.length < 3 || cityMatches.length > 0) {
+      // Si ya hay match de ciudad conocida, no hace falta golpear la API de geocoding.
       setAddressResults([]);
-      setIsOpen(cityMatches.length > 0 || agencyMatches.length > 0);
+      setIsOpen(cityMatches.length > 0);
       return;
     }
     const timeoutId = setTimeout(async () => {
@@ -115,15 +101,9 @@ export function AgencySearchBar({
       }
     }, 350);
     return () => clearTimeout(timeoutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, cityMatches.length, agencyMatches.length, geocodeFallback]);
+  }, [query, cityMatches.length, geocodeFallback]);
 
   const selectSuggestion = (suggestion: Suggestion) => {
-    if (suggestion.type === 'agency') {
-      setIsOpen(false);
-      navigateTo(`/inmobiliarias/${suggestion.id}`);
-      return;
-    }
     if (suggestion.type === 'city' && suggestion.count === 0) {
       setNoAgenciesToast({ city: suggestion.city, nearby: getNearbyCities(suggestion.city) });
       setIsOpen(false);
@@ -218,17 +198,7 @@ export function AgencySearchBar({
                 index === highlighted ? 'bg-orange-50' : 'hover:bg-slate-50'
               }`}
             >
-              {s.type === 'agency' ? (
-                <>
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 text-[#FF8000] shadow-sm">
-                    <Building2 size={16} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-slate-800">{s.label}</p>
-                    {s.poblacion && <p className="truncate text-xs text-slate-500">{s.poblacion}</p>}
-                  </div>
-                </>
-              ) : s.type === 'city' ? (
+              {s.type === 'city' ? (
                 <>
                   <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg shadow-sm">
                     {cityImages[s.city] ? (

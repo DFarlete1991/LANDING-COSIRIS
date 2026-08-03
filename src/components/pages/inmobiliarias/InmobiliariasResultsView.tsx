@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, MapPin } from 'lucide-react';
+import { ArrowLeft, Building2, MapPin } from 'lucide-react';
 import { AgencyResultRow } from '../../ui/AgencyCard';
+import { AgencySearchBar, type SearchSuggestion } from '../../ui/AgencySearchBar';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { haversineKm } from '@/lib/geo';
 
@@ -15,9 +16,13 @@ const MAX_DISTANCE_KM = 50;
 export function InmobiliariasResultsView({
   initialQuery,
   searchPoint,
+  onSearch,
+  onBack,
 }: {
   initialQuery: string;
   searchPoint: { lat: number; lng: number };
+  onSearch: (suggestion: SearchSuggestion) => void;
+  onBack: () => void;
 }) {
   const { agencies: allAgencies, isLive } = useInmobiliarias();
 
@@ -56,9 +61,11 @@ export function InmobiliariasResultsView({
 
   return (
     <div>
-      {/* Hero — compacto, 220-260px */}
+      {/* Hero — compacto, 220-260px. Sin overflow-hidden: el desplegable del
+          buscador (absolute, z-40) se asoma por debajo de esta banda y no
+          debe recortarse contra la sección siguiente. */}
       <div
-        className="relative overflow-hidden bg-black px-6 py-9"
+        className="relative bg-black px-6 py-9"
         style={{
           backgroundImage: 'url(/assets/inmobiliarias/results-banner.png)',
           // >100% empuja el recorte más allá del borde derecho real de la imagen
@@ -73,6 +80,13 @@ export function InmobiliariasResultsView({
           className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/10 via-black/50 to-black/90"
         />
         <div className="relative mx-auto w-full max-w-[1400px]">
+          <button
+            type="button"
+            onClick={onBack}
+            className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/80 backdrop-blur-md transition-all duration-200 hover:bg-white/20 hover:text-white active:scale-95"
+          >
+            <ArrowLeft size={14} /> Volver al directorio
+          </button>
           <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#FF8000]">Directorio Cosiris</p>
           <h1 className="mt-2.5 text-[32px] font-black leading-[1.1] tracking-[-0.02em] text-white md:text-[36px]">
             Inmobiliarias en {cityName}
@@ -85,6 +99,9 @@ export function InmobiliariasResultsView({
             <span>
               <strong className="font-bold text-white">{visibleAgencies.length}</strong> {visibleAgencies.length === 1 ? 'inmobiliaria encontrada' : 'inmobiliarias encontradas'}
             </span>
+          </div>
+          <div className="mt-5 max-w-xl">
+            <AgencySearchBar initialValue={initialQuery} size="compact" onSelect={onSearch} placeholder="Cambiar de zona o buscar otra inmobiliaria" />
           </div>
         </div>
       </div>

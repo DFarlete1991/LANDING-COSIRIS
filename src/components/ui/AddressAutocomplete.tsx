@@ -1,6 +1,7 @@
-import { type KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Loader2, MapPin } from 'lucide-react';
-import { OpenStreetMapProvider } from 'leaflet-geosearch';
+import { useJsApiLoader } from '@react-google-maps/api';
+import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
 
 interface AddressAutocompleteProps {
   value: string;
@@ -11,64 +12,54 @@ interface AddressAutocompleteProps {
     postalCode?: string;
     city?: string;
     province?: string;
+    lat?: number;
+    lng?: number;
   }) => void;
 }
 
-interface OSMAddress {
-  postcode?: string;
-  city?: string;
-  town?: string;
-  village?: string;
-  state?: string;
-}
-
-interface OSMRawResult {
-  display_name: string;
-  address?: OSMAddress;
-}
-
-interface ProviderResult {
+type GeocodeResult = {
   label: string;
-  raw: OSMRawResult;
-}
+  lat: number;
+  lng: number;
+  postalCode?: string;
+  city?: string;
+  province?: string;
+};
 
 const EXPO = [0.19, 1, 0.22, 1] as const;
 
 const inputBaseClass =
   'w-full rounded-md border bg-slate-50 px-4 py-3.5 text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#FF8000]/15';
 
-function formatSuggestion(displayName: string): string {
-  const segments = displayName.split(',').map((part) => part.trim()).filter(Boolean);
-  return segments.slice(0, 3).join(', ');
-}
-
-function normalizePostalCode(postcode?: string): string | undefined {
-  if (!postcode) return undefined;
-  const digits = postcode.replace(/\D/g, '').slice(0, 5);
-  return digits.length === 5 ? digits : undefined;
+// Mismo mapeo que usa el registro de inmobiliarias (RegistroInmobiliariaPage) —
+// Google devuelve la dirección ya desglosada en address_components, mucho más
+// fiable para España que el geocoder de OpenStreetMap que usaba antes este campo.
+function geocoderResultToPlace(result: google.maps.GeocoderResult): GeocodeResult {
+  const find = (type: string) => result.address_components.find((c) => c.types.includes(type))?.long_name;
+  return {
+    label: result.formatted_address,
+    lat: result.geometry.location.lat(),
+    lng: result.geometry.location.lng(),
+    postalCode: find('postal_code'),
+    city: find('locality') || find('postal_town') || find('sublocality') || find('administrative_area_level_3'),
+    province: find('administrative_area_level_2') || find('administrative_area_level_1'),
+  };
 }
 
 export function AddressAutocomplete({ value, onChange, error, onSelectDetails }: AddressAutocompleteProps) {
+  const { isLoaded } = useJsApiLoader(googleMapsLoaderOptions);
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
+  const getGeocoder = () => {
+    if (!geocoderRef.current) geocoderRef.current = new google.maps.Geocoder();
+    return geocoderRef.current;
+  };
+
   const [query, setQuery] = useState(value);
-  const [results, setResults] = useState<ProviderResult[]>([]);
+  const [results, setResults] = useState<GeocodeResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
-
-  const provider = useMemo(
-    () =>
-      new OpenStreetMapProvider({
-        params: {
-          countrycodes: 'es',
-          addressdetails: 1,
-          dedupe: 1,
-          limit: 6,
-          'accept-language': 'es',
-        },
-      }),
-    [],
-  );
 
   useEffect(() => {
     setQuery(value);
@@ -85,46 +76,44 @@ export function AddressAutocomplete({ value, onChange, error, onSelectDetails }:
   }, []);
 
   useEffect(() => {
-    const fetchAddresses = async () => {
-      const trimmed = query.trim();
-      if (trimmed.length < 3) {
-        setResults([]);
-        setIsOpen(false);
-        return;
-      }
+    const trimmed = query.trim();
+    if (trimmed.length < 3 || !isLoaded) {
+      setResults([]);
+      setIsOpen(false);
+      return;
+    }
 
+    const timeoutId = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const data = (await provider.search({ query: trimmed })) as ProviderResult[];
-        setResults(data);
+        const response = await getGeocoder().geocode({ address: trimmed, region: 'es' });
+        const mapped = response.results.slice(0, 6).map(geocoderResultToPlace);
+        setResults(mapped);
         setHighlightedIndex(0);
-        setIsOpen(data.length > 0);
+        setIsOpen(mapped.length > 0);
       } catch (err) {
         console.error(err);
+        setResults([]);
       } finally {
         setIsLoading(false);
       }
-    };
+    }, 350);
 
-    const timeoutId = setTimeout(fetchAddresses, 300);
     return () => clearTimeout(timeoutId);
-  }, [provider, query, value]);
+  }, [query, isLoaded]);
 
-  const selectResult = (item: ProviderResult) => {
-    const raw = item.raw;
-    const fullAddress = raw.display_name;
-    setQuery(fullAddress);
-    onChange(fullAddress);
+  const selectResult = (item: GeocodeResult) => {
+    setQuery(item.label);
+    onChange(item.label);
     setIsOpen(false);
 
-    const postalCode = normalizePostalCode(raw.address?.postcode);
-    const city = raw.address?.city || raw.address?.town || raw.address?.village;
-
     onSelectDetails?.({
-      fullAddress,
-      postalCode,
-      city,
-      province: raw.address?.state,
+      fullAddress: item.label,
+      postalCode: item.postalCode,
+      city: item.city,
+      province: item.province,
+      lat: item.lat,
+      lng: item.lng,
     });
   };
 
@@ -162,7 +151,6 @@ export function AddressAutocomplete({ value, onChange, error, onSelectDetails }:
         onChange={(e) => {
           setQuery(e.target.value);
           onChange(e.target.value);
-          setIsOpen(true);
         }}
         onFocus={() => { if (results.length > 0) setIsOpen(true); }}
         onKeyDown={handleKeyDown}
@@ -193,8 +181,7 @@ export function AddressAutocomplete({ value, onChange, error, onSelectDetails }:
               }}
               onMouseEnter={() => setHighlightedIndex(index)}
             >
-              <p className="text-sm font-semibold text-slate-800">{formatSuggestion(item.raw.display_name)}</p>
-              <p className="mt-0.5 text-xs text-slate-500">{item.raw.display_name}</p>
+              <p className="text-sm font-semibold text-slate-800">{item.label}</p>
             </li>
           ))}
         </ul>

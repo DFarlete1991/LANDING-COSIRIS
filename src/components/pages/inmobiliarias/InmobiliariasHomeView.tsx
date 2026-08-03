@@ -113,8 +113,10 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
       {/* HERO — video de fondo real, overlay oscuro + buscador */}
       <section id="inicio-directorio" className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-4 pb-20 pt-28 text-center text-white sm:min-h-[92vh] sm:pb-28 sm:pt-32">
         <div className="absolute inset-0">
+          {/* scale-125: recorta el video ~12.5% por lado para sacar de cuadro la
+              marca de agua que trae el archivo fuente en la esquina superior izquierda. */}
           <video
-            className="h-full w-full object-cover"
+            className="h-full w-full scale-125 object-cover"
             src="/assets/inmobiliarias/hero-bg.mp4"
             poster="/assets/inmobiliarias/ciudades/madrid.jpg"
             autoPlay muted loop playsInline
