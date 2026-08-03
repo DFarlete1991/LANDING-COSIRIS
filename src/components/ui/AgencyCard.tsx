@@ -162,12 +162,14 @@ export function AgencyResultRow({
 
   const filledStars = agency.rating != null ? Math.round(agency.rating) : 0;
 
+  // Una métrica en 0 no aporta nada y se ve como un dato roto — se omite en
+  // vez de mostrar "0 Propiedades" / "0 años" / "0 Agentes".
   const metrics = [
-    { icon: Home, value: String(agency.num_propiedades), label: 'Propiedades' },
-    { icon: Clock, value: `${agency.anos_experiencia} años`, label: 'Experiencia' },
-    ...(distanceKm != null ? [{ icon: MapPin, value: formatDistanceKm(distanceKm), label: 'De tu ubicación' }] : []),
-    { icon: Users, value: String(agency.num_empleados), label: 'Agentes' },
-  ];
+    agency.num_propiedades > 0 && { icon: Home, value: String(agency.num_propiedades), label: 'Propiedades' },
+    agency.anos_experiencia > 0 && { icon: Clock, value: `${agency.anos_experiencia} años`, label: 'Experiencia' },
+    distanceKm != null && { icon: MapPin, value: formatDistanceKm(distanceKm), label: 'De tu ubicación' },
+    agency.num_empleados > 0 && { icon: Users, value: String(agency.num_empleados), label: 'Agentes' },
+  ].filter((m): m is { icon: typeof Home; value: string; label: string } => Boolean(m));
 
   return (
     <div

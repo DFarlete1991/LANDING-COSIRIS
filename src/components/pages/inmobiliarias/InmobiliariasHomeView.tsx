@@ -25,6 +25,7 @@ import {
 import { AgencyNetworkIllustration } from '../../ui/AgencyNetworkIllustration';
 import { AgencySearchBar, type SearchSuggestion } from '../../ui/AgencySearchBar';
 import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
+import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo } from '@/lib/utils';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
@@ -44,18 +45,28 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   );
 }
 
+// Sin foto ni video reproducible, la tarjeta caía al video genérico de fondo
+// como último recurso — mejor no mostrar la inmobiliaria en este carrusel.
+function hasShowcaseMedia(agency: InmobiliariaPublica): boolean {
+  if (agency.foto_url) return true;
+  if (!agency.media_presentacion_url) return false;
+  return !!getVideoEmbed(agency.media_presentacion_url) || isDirectVideoUrl(agency.media_presentacion_url);
+}
+
 export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSuggestion) => void }) {
   const { agencies } = useInmobiliarias();
   const allCities = useMemo(() => getAllCitiesWithCounts(agencies), [agencies]);
 
   const VIDEO_COUNT = 5;
-  const shuffledForVideo = useMemo(() => [...agencies].sort(() => Math.random() - 0.5), [agencies]);
+  const agenciesWithMedia = useMemo(() => agencies.filter(hasShowcaseMedia), [agencies]);
+  const shuffledForVideo = useMemo(() => [...agenciesWithMedia].sort(() => Math.random() - 0.5), [agenciesWithMedia]);
   const [videoStartIdx, setVideoStartIdx] = useState(0);
 
   // La rotación automática reinicia el contador cada vez que cambia el índice
   // (por flecha o por el propio temporizador), así tras navegar manualmente
   // no salta a otro grupo a los pocos segundos.
   useEffect(() => {
+    if (shuffledForVideo.length === 0) return;
     const t = setInterval(() => setVideoStartIdx((prev) => (prev + 1) % shuffledForVideo.length), 15000);
     return () => clearInterval(t);
   }, [shuffledForVideo.length, videoStartIdx]);
@@ -64,6 +75,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
   const goPrev = () => setVideoStartIdx((prev) => (prev - 1 + shuffledForVideo.length) % shuffledForVideo.length);
 
   const visibleForVideo = useMemo(() => {
+    if (shuffledForVideo.length === 0) return [];
     const result: typeof agencies = [];
     for (let i = 0; i < VIDEO_COUNT; i++) {
       result.push(shuffledForVideo[(videoStartIdx + i) % shuffledForVideo.length]);
@@ -331,7 +343,9 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
         </div>
       </section>
 
-      {/* 2. VIDEO SHOWCASE — cards verticales que rotan cada 5s */}
+      {/* 2. VIDEO SHOWCASE — cards verticales que rotan cada 5s. Solo si hay
+          alguna inmobiliaria con foto o video real que mostrar. */}
+      {agenciesWithMedia.length > 0 && (
       <section className="relative overflow-hidden bg-black py-14 sm:py-28">
         <div className="absolute inset-0">
           <video
@@ -455,6 +469,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             </button>
           </div>
       </section>
+      )}
 
       {/* 3. PARA INMOBILIARIAS — header + confianza */}
       <section id="para-inmobiliarias" className="bg-white py-14 sm:py-28">

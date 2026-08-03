@@ -13,8 +13,14 @@ type InmobiliariasContextValue = {
   cityImages: Record<string, string>;
 };
 
+// Sin lat/lng no hay forma de saber dónde está la inmobiliaria — no debe
+// aparecer en ningún sitio del directorio público (listados, carruseles,
+// buscador...), así que se filtra una sola vez aquí en vez de repetirlo en
+// cada componente que consuma `agencies`.
+const withLocation = (list: InmobiliariaPublica[]) => list.filter((a) => a.lat != null && a.lng != null);
+
 const InmobiliariasContext = createContext<InmobiliariasContextValue>({
-  agencies: INMOBILIARIAS_MOCK,
+  agencies: withLocation(INMOBILIARIAS_MOCK),
   isLive: false,
   loading: false,
   cityImages: CITY_IMAGES,
@@ -22,7 +28,7 @@ const InmobiliariasContext = createContext<InmobiliariasContextValue>({
 
 export function InmobiliariasProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<InmobiliariasContextValue>({
-    agencies: INMOBILIARIAS_MOCK,
+    agencies: withLocation(INMOBILIARIAS_MOCK),
     isLive: false,
     loading: true,
     cityImages: CITY_IMAGES,
@@ -36,8 +42,9 @@ export function InmobiliariasProvider({ children }: { children: ReactNode }) {
       // Si Supabase no está configurado, la vista aún no existe, o todavía
       // ningún cliente activó mostrar_en_directorio con ubicación puesta,
       // se queda con el mock — nunca se muestra un directorio vacío por eso.
-      if (live.length > 0) {
-        setState((prev) => ({ ...prev, agencies: live, isLive: true, loading: false }));
+      const liveWithLocation = withLocation(live);
+      if (liveWithLocation.length > 0) {
+        setState((prev) => ({ ...prev, agencies: liveWithLocation, isLive: true, loading: false }));
       } else {
         setState((prev) => ({ ...prev, loading: false }));
       }
