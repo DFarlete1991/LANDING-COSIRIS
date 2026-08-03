@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, Loader2, MapPin, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Check, Clock, Home, Loader2, MapPin, ShieldCheck, Star } from 'lucide-react';
 import { AddressAutocomplete } from '../ui/AddressAutocomplete';
-import { AgencyResultRow } from '../ui/AgencyCard';
 import { Footer } from '../Footer';
 import { LandingNavbar } from './landing-navbar';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
@@ -53,7 +52,7 @@ function matchAgenciesInZone(agencies: InmobiliariaPublica[], zone: ZoneDetails)
       .map((a) => ({ agency: a, km: haversineKm(point, { lat: a.lat as number, lng: a.lng as number }) }))
       .filter((s) => s.km <= MAX_ZONE_DISTANCE_KM)
       .sort((a, b) => a.km - b.km)
-      .slice(0, 8)
+      .slice(0, 4)
       .map((s) => s.agency);
   }
 
@@ -80,7 +79,7 @@ function matchAgenciesInZone(agencies: InmobiliariaPublica[], zone: ZoneDetails)
   return scored
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 8)
+    .slice(0, 4)
     .map((s) => s.agency);
 }
 
@@ -97,6 +96,97 @@ async function submitAgencyLead(payload: Record<string, unknown>): Promise<{ ok:
   } catch {
     return { ok: false, error: 'Error de conexión con el CRM.' };
   }
+}
+
+function MinimalAgencyCard({
+  agency,
+  selected,
+  onToggle,
+}: {
+  agency: InmobiliariaPublica;
+  selected: boolean;
+  onToggle: (id: string) => void;
+}) {
+  const filledStars = agency.rating != null ? Math.min(5, Math.round(agency.rating)) : 0;
+  return (
+    <button
+      type="button"
+      onClick={() => onToggle(agency.id)}
+      aria-pressed={selected}
+      className={`relative flex flex-col rounded-2xl border p-4 text-left shadow-sm transition-[border-color,background-color,box-shadow,transform] duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000] ${
+        selected
+          ? 'border-[#FF8000] bg-orange-50/60 ring-2 ring-[#FF8000]/15'
+          : 'border-slate-200 bg-white hover:border-[#FF8000]/40 hover:shadow-md hover:shadow-[#FF8000]/5'
+      }`}
+    >
+      <span
+        className={`absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors duration-200 ${
+          selected ? 'border-[#FF8000] bg-[#FF8000] text-white' : 'border-slate-300 bg-white text-transparent'
+        }`}
+      >
+        <Check size={13} strokeWidth={3} />
+      </span>
+
+      <div className="flex items-center gap-3 pr-7">
+        {agency.foto_url ? (
+          <img
+            src={agency.foto_url}
+            alt={agency.nombre_agente}
+            style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
+            className="h-11 w-11 shrink-0 rounded-full border border-slate-100 object-cover"
+          />
+        ) : agency.logo_url ? (
+          <img
+            src={agency.logo_url}
+            alt={agency.nombre_comercial}
+            style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
+            className="h-11 w-11 shrink-0 rounded-xl border border-slate-100 object-cover"
+          />
+        ) : (
+          <div
+            style={{ backgroundColor: agency.color_hex }}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-base font-black text-white"
+          >
+            {agency.nombre_comercial.slice(0, 1)}
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-1 truncate text-sm font-bold text-slate-900">
+            {agency.nombre_comercial}
+            <BadgeCheck size={14} className="shrink-0 text-[#FF8000]" aria-label="Cliente verificado" />
+          </p>
+          <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-slate-500">
+            <MapPin size={11} className="shrink-0" /> {agency.poblacion}, {agency.provincia}
+          </p>
+        </div>
+      </div>
+
+      {agency.rating != null && (
+        <div className="mt-3 flex items-center gap-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star key={i} size={11} className={i < filledStars ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'} />
+          ))}
+          <span className="ml-1 text-[11px] font-bold text-slate-900">{agency.rating}</span>
+          {agency.num_opiniones != null && (
+            <span className="text-[11px] text-slate-400">({agency.num_opiniones})</span>
+          )}
+        </div>
+      )}
+
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-slate-100 pt-2.5 text-[11px] font-medium text-slate-600">
+        {agency.anos_experiencia > 0 && (
+          <span className="flex items-center gap-1">
+            <Clock size={12} className="shrink-0 text-[#FF8000]" /> {agency.anos_experiencia} años
+          </span>
+        )}
+        {agency.num_propiedades > 0 && (
+          <span className="flex items-center gap-1">
+            <Home size={12} className="shrink-0 text-[#FF8000]" /> {agency.num_propiedades} propiedades
+          </span>
+        )}
+      </div>
+    </button>
+  );
 }
 
 export function ValorarPropiedadPage() {
@@ -294,14 +384,11 @@ export function ValorarPropiedadPage() {
                   </button>
                 </div>
 
-                <div className="mt-4 space-y-4">
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {matched.map((agency) => (
-                    <AgencyResultRow
+                    <MinimalAgencyCard
                       key={agency.id}
                       agency={agency}
-                      distanceKm={null}
-                      isNearest={false}
-                      selectable
                       selected={selected.includes(agency.id)}
                       onToggle={toggleAgency}
                     />

@@ -8,12 +8,14 @@ import { navigateTo } from '@/lib/utils';
 import { AgencyLeadForm } from './AgencyLeadForm';
 
 function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: InmobiliariaPublica; sizeClass?: string }) {
-  if (agency.foto_url) {
+  // Primero la foto de perfil; si no hay, el logo; y si tampoco, la inicial.
+  const image = agency.foto_url ?? agency.logo_url;
+  if (image) {
     return (
       <img
-        src={agency.foto_url}
-        alt={agency.nombre_agente}
-        style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
+        src={image}
+        alt={agency.foto_url ? agency.nombre_agente : agency.nombre_comercial}
+        style={{ objectPosition: agency.foto_pos ?? agency.logo_pos ?? '50% 50%' }}
         className={`shrink-0 rounded-full border-2 border-white object-cover shadow-lg ${sizeClass}`}
       />
     );
@@ -29,12 +31,15 @@ function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: Inmobilia
 }
 
 function AgencyThumbnail({ agency, sizeClass }: { agency: InmobiliariaPublica; sizeClass: string }) {
-  if (agency.logo_url) {
+  // Primero la foto de perfil (del asesor/agencia); si no hay, el logo; y si
+  // tampoco, unas iniciales sobre el color de la marca.
+  const image = agency.foto_url ?? agency.logo_url;
+  if (image) {
     return (
       <img
-        src={agency.logo_url}
+        src={image}
         alt={agency.nombre_comercial}
-        style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
+        style={{ objectPosition: agency.foto_pos ?? agency.logo_pos ?? '50% 50%' }}
         className={`shrink-0 border-2 border-white object-cover shadow-sm ${sizeClass}`}
       />
     );
