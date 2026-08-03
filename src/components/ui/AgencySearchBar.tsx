@@ -44,6 +44,10 @@ export function AgencySearchBar({
   const [query, setQuery] = useState(initialValue);
   const [addressResults, setAddressResults] = useState<Suggestion[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  // El efecto de abajo también corre al montar (cuando `query` ya llega con un
+  // valor desde la URL), no solo cuando el usuario escribe — sin este guard,
+  // el dropdown se abría solo con recargar la página, aunque nadie tocara el buscador.
+  const [isFocused, setIsFocused] = useState(false);
   const [highlighted, setHighlighted] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
   const [noAgenciesToast, setNoAgenciesToast] = useState<{ city: string; nearby: string[] } | null>(null);
@@ -73,7 +77,10 @@ export function AgencySearchBar({
 
   useEffect(() => {
     const closeOnOutsideClick = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) setIsOpen(false);
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        setIsFocused(false);
+      }
     };
     document.addEventListener('mousedown', closeOnOutsideClick);
     return () => document.removeEventListener('mousedown', closeOnOutsideClick);
@@ -84,7 +91,7 @@ export function AgencySearchBar({
     if (trimmed.length < 3 || cityMatches.length > 0) {
       // Si ya hay match de ciudad conocida, no hace falta golpear la API de geocoding.
       setAddressResults([]);
-      setIsOpen(cityMatches.length > 0);
+      setIsOpen(isFocused && cityMatches.length > 0);
       return;
     }
     const timeoutId = setTimeout(async () => {
@@ -93,7 +100,7 @@ export function AgencySearchBar({
         const results = await geocodeFallback(trimmed);
         setAddressResults(results);
         setHighlighted(0);
-        setIsOpen(results.length > 0);
+        setIsOpen(isFocused && results.length > 0);
       } catch (err) {
         console.error(err);
       } finally {
@@ -101,16 +108,18 @@ export function AgencySearchBar({
       }
     }, 350);
     return () => clearTimeout(timeoutId);
-  }, [query, cityMatches.length, geocodeFallback]);
+  }, [query, cityMatches.length, geocodeFallback, isFocused]);
 
   const selectSuggestion = (suggestion: Suggestion) => {
     if (suggestion.type === 'city' && suggestion.count === 0) {
       setNoAgenciesToast({ city: suggestion.city, nearby: getNearbyCities(suggestion.city) });
       setIsOpen(false);
+      setIsFocused(false);
       return;
     }
     setQuery(suggestion.label);
     setIsOpen(false);
+    setIsFocused(false);
     onSelect({ label: suggestion.label, lat: suggestion.lat, lng: suggestion.lng });
   };
 
@@ -156,7 +165,10 @@ export function AgencySearchBar({
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => { if (!noAgenciesToast && suggestions.length > 0) setIsOpen(true); }}
+            onFocus={() => {
+              setIsFocused(true);
+              if (!noAgenciesToast && suggestions.length > 0) setIsOpen(true);
+            }}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             className={`w-full rounded-full bg-transparent pl-11 pr-4 font-medium text-slate-900 placeholder:text-slate-400 outline-none ${
