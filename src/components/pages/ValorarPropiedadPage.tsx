@@ -154,7 +154,13 @@ export function ValorarPropiedadPage() {
     if (Object.keys(errs).length > 0) return setErrors(errs);
 
     setErrors({});
-    const candidates = matchAgenciesInZone(agencies, { postalCode, city: zone.city, province: zone.province });
+    const candidates = matchAgenciesInZone(agencies, {
+      postalCode,
+      city: zone.city,
+      province: zone.province,
+      lat: zone.lat,
+      lng: zone.lng,
+    });
     setMatched(candidates);
     setSelected(candidates.length > 0 ? [candidates[0].id] : []);
     setPhase('select');

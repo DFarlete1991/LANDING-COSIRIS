@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { OpenStreetMapProvider } from 'leaflet-geosearch';
+import { useJsApiLoader } from '@react-google-maps/api';
 import { Loader2, MapPin, MapPinned, Search, X } from 'lucide-react';
 import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
+import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { PlaceholderImage } from './PlaceholderImage';
 
@@ -12,18 +13,18 @@ type Suggestion =
   | { type: 'city'; label: string; city: string; province: string; count: number; lat: number; lng: number }
   | { type: 'address'; label: string; lat: number; lng: number };
 
-function useGeocodeFallback() {
-  const provider = useMemo(
-    () =>
-      new OpenStreetMapProvider({
-        params: { countrycodes: 'es', addressdetails: 0, dedupe: 1, limit: 4, 'accept-language': 'es' },
-      }),
-    [],
-  );
-
-  return async (query: string): Promise<Suggestion[]> => {
-    const results = await provider.search({ query });
-    return results.map((r) => ({ type: 'address' as const, label: r.label, lat: r.y, lng: r.x }));
+// Mismo geocodificador que usa AddressAutocomplete en el formulario de
+// valoración: Google con `region: 'es'`. Resuelve igual de bien una dirección
+// completa, un barrio, una ciudad ("zaragoza") o una comunidad ("galicia"),
+// con lo que el buscador no depende de una lista de ciudades fija ni de los
+// datos de inmobiliarias — si hay resultados se sugieren, aunque esa zona no
+// tenga agencias registradas todavía.
+function geocoderResultToSuggestion(result: google.maps.GeocoderResult): Suggestion {
+  return {
+    type: 'address' as const,
+    label: result.formatted_address,
+    lat: result.geometry.location.lat(),
+    lng: result.geometry.location.lng(),
   };
 }
 
@@ -38,7 +39,12 @@ export function AgencySearchBar({
   size?: 'hero' | 'compact';
   onSelect: (suggestion: SearchSuggestion) => void;
 }) {
-  const geocodeFallback = useGeocodeFallback();
+  const { isLoaded } = useJsApiLoader(googleMapsLoaderOptions);
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
+  const getGeocoder = () => {
+    if (!geocoderRef.current) geocoderRef.current = new google.maps.Geocoder();
+    return geocoderRef.current;
+  };
   const { agencies, cityImages } = useInmobiliarias();
   const allCities = useMemo(() => getAllCitiesWithCounts(agencies), [agencies]);
   const [query, setQuery] = useState(initialValue);
@@ -88,7 +94,7 @@ export function AgencySearchBar({
 
   useEffect(() => {
     const trimmed = query.trim();
-    if (trimmed.length < 3 || cityMatches.length > 0) {
+    if (trimmed.length < 3 || !isLoaded || cityMatches.length > 0) {
       // Si ya hay match de ciudad conocida, no hace falta golpear la API de geocoding.
       setAddressResults([]);
       setIsOpen(isFocused && cityMatches.length > 0);
@@ -97,18 +103,20 @@ export function AgencySearchBar({
     const timeoutId = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const results = await geocodeFallback(trimmed);
-        setAddressResults(results);
+        const response = await getGeocoder().geocode({ address: trimmed, region: 'es' });
+        const mapped = response.results.slice(0, 4).map(geocoderResultToSuggestion);
+        setAddressResults(mapped);
         setHighlighted(0);
-        setIsOpen(isFocused && results.length > 0);
+        setIsOpen(isFocused && mapped.length > 0);
       } catch (err) {
         console.error(err);
+        setAddressResults([]);
       } finally {
         setIsSearching(false);
       }
     }, 350);
     return () => clearTimeout(timeoutId);
-  }, [query, cityMatches.length, geocodeFallback, isFocused]);
+  }, [query, cityMatches.length, isLoaded, isFocused]);
 
   const selectSuggestion = (suggestion: Suggestion) => {
     if (suggestion.type === 'city' && suggestion.count === 0) {
