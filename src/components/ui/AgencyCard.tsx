@@ -31,9 +31,10 @@ function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: Inmobilia
 }
 
 function AgencyThumbnail({ agency, sizeClass }: { agency: InmobiliariaPublica; sizeClass: string }) {
-  // Primero la foto de perfil (del asesor/agencia); si no hay, el logo; y si
-  // tampoco, unas iniciales sobre el color de la marca.
-  const image = agency.foto_url ?? agency.logo_url;
+  // Mini-identificador de marca debajo del avatar: siempre el logo de la
+  // inmobiliaria (nunca la foto de perfil, que ya va arriba); si no hay
+  // logo, iniciales sobre el color de la marca.
+  const image = agency.logo_url;
   if (image) {
     return (
       <img
@@ -201,7 +202,7 @@ export function AgencyResultRow({
             </span>
           )}
           <div className="hidden items-center gap-1.5 sm:flex">
-            <AgencyThumbnail agency={agency} sizeClass="h-6 w-6 rounded-md" />
+            {agency.foto_url && <AgencyThumbnail agency={agency} sizeClass="h-6 w-6 rounded-md" />}
             <span className="max-w-[90px] truncate text-[10px] font-black uppercase leading-tight tracking-tight text-slate-400">
               {agency.nombre_comercial}
             </span>

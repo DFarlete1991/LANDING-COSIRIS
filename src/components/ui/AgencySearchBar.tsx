@@ -4,6 +4,7 @@ import { useJsApiLoader } from '@react-google-maps/api';
 import { Loader2, MapPin, MapPinned, Search, X } from 'lucide-react';
 import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
 import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
+import { formatSpanishAddressLabel } from '@/lib/geo';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { PlaceholderImage } from './PlaceholderImage';
 
@@ -22,11 +23,16 @@ type Suggestion =
 function geocoderResultToSuggestion(result: google.maps.GeocoderResult): Suggestion {
   return {
     type: 'address' as const,
-    label: result.formatted_address,
+    label: formatSpanishAddressLabel(result),
     lat: result.geometry.location.lat(),
     lng: result.geometry.location.lng(),
   };
 }
+
+// Cache en memoria de geocoding por consulta: buscar dos veces la misma
+// dirección (muy común al repetir búsquedas) se sirve al instante sin volver
+// a llamar a la API, que es la parte lenta del autocompletado.
+const geocodeCache = new Map<string, Suggestion[]>();
 
 export function AgencySearchBar({
   initialValue = '',
@@ -101,10 +107,18 @@ export function AgencySearchBar({
       return;
     }
     const timeoutId = setTimeout(async () => {
+      const cached = geocodeCache.get(trimmed);
+      if (cached) {
+        setAddressResults(cached);
+        setHighlighted(0);
+        setIsOpen(isFocused && cached.length > 0);
+        return;
+      }
       setIsSearching(true);
       try {
         const response = await getGeocoder().geocode({ address: trimmed, region: 'es' });
         const mapped = response.results.slice(0, 4).map(geocoderResultToSuggestion);
+        geocodeCache.set(trimmed, mapped);
         setAddressResults(mapped);
         setHighlighted(0);
         setIsOpen(isFocused && mapped.length > 0);

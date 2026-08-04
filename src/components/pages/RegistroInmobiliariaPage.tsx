@@ -5,6 +5,7 @@ import { ArrowRight, Check, CheckCircle2, ChevronDown, ImageIcon, Link2, Loader2
 import { navigateTo } from '@/lib/utils';
 import { gmapsAvailable } from '@/lib/map-static';
 import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
+import { formatSpanishAddressLabel } from '@/lib/geo';
 
 const AVAILABLE_LANGUAGES = [
   'Español', 'Inglés', 'Francés', 'Alemán', 'Italiano', 'Portugués',
@@ -45,7 +46,7 @@ function extractAddressParts(components: google.maps.GeocoderAddressComponent[])
 function geocoderResultToPlace(result: google.maps.GeocoderResult): GeocodedPlace {
   const parts = extractAddressParts(result.address_components);
   return {
-    label: result.formatted_address,
+    label: formatSpanishAddressLabel(result),
     lat: result.geometry.location.lat(),
     lng: result.geometry.location.lng(),
     ...parts,

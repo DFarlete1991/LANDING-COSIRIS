@@ -2,6 +2,7 @@ import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Loader2, MapPin } from 'lucide-react';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
+import { formatSpanishAddressLabel } from '@/lib/geo';
 
 interface AddressAutocompleteProps {
   value: string;
@@ -37,7 +38,7 @@ const inputBaseClass =
 function geocoderResultToPlace(result: google.maps.GeocoderResult): GeocodeResult {
   const find = (type: string) => result.address_components.find((c) => c.types.includes(type))?.long_name;
   return {
-    label: result.formatted_address,
+    label: formatSpanishAddressLabel(result),
     lat: result.geometry.location.lat(),
     lng: result.geometry.location.lng(),
     postalCode: find('postal_code'),
