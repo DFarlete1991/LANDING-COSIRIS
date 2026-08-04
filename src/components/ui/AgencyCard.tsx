@@ -241,6 +241,9 @@ export function AgencyResultRow({
           )}
 
           <p className="mt-2.5 line-clamp-2 text-xs leading-relaxed text-slate-600 sm:text-sm">{agency.texto_presentacion}</p>
+          {agency.texto_presentacion.length > 110 && (
+            <span className="mt-0.5 inline-block text-xs font-bold text-[#FF8000] sm:text-sm">Leer más</span>
+          )}
 
           <div className="mt-3.5 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-slate-100 pt-3.5 sm:mt-4 sm:pt-4">
             {metrics.map(({ icon: Icon, value, label }) => (

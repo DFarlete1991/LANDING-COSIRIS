@@ -847,6 +847,11 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
   // revelar el teléfono también en el otro, no solo en el que se usó.
   const [showPhone, setShowPhone] = useState(false);
 
+  // La presentación se recorta en el hero — no se muestra completa en
+  // ningún otro sitio de la página, así que "Leer más" expande este mismo
+  // párrafo en vez de enlazar a otro lado.
+  const [bioExpanded, setBioExpanded] = useState(false);
+
   // Si se llegó desde una búsqueda (lista de resultados), conserva el punto
   // buscado para poder mostrar distancia real en el mapa del perfil.
   const searchPoint = useMemo(() => {
@@ -1002,9 +1007,18 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
                 <BadgeCheck size={15} className="shrink-0 text-primary" /> Inmobiliaria verificada por Cosiris
               </p>
 
-              <p className="mt-6 max-w-[520px] text-body leading-relaxed text-ink-muted line-clamp-3">
-                {excerpt(agency.texto_presentacion)}
+              <p className={`mt-6 max-w-[520px] text-body leading-relaxed text-ink-muted ${bioExpanded ? '' : 'line-clamp-3'}`}>
+                {bioExpanded ? agency.texto_presentacion : excerpt(agency.texto_presentacion)}
               </p>
+              {agency.texto_presentacion.length > 168 && (
+                <button
+                  type="button"
+                  onClick={() => setBioExpanded((v) => !v)}
+                  className="mt-1.5 text-sm font-bold text-primary hover:underline"
+                >
+                  {bioExpanded ? 'Leer menos' : 'Leer más'}
+                </button>
+              )}
 
               <div className="mt-8">
                 <CtaButton agency={agency} showPhone={showPhone} onRevealed={() => setShowPhone(true)} />
