@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
 import {
-  ArrowLeft, BadgeCheck, ChevronLeft, ChevronRight, Home, MapPin, MapPinned,
+  ArrowLeft, BadgeCheck, Check, ChevronLeft, ChevronRight, Copy, Home, MapPin, MapPinned,
   MessageCircle, Phone, ShieldCheck, Star, User, Users, Wallet, Briefcase, Zap, X,
 } from 'lucide-react';
 import { Footer } from '../Footer';
@@ -740,6 +740,7 @@ function CtaButton({
   onRevealed: () => void;
 }) {
   const [showModal, setShowModal] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!showModal) return;
@@ -750,15 +751,33 @@ function CtaButton({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [showModal]);
 
+  useEffect(() => {
+    if (!copied) return;
+    const t = window.setTimeout(() => setCopied(false), 2000);
+    return () => window.clearTimeout(t);
+  }, [copied]);
+
+  const handleCopyPhone = async () => {
+    try {
+      await navigator.clipboard.writeText(agency.telefono);
+      setCopied(true);
+    } catch {
+      // Clipboard API bloqueada (permisos, contexto no seguro) — nada que
+      // recuperar aquí, el usuario aún puede copiar el número a mano.
+    }
+  };
+
   return (
     <>
       {showPhone ? (
-        <a
-          href={`tel:${agency.telefono}`}
-          className="flex w-fit items-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-sm font-bold text-white shadow-soft transition-all duration-200 hover:bg-green-700 hover:shadow-card active:scale-[0.98]"
+        <button
+          type="button"
+          onClick={handleCopyPhone}
+          className="flex w-fit items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-soft transition-all duration-200 hover:bg-primary-hover hover:shadow-card active:scale-[0.98]"
         >
-          <Phone size={14} /> {agency.telefono}
-        </a>
+          {copied ? <Check size={14} /> : <Copy size={14} />}
+          {copied ? '¡Copiado!' : agency.telefono}
+        </button>
       ) : (
         <button
           type="button"
