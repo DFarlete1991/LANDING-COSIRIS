@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useJsApiLoader } from '@react-google-maps/api';
+import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
 import {
   ArrowLeft, BadgeCheck, ChevronLeft, ChevronRight, Home, MapPin, MapPinned,
-  MessageCircle, Phone, ShieldCheck, Star, Users, Wallet, Briefcase, Zap, X,
+  MessageCircle, Phone, ShieldCheck, Star, User, Users, Wallet, Briefcase, Zap, X,
 } from 'lucide-react';
 import { Footer } from '../Footer';
 import { AgencyLeadForm } from '../ui/AgencyLeadForm';
@@ -340,13 +342,9 @@ function ReviewsCarousel({ reviews }: { reviews: DisplayReview[] }) {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex min-w-0 items-center gap-3">
-                  {active.avatarUrl ? (
-                    <img src={active.avatarUrl} alt={active.autor} className="h-8 w-8 shrink-0 rounded-full" />
-                  ) : (
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/8 text-sm font-bold text-primary">
-                      {active.autor.charAt(0) || '?'}
-                    </div>
-                  )}
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
+                    <User size={16} />
+                  </div>
                   <div className="min-w-0">
                     <p className="truncate text-lg font-semibold text-[#0F172A]">{active.autor}</p>
                   </div>
@@ -398,6 +396,10 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
   const [googleReviews, setGoogleReviews] = useState<GoogleReview[] | null>(null);
   const [manualReviews, setManualReviews] = useState<ResenaManual[] | null>(null);
   const [loading, setLoading] = useState(false);
+  // fetchPlaceReviews usa la librería JS de Places (no un fetch() directo, que
+  // Google bloquea por CORS desde el navegador) — necesita el script de Maps
+  // ya cargado antes de poder pedir la ficha del negocio.
+  const { isLoaded: mapsLoaded } = useJsApiLoader(googleMapsLoaderOptions);
 
   // Prioridad: Google (si hay google_place_id) > reseñas escritas a mano
   // desde el CRM > placeholder de ejemplo — ver CRM: Perfil > Directorio
@@ -405,6 +407,7 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
   // primeras opciones (o ninguna, y se queda en el placeholder).
   useEffect(() => {
     if (agency.google_place_id) {
+      if (!mapsLoaded) return;
       setLoading(true);
       fetchPlaceReviews(agency.google_place_id).then((result) => {
         if (result?.reviews?.length) setGoogleReviews(result.reviews);
@@ -417,11 +420,13 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
       if (rows.length > 0) setManualReviews(rows);
       setLoading(false);
     });
-  }, [agency.google_place_id, agency.id]);
+  }, [agency.google_place_id, agency.id, mapsLoaded]);
 
   const source: 'google' | 'manual' | 'placeholder' = googleReviews ? 'google' : manualReviews ? 'manual' : 'placeholder';
 
-  const reviews: DisplayReview[] =
+  // Solo se muestran las reseñas de 5 estrellas — la idea es dar buena imagen,
+  // no un resumen representativo de todas las opiniones recibidas.
+  const reviews: DisplayReview[] = (
     source === 'google'
       ? googleReviews!.map((r, i) => ({
           key: i, autor: r.author_name, rating: r.rating, comentario: r.text,
@@ -434,7 +439,12 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
           }))
         : REVIEWS_PLACEHOLDER_EXPANDED.map((r) => ({
             key: r.id, autor: r.autor, rating: r.rating, comentario: r.comentario, fecha: r.fecha,
-          }));
+          }))
+  ).filter((r) => r.rating === 5);
+
+  // Sin reseñas de 5 estrellas que mostrar, mejor ocultar toda la sección
+  // (título incluido) que dejar un bloque "Lo que dicen de nosotros" vacío.
+  if (!loading && reviews.length === 0) return null;
 
   // El carrusel entra no solo cuando hay muchas reseñas, sino también cuando
   // pocas (2-3) son tan largas juntas que la columna quedaría mucho más alta
@@ -487,13 +497,9 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
-                {review.avatarUrl ? (
-                  <img src={review.avatarUrl} alt={review.autor} className="h-8 w-8 shrink-0 rounded-full" />
-                ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/8 text-sm font-bold text-primary">
-                    {review.autor.charAt(0) || '?'}
-                  </div>
-                )}
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
+                  <User size={16} />
+                </div>
                 <div>
                   <p className="text-lg font-semibold text-[#0F172A]">{review.autor}</p>
                 </div>

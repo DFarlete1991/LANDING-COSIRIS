@@ -230,6 +230,11 @@ export function ValorarPropiedadPage() {
   const handleNextPhase1 = () => {
     const errs: Record<string, string> = {};
     if (!address.trim()) errs.address = 'La dirección es obligatoria.';
+    // Sin coordenadas reales (solo se obtienen al elegir una sugerencia del
+    // autocompletado) el match de inmobiliarias cercanas cae a un método por
+    // texto mucho menos fiable — mejor exigir una dirección real seleccionada
+    // que dejar pasar una escrita a mano y sin geocodificar.
+    else if (zone.lat == null || zone.lng == null) errs.address = 'Selecciona una dirección de la lista de sugerencias.';
     if (!postalCode.trim() || !/^\d{5}$/.test(postalCode)) errs.postalCode = 'C.P. debe tener 5 dígitos.';
     if (Object.keys(errs).length > 0) return setErrors(errs);
     setErrors({});
