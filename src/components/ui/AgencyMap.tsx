@@ -1,5 +1,4 @@
 import { GOOGLE_MAPS_API_KEY } from '@/lib/google-maps-loader';
-import { MapPin } from 'lucide-react';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 
 export function AgencyMap({
@@ -45,14 +44,6 @@ export function AgencyMap({
         referrerPolicy="no-referrer-when-downgrade"
         allowFullScreen
       />
-      <a
-        href={`https://www.google.com/maps/dir/?api=1&destination=${agency.lat},${agency.lng}`}
-        target="_blank"
-        rel="noreferrer"
-        className="absolute bottom-4 right-4 z-10 flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-xs font-bold text-[#1D2433] shadow-md transition-colors hover:bg-slate-50"
-      >
-        <MapPin size={14} className="text-[#FF8000]" /> Cómo llegar
-      </a>
     </div>
   );
 }

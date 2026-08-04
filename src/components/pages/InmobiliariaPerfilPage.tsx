@@ -732,6 +732,7 @@ function Accordion({ items }: { items: { q: string; a: string }[] }) {
 
 function CtaButton({ agency }: { agency: InmobiliariaPublica }) {
   const [showModal, setShowModal] = useState(false);
+  const [showPhone, setShowPhone] = useState(false);
 
   useEffect(() => {
     if (!showModal) return;
@@ -744,13 +745,24 @@ function CtaButton({ agency }: { agency: InmobiliariaPublica }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setShowModal(true)}
-        className="flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-soft transition-all duration-200 hover:bg-primary-hover hover:shadow-card active:scale-[0.98]"
-      >
-        <Phone size={14} /> Solicitar valoración
-      </button>
+      <div className="flex flex-wrap items-center gap-4">
+        <button
+          type="button"
+          onClick={() => setShowModal(true)}
+          className="flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-soft transition-all duration-200 hover:bg-primary-hover hover:shadow-card active:scale-[0.98]"
+        >
+          <Phone size={14} /> Solicitar valoración
+        </button>
+
+        {showPhone && (
+          <a
+            href={`tel:${agency.telefono}`}
+            className="flex items-center gap-1.5 text-sm font-bold text-green-700 underline decoration-green-300 underline-offset-2 transition-colors hover:text-green-800 hover:decoration-green-500"
+          >
+            <Phone size={14} /> {agency.telefono}
+          </a>
+        )}
+      </div>
 
       {createPortal(
         <AnimatePresence>
@@ -790,7 +802,7 @@ function CtaButton({ agency }: { agency: InmobiliariaPublica }) {
                   </button>
                   <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Sin compromiso</p>
                   <h3 className="mb-5 text-lg font-extrabold text-slate-900">Cuéntale a {agency.nombre_comercial} qué necesitas</h3>
-                  <AgencyLeadForm agency={agency} onSuccess={() => setShowModal(false)} />
+                  <AgencyLeadForm agency={agency} onSuccess={() => { setShowPhone(true); setShowModal(false); }} />
                 </div>
               </motion.div>
             </>
