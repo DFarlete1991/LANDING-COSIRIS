@@ -730,9 +730,16 @@ function Accordion({ items }: { items: { q: string; a: string }[] }) {
   );
 }
 
-function CtaButton({ agency }: { agency: InmobiliariaPublica }) {
+function CtaButton({
+  agency,
+  showPhone,
+  onRevealed,
+}: {
+  agency: InmobiliariaPublica;
+  showPhone: boolean;
+  onRevealed: () => void;
+}) {
   const [showModal, setShowModal] = useState(false);
-  const [showPhone, setShowPhone] = useState(false);
 
   useEffect(() => {
     if (!showModal) return;
@@ -745,7 +752,14 @@ function CtaButton({ agency }: { agency: InmobiliariaPublica }) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-4">
+      {showPhone ? (
+        <a
+          href={`tel:${agency.telefono}`}
+          className="flex w-fit items-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-sm font-bold text-white shadow-soft transition-all duration-200 hover:bg-green-700 hover:shadow-card active:scale-[0.98]"
+        >
+          <Phone size={14} /> {agency.telefono}
+        </a>
+      ) : (
         <button
           type="button"
           onClick={() => setShowModal(true)}
@@ -753,16 +767,7 @@ function CtaButton({ agency }: { agency: InmobiliariaPublica }) {
         >
           <Phone size={14} /> Solicitar valoración
         </button>
-
-        {showPhone && (
-          <a
-            href={`tel:${agency.telefono}`}
-            className="flex items-center gap-1.5 text-sm font-bold text-green-700 underline decoration-green-300 underline-offset-2 transition-colors hover:text-green-800 hover:decoration-green-500"
-          >
-            <Phone size={14} /> {agency.telefono}
-          </a>
-        )}
-      </div>
+      )}
 
       {createPortal(
         <AnimatePresence>
@@ -802,7 +807,7 @@ function CtaButton({ agency }: { agency: InmobiliariaPublica }) {
                   </button>
                   <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Sin compromiso</p>
                   <h3 className="mb-5 text-lg font-extrabold text-slate-900">Cuéntale a {agency.nombre_comercial} qué necesitas</h3>
-                  <AgencyLeadForm agency={agency} onSuccess={() => { setShowPhone(true); setShowModal(false); }} />
+                  <AgencyLeadForm agency={agency} onSuccess={() => { onRevealed(); setShowModal(false); }} />
                 </div>
               </motion.div>
             </>
@@ -817,6 +822,11 @@ function CtaButton({ agency }: { agency: InmobiliariaPublica }) {
 export function InmobiliariaPerfilPage({ id }: { id: string }) {
   const { agencies } = useInmobiliarias();
   const agency = agencies.find((a) => a.id === id);
+
+  // Compartido entre el botón "Solicitar valoración" y el formulario
+  // embebido más abajo: cualquiera de los dos que se envíe primero debe
+  // revelar el teléfono también en el otro, no solo en el que se usó.
+  const [showPhone, setShowPhone] = useState(false);
 
   // Si se llegó desde una búsqueda (lista de resultados), conserva el punto
   // buscado para poder mostrar distancia real en el mapa del perfil.
@@ -978,7 +988,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
               </p>
 
               <div className="mt-8">
-                <CtaButton agency={agency} />
+                <CtaButton agency={agency} showPhone={showPhone} onRevealed={() => setShowPhone(true)} />
               </div>
             </motion.div>
 
@@ -994,7 +1004,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
                 Cuéntanos qué necesitas y uno de nuestros asesores se pondrá en contacto contigo sin compromiso.
               </p>
               <div className="mt-6">
-                <AgencyLeadForm agency={agency} />
+                <AgencyLeadForm agency={agency} onSuccess={() => setShowPhone(true)} />
               </div>
             </motion.div>
           </div>
