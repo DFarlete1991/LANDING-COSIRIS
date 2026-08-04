@@ -121,6 +121,14 @@ export function AgencyLeadForm({ agency, onSuccess }: { agency: InmobiliariaPubl
 
     if (result.ok) {
       setPhase('sent');
+      // Cambia la query string (sin recargar ni perder el resto de la página)
+      // para que quede una URL distinta al enviar el lead — la App ya tiene
+      // pushState "parcheado" para disparar un page_view a dataLayer en cada
+      // cambio de URL, así que esto basta para que Analytics lo registre
+      // como una conversión con su propia URL.
+      const url = new URL(window.location.href);
+      url.searchParams.set('lead', 'enviado');
+      window.history.pushState({}, '', `${url.pathname}${url.search}`);
       onSuccess?.();
     } else {
       setErrorMessage(result.error ?? 'No se pudo enviar el mensaje.');
