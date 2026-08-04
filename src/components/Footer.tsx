@@ -8,43 +8,43 @@ const socialLinks = [
 
 const linkGroups = [
   {
-    title: 'Company',
+    title: 'Empresa',
     links: [
-      { label: 'About Us', href: '/about' },
-      { label: 'How It Works', href: '/como-funciona' },
-      { label: 'Contact', href: '/contacto' },
+      { label: 'Sobre Nosotros', href: '/about' },
+      { label: 'Cómo Funciona', href: '/como-funciona' },
+      { label: 'Contacto', href: '/contacto' },
       { label: 'Blog', href: '/blog' },
-      { label: 'Partners', href: '/partners' },
+      { label: 'Colaboradores', href: '/partners' },
     ],
   },
   {
-    title: 'Services',
+    title: 'Servicios',
     links: [
-      { label: 'Sell your Property', href: '/vender' },
-      { label: 'Find an Agency', href: '/inmobiliarias' },
-      { label: 'Property Valuation', href: '/tasacion' },
-      { label: 'Real Estate Marketing', href: '/marketing' },
-      { label: 'Mortgage Advice', href: '/hipotecas' },
+      { label: 'Vender tu Propiedad', href: '/vender' },
+      { label: 'Buscar Inmobiliaria', href: '/inmobiliarias' },
+      { label: 'Valoración de Propiedad', href: '/tasacion' },
+      { label: 'Marketing Inmobiliario', href: '/marketing' },
+      { label: 'Asesoría Hipotecaria', href: '/hipotecas' },
     ],
   },
   {
-    title: 'For Agencies',
+    title: 'Para Inmobiliarias',
     links: [
-      { label: 'Lead Generation', href: '/captacion_inmobiliarias' },
-      { label: 'Digital Marketing', href: '/marketing-digital' },
+      { label: 'Generación de Leads', href: '/captacion_inmobiliarias' },
+      { label: 'Marketing Digital', href: '/marketing-digital' },
       { label: 'CRM', href: '/crm' },
-      { label: 'Social Media', href: '/social-media' },
-      { label: 'Become a Partner', href: '/registro' },
+      { label: 'Redes Sociales', href: '/social-media' },
+      { label: 'Hazte Partner', href: '/registro' },
     ],
   },
   {
     title: 'Legal',
     links: [
-      { label: 'Privacy Policy', href: '/privacidad' },
+      { label: 'Política de Privacidad', href: '/privacidad' },
       { label: 'Cookies', href: '/cookies' },
-      { label: 'Terms', href: '/terminos-condiciones' },
-      { label: 'Legal Notice', href: '/aviso-legal' },
-      { label: 'Accessibility', href: '/accesibilidad' },
+      { label: 'Términos y Condiciones', href: '/terminos-condiciones' },
+      { label: 'Aviso Legal', href: '/aviso-legal' },
+      { label: 'Accesibilidad', href: '/accesibilidad' },
     ],
   },
 ];
@@ -76,31 +76,18 @@ export function Footer() {
           <div className="max-w-sm">
             <img src="/assets/logo_orange.png" alt="Cosiris" className="h-12 w-auto" />
             <p className="mt-5 text-sm leading-relaxed text-white/40">
-              The network that connects property owners with the best real estate agencies across Spain.
+              La red que conecta a propietarios con las mejores inmobiliarias de España.
             </p>
 
             <div className="mt-6 space-y-3">
-              <div className="flex items-center gap-1.5">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <svg key={star} viewBox="0 0 20 20" className="h-3.5 w-3.5 fill-[#FF7A00]">
-                    <path d="M10 1l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z" />
-                  </svg>
-                ))}
-                <span className="ml-1 text-sm font-semibold text-white/80">4.9</span>
-                <span className="text-sm text-white/30">Satisfaction</span>
-              </div>
               <div className="flex items-center gap-4 text-sm text-white/40">
                 <span className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#FF7A00]" />
-                  650+ Verified Agencies
+                  Inmobiliarias verificadas
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#FF7A00]" />
-                  30,000+ Monthly Visitors
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#FF7A00]" />
-                  Spain Coverage
+                  Cobertura en toda España
                 </span>
               </div>
             </div>
@@ -145,9 +132,9 @@ export function Footer() {
 
         {/* SECTION 3 — SEO AREA */}
         <div className="mt-16 border-t border-white/5 pt-14 lg:mt-20 lg:pt-16">
-          <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-white/30">Explore Agencies Across Spain</h2>
+          <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-white/30">Explora Inmobiliarias en Toda España</h2>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/40">
-            Discover verified real estate agencies in the main cities of Spain. Find experienced professionals in your area and connect directly with trusted local experts.
+            Descubre inmobiliarias verificadas en las principales ciudades de España. Encuentra profesionales con experiencia en tu zona y conecta directamente con expertos locales de confianza.
           </p>
           <div className="mt-7 flex flex-wrap gap-2.5">
             {cities.map((city) => (
@@ -166,7 +153,7 @@ export function Footer() {
             onClick={(e) => { e.preventDefault(); handleNav('/inmobiliarias'); }}
             className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-white/40 transition-colors duration-200 hover:text-[#FF7A00]"
           >
-            View All Cities
+            Ver Todas las Ciudades
             <ChevronRight size={14} />
           </a>
         </div>
@@ -176,10 +163,10 @@ export function Footer() {
       <div className="border-t border-white/5">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-5 sm:flex-row lg:px-8">
           <p className="text-[12px] text-white/25">
-            © {currentYear} Cosiris. Helping thousands of people find trusted real estate agencies.
+            © {currentYear} Cosiris. Todos los derechos reservados.
           </p>
           <p className="text-[12px] text-white/20">
-            Connecting Spain&rsquo;s Real Estate Network
+            La red inmobiliaria de confianza en España
           </p>
         </div>
       </div>
