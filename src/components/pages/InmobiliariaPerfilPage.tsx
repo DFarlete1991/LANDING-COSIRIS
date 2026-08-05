@@ -927,7 +927,14 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
                 animation: 'float-blob 22s ease-in-out infinite',
               }}
             />
-            <svg aria-hidden="true" className="absolute inset-0 h-full w-full opacity-[0.07]">
+            <svg
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full opacity-[0.07]"
+              style={{
+                maskImage: 'radial-gradient(circle at 78% 45%, transparent 0%, transparent 14%, black 42%)',
+                WebkitMaskImage: 'radial-gradient(circle at 78% 45%, transparent 0%, transparent 14%, black 42%)',
+              }}
+            >
             <defs>
               <pattern id="honeycomb" width="80" height="46.19" patternUnits="userSpaceOnUse" patternTransform="scale(1.5)">
                 <path d="M13.33 0L40 0L53.33 23.09L40 46.19L13.33 46.19L0 23.09Z" fill="none" className="stroke-primary" strokeWidth="0.9"/>
@@ -946,14 +953,16 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
               className="relative"
             >
               {/* Foto del agente — en móvil se muestra centrada encima del contenido;
-                  en lg+ flota en el hueco a la derecha del texto (la columna del
-                  formulario ya está al lado). */}
+                  en lg+ flota en el hueco a la derecha del texto, desplazada hacia
+                  la izquierda para que se sienta parte del bloque informativo y no
+                  compita con el formulario. Se mantiene limpia, sin etiquetas ni
+                  badges superpuestos — el nombre va en la ficha de abajo. */}
               {agency.foto_url && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
-                  className="pointer-events-none relative z-10 mb-8 flex flex-col items-center justify-center lg:absolute lg:-right-2 lg:top-1/2 lg:mb-0 lg:-translate-y-1/2 lg:justify-start xl:-right-8"
+                  className="pointer-events-none relative z-10 mb-8 flex justify-center lg:absolute lg:right-14 lg:top-1/2 lg:mb-0 lg:-translate-y-1/2 lg:justify-start xl:right-12"
                 >
                   <div className="relative">
                     <span className="absolute -left-7 -top-6 h-14 w-14 rounded-full bg-primary/10" aria-hidden="true" />
@@ -966,9 +975,6 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
                       className="relative h-40 w-40 rounded-full border-4 border-white object-cover shadow-2xl shadow-slate-900/15 sm:h-52 sm:w-52 xl:h-60 xl:w-60"
                     />
                   </div>
-                  <p className="mt-3 rounded-full bg-white px-4 py-1.5 text-sm font-bold text-slate-900 shadow-lg shadow-slate-900/10">
-                    {agency.nombre_agente}
-                  </p>
                 </motion.div>
               )}
 
@@ -1017,6 +1023,14 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
                   {bioExpanded ? 'Leer menos' : 'Leer más'}
                 </button>
               )}
+
+              <div className="mt-5 flex items-center gap-2.5">
+                <User size={15} className="shrink-0 text-ink-muted" />
+                <div className="leading-tight">
+                  <p className="text-sm font-semibold text-foreground">{agency.nombre_agente}</p>
+                  <p className="text-xs text-ink-muted">Agente inmobiliario</p>
+                </div>
+              </div>
 
               <div className="mt-8">
                 <CtaButton agency={agency} showPhone={showPhone} onRevealed={() => setShowPhone(true)} />
