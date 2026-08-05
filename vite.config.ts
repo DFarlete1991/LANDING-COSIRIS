@@ -10,6 +10,19 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      // Segunda entrada HTML solo para que /inmobiliarias tenga sus propias
+      // etiquetas og:title/og:description — la app en sí es la misma SPA
+      // (mismo main.tsx), Vercel solo sirve este HTML en la carga inicial de
+      // esa ruta (ver el rewrite en vercel.json) para que los crawlers de
+      // WhatsApp/Facebook (que no ejecutan JS) vean el resumen correcto.
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        inmobiliarias: path.resolve(__dirname, 'inmobiliarias.html'),
+      },
+    },
+  },
   server: {
     proxy: {
       '/api/webhook': {

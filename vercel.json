@@ -13,6 +13,10 @@
       "destination": "https://n8n.srv1123447.hstgr.cloud/webhook/a775df38-0b86-474d-8fad-067049def95a"
     },
     {
+      "source": "/inmobiliarias",
+      "destination": "/inmobiliarias.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
