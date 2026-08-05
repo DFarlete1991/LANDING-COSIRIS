@@ -126,7 +126,6 @@ export function InmobiliariasResultsView({
               <AgencyResultRow
                 agency={agency}
                 isNearest={agency.id === nearestId}
-                searchPoint={searchPoint}
               />
             </motion.div>
           ))}

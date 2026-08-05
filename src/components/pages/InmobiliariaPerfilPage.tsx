@@ -13,7 +13,7 @@ import { AgencyMap } from '../ui/AgencyMap';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { REVIEWS_PLACEHOLDER } from '@/data/reviews-placeholder';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
-import { navigateTo } from '@/lib/utils';
+import { navigateTo, getLastDirectoryUrl } from '@/lib/utils';
 import { haversineKm, formatDistanceKm } from '@/lib/geo';
 import { fetchPlaceReviews, type GoogleReview } from '@/lib/google-places';
 import { fetchResenasManuales, type ResenaManual } from '@/data/live-resenas';
@@ -861,15 +861,10 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
     return lat && lng ? { lat: Number(lat), lng: Number(lng) } : null;
   }, []);
 
-  /** Vuelve a los resultados de búsqueda si venía de ahí, o al home si no. */
-  const backUrl = useMemo(() => {
-    const params = new URLSearchParams(window.location.search);
-    const q = params.get('q');
-    const lat = params.get('lat');
-    const lng = params.get('lng');
-    if (q && lat && lng) return `/inmobiliarias?${params.toString()}`;
-    return '/inmobiliarias';
-  }, []);
+  /** Vuelve exactamente a la sección del directorio de la que se venía
+   * (resultados con sus filtros, sección principal, carrusel de vídeos...),
+   * no siempre al inicio del directorio. */
+  const backUrl = useMemo(() => getLastDirectoryUrl(), []);
 
   if (!agency) {
     return (
@@ -878,7 +873,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
           <p className="text-lg font-bold text-slate-900">No encontramos esta inmobiliaria</p>
           <button
             type="button"
-            onClick={() => navigateTo('/inmobiliarias')}
+            onClick={() => navigateTo(getLastDirectoryUrl())}
             className="mt-4 text-sm font-semibold text-[#FF8000] hover:underline"
           >
             ← Volver al directorio
@@ -958,7 +953,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
-                  className="pointer-events-none relative z-10 mb-8 flex justify-center lg:absolute lg:-right-2 lg:top-1/2 lg:mb-0 lg:-translate-y-1/2 lg:justify-start xl:-right-8"
+                  className="pointer-events-none relative z-10 mb-8 flex flex-col items-center justify-center lg:absolute lg:-right-2 lg:top-1/2 lg:mb-0 lg:-translate-y-1/2 lg:justify-start xl:-right-8"
                 >
                   <div className="relative">
                     <span className="absolute -left-7 -top-6 h-14 w-14 rounded-full bg-primary/10" aria-hidden="true" />
@@ -971,6 +966,9 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
                       className="relative h-40 w-40 rounded-full border-4 border-white object-cover shadow-2xl shadow-slate-900/15 sm:h-52 sm:w-52 xl:h-60 xl:w-60"
                     />
                   </div>
+                  <p className="mt-3 rounded-full bg-white px-4 py-1.5 text-sm font-bold text-slate-900 shadow-lg shadow-slate-900/10">
+                    {agency.nombre_agente}
+                  </p>
                 </motion.div>
               )}
 

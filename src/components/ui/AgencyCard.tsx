@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, BadgeCheck, Briefcase, Check, Clock, Home, MapPin, Phone, Star, Users, X } from 'lucide-react';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { formatDistanceKm } from '@/lib/geo';
-import { navigateTo } from '@/lib/utils';
+import { navigateTo, rememberDirectoryUrl } from '@/lib/utils';
 import { AgencyLeadForm } from './AgencyLeadForm';
 
 function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: InmobiliariaPublica; sizeClass?: string }) {
@@ -67,7 +67,7 @@ export function AgencyCard({
   return (
     <button
       type="button"
-      onClick={() => navigateTo(`/inmobiliarias/${agency.id}`)}
+      onClick={() => { rememberDirectoryUrl(); navigateTo(`/inmobiliarias/${agency.id}`); }}
       className="group flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm shadow-slate-900/5 transition-[transform,border-color,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:border-[#FF8000]/20 hover:shadow-xl hover:shadow-[#FF8000]/10"
     >
       <div
@@ -128,14 +128,12 @@ export function AgencyCard({
 export function AgencyResultRow({
   agency,
   isNearest,
-  searchPoint,
   selectable = false,
   selected = false,
   onToggle,
 }: {
   agency: InmobiliariaPublica;
   isNearest: boolean;
-  searchPoint?: { lat: number; lng: number } | null;
   selectable?: boolean;
   selected?: boolean;
   onToggle?: (id: string) => void;
@@ -153,9 +151,10 @@ export function AgencyResultRow({
   }, [showModal]);
 
   const goToProfile = () => {
-    const href = searchPoint
-      ? `/inmobiliarias/${agency.id}?lat=${searchPoint.lat}&lng=${searchPoint.lng}`
-      : `/inmobiliarias/${agency.id}`;
+    // Conserva la query completa (q, lat, lng) de la página de resultados
+    // para que el perfil pueda mostrar la distancia real en su mapa.
+    rememberDirectoryUrl();
+    const href = `/inmobiliarias/${agency.id}${window.location.search}`;
     navigateTo(href);
   };
 
