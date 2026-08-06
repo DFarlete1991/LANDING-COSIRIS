@@ -517,6 +517,12 @@ export function RegistroInmobiliariaPage() {
       setStep1Phase('idle');
       setStep(2);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Aviso a GTM del paso 1 completado (lead parcial), aunque no cambie
+      // la URL — este formulario manda los datos a otro proyecto (CRM) y no
+      // hay recarga ni pushState que GTM pueda detectar por sí solo.
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'registro_inmobiliaria_paso1', solicitud_id: data?.id ?? null });
     } catch {
       setStep1Error('Error de conexión. Comprueba tu internet e inténtalo de nuevo.');
       setStep1Phase('idle');
@@ -556,6 +562,11 @@ export function RegistroInmobiliariaPage() {
       }
 
       setPhase('sent');
+
+      // Igual que en el paso 1: sin esto GTM no se entera de que la
+      // solicitud se completó, porque no hay recarga ni cambio de URL.
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'registro_inmobiliaria_completado', solicitud_id: solicitudId });
     } catch {
       setError('Error de conexión. Comprueba tu internet e inténtalo de nuevo.');
       setPhase('idle');
