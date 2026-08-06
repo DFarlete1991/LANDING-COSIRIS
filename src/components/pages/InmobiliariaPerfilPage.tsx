@@ -635,33 +635,54 @@ function Accordion({ items }: { items: { q: string; a: string }[] }) {
           Haz clic en cada pregunta
         </motion.div>
         {items.map((item, i) => (
-          <motion.button
-            key={item.q}
-            type="button"
-            onClick={() => setOpenIndex(openIndex === i ? null : i)}
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.35, delay: i * 0.06, ease: [0.19, 1, 0.22, 1] }}
-            className={`w-full rounded-xl border px-5 py-4 text-left text-body-sm font-semibold shadow-soft transition-all duration-200 ${
-              openIndex === i
-                ? 'border-primary bg-primary text-white shadow-[0_8px_24px_rgba(255,128,0,0.25)]'
-                : 'border-border bg-white text-foreground hover:border-primary/30'
-            }`}
-          >
-            <span className="flex items-center gap-3">
-              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
-                openIndex === i ? 'bg-white/20 text-white' : 'bg-primary/8 text-primary'
-              }`}>
-                {i + 1}
+          <div key={item.q}>
+            <motion.button
+              type="button"
+              onClick={() => setOpenIndex(openIndex === i ? null : i)}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.35, delay: i * 0.06, ease: [0.19, 1, 0.22, 1] }}
+              className={`w-full rounded-xl border px-5 py-4 text-left text-body-sm font-semibold shadow-soft transition-all duration-200 ${
+                openIndex === i
+                  ? 'border-primary bg-primary text-white shadow-[0_8px_24px_rgba(255,128,0,0.25)]'
+                  : 'border-border bg-white text-foreground hover:border-primary/30'
+              }`}
+            >
+              <span className="flex items-center gap-3">
+                <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                  openIndex === i ? 'bg-white/20 text-white' : 'bg-primary/8 text-primary'
+                }`}>
+                  {i + 1}
+                </span>
+                {item.q}
               </span>
-              {item.q}
-            </span>
-          </motion.button>
+            </motion.button>
+
+            {/* Respuesta en línea, justo debajo de su pregunta — solo en
+                móvil/tablet. En lg+ la respuesta va en el panel de la
+                derecha (columna aparte), así que aquí se oculta. */}
+            <AnimatePresence initial={false}>
+              {openIndex === i && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: [0.19, 1, 0.22, 1] }}
+                  className="overflow-hidden lg:hidden"
+                >
+                  <div className="mt-2.5 rounded-xl border border-border bg-white p-5 shadow-soft">
+                    <div className="mb-3 h-1 w-10 rounded-full bg-primary" />
+                    <p className="text-body-sm leading-[170%] text-ink-muted">{item.a}</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         ))}
       </div>
 
-      <div className="relative flex min-h-[280px] items-center lg:pl-4">
+      <div className="relative hidden min-h-[280px] items-center lg:flex lg:pl-4">
         <AnimatePresence mode="wait">
           {openIndex !== null ? (
             <motion.div
