@@ -14,7 +14,6 @@ import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { REVIEWS_PLACEHOLDER } from '@/data/reviews-placeholder';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo, getLastDirectoryUrl } from '@/lib/utils';
-import { haversineKm, formatDistanceKm } from '@/lib/geo';
 import { fetchPlaceReviews, type GoogleReview } from '@/lib/google-places';
 import { fetchResenasManuales, type ResenaManual } from '@/data/live-resenas';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
@@ -537,7 +536,6 @@ function LocationSection({ agency, searchPoint }: { agency: InmobiliariaPublica;
   if (agency.lat == null || agency.lng == null) return null;
 
   const location = { lat: agency.lat, lng: agency.lng };
-  const distanceKm = searchPoint ? haversineKm(searchPoint, location) : null;
 
   return (
     <div>
@@ -587,20 +585,6 @@ function LocationSection({ agency, searchPoint }: { agency: InmobiliariaPublica;
                 <p className="text-xs text-[#68707F]">Zona centro</p>
               </div>
             </div>
-
-            {distanceKm != null && (
-              <>
-                <div className="h-8 w-px bg-[#ECE8E1]" />
-
-                <div className="flex items-center gap-4">
-                  <span className="text-xl">🚗</span>
-                  <div>
-                    <p className="text-sm font-bold text-[#0F172A]">{formatDistanceKm(distanceKm)}</p>
-                    <p className="text-xs text-[#68707F]">de tu búsqueda</p>
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         </motion.div>
       </motion.div>
@@ -860,7 +844,7 @@ function CtaButton({
 }
 
 export function InmobiliariaPerfilPage({ id }: { id: string }) {
-  const { agencies } = useInmobiliarias();
+  const { agencies, loading } = useInmobiliarias();
   const agency = agencies.find((a) => a.id === id);
 
   // Compartido entre el botón "Solicitar valoración" y el formulario
@@ -886,6 +870,19 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
    * (resultados con sus filtros, sección principal, carrusel de vídeos...),
    * no siempre al inicio del directorio. */
   const backUrl = useMemo(() => getLastDirectoryUrl(), []);
+
+  // Al entrar por un enlace directo, `agencies` todavía es el mock (no
+  // contiene este id) mientras Supabase responde — sin este chequeo se
+  // mostraba "No encontramos esta inmobiliaria" un instante antes de que
+  // el perfil real apareciera.
+  if (!agency && loading) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-white px-4">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-[#FF8000]" />
+        <p className="text-sm font-medium text-slate-500">Cargando inmobiliaria…</p>
+      </div>
+    );
+  }
 
   if (!agency) {
     return (
@@ -971,7 +968,7 @@ export function InmobiliariaPerfilPage({ id }: { id: string }) {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
-              className="relative"
+              className="relative lg:pr-[280px] xl:pr-[320px]"
             >
               {/* Foto del agente — en móvil se muestra centrada encima del contenido;
                   en lg+ flota en el hueco a la derecha del texto, desplazada hacia
