@@ -129,6 +129,12 @@ export function AgencyLeadForm({ agency, onSuccess }: { agency: InmobiliariaPubl
       const url = new URL(window.location.href);
       url.searchParams.set('lead', 'enviado');
       window.history.pushState({}, '', `${url.pathname}${url.search}`);
+      // Evento propio además del page_view de arriba — mismo patrón que
+      // registro_inmobiliaria_paso1/completado (RegistroInmobiliariaPage),
+      // para poder marcarlo como evento clave en GA4 e importarlo a Google
+      // Ads sin depender de un activador de "URL contiene lead=enviado".
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'lead_inmobiliaria_enviado', agency_id: agency.id });
       onSuccess?.();
     } else {
       setErrorMessage(result.error ?? 'No se pudo enviar el mensaje.');
