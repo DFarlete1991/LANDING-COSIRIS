@@ -17,6 +17,10 @@
       "destination": "/inmobiliarias.html"
     },
     {
+      "source": "/inmobiliarias/(.*)",
+      "destination": "/inmobiliarias.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
