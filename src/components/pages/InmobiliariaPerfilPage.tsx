@@ -14,6 +14,7 @@ import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { REVIEWS_PLACEHOLDER } from '@/data/reviews-placeholder';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo, getLastDirectoryUrl } from '@/lib/utils';
+import { findAgencyByProfilePath } from '@/lib/agency-url';
 import { fetchPlaceReviews, type GoogleReview } from '@/lib/google-places';
 import { fetchResenasManuales, type ResenaManual } from '@/data/live-resenas';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
@@ -843,9 +844,20 @@ function CtaButton({
   );
 }
 
-export function InmobiliariaPerfilPage({ id }: { id: string }) {
+/**
+ * Se llega por la URL nueva (`city` + `slug`, legible y con la ciudad para
+ * SEO) o por la vieja (`id`, un uuid), que sigue viva porque ya se
+ * compartieron enlaces con ese formato.
+ */
+export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?: string; slug?: string }) {
   const { agencies, loading } = useInmobiliarias();
-  const agency = agencies.find((a) => a.id === id);
+  const agency = useMemo(
+    () =>
+      city && slug
+        ? findAgencyByProfilePath(agencies, city, slug) ?? undefined
+        : agencies.find((a) => a.id === id),
+    [agencies, city, slug, id],
+  );
 
   // Compartido entre el botón "Solicitar valoración" y el formulario
   // embebido más abajo: cualquiera de los dos que se envíe primero debe

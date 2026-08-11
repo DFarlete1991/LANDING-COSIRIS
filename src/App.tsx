@@ -20,6 +20,7 @@ import { InmobiliariaPerfilPage } from './components/pages/InmobiliariaPerfilPag
 import { PlanesInmobiliariasPage } from './components/pages/PlanesInmobiliariasPage';
 import { RegistroInmobiliariaPage } from './components/pages/RegistroInmobiliariaPage';
 import { InmobiliariasProvider } from './context/InmobiliariasContext';
+import { parseAgencyProfilePath } from '@/lib/agency-url';
 
 declare global {
   interface Window {
@@ -115,6 +116,25 @@ export default function App() {
     );
   }
 
+  // Perfil público: /inmobiliarias-en-<ciudad>/<nombre-comercial>. Sin el
+  // segundo segmento (alguien recortó la URL a mano) todavía no hay página
+  // por ciudad, así que se cae al directorio en vez de dar un 404.
+  const profilePath = parseAgencyProfilePath(currentPath);
+  if (profilePath) {
+    return (
+      <InmobiliariasProvider>
+        {profilePath.slug ? (
+          <InmobiliariaPerfilPage city={profilePath.city} slug={profilePath.slug} />
+        ) : (
+          <BuscadorInmobiliariasPage />
+        )}
+        <ContactModal />
+      </InmobiliariasProvider>
+    );
+  }
+
+  // Formato anterior /inmobiliarias/<uuid>: se mantiene vivo porque ya se
+  // compartieron enlaces así (WhatsApp, campañas) y no pueden romperse.
   if (currentPath.startsWith('/inmobiliarias/')) {
     const agencyId = decodeURIComponent(currentPath.slice('/inmobiliarias/'.length));
     return (

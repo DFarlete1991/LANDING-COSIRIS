@@ -5,6 +5,8 @@ import { ArrowRight, BadgeCheck, Briefcase, Check, Clock, Home, MapPin, Phone, S
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { formatDistanceKm } from '@/lib/geo';
 import { navigateTo, rememberDirectoryUrl } from '@/lib/utils';
+import { agencyProfilePath } from '@/lib/agency-url';
+import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { AgencyLeadForm } from './AgencyLeadForm';
 
 function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: InmobiliariaPublica; sizeClass?: string }) {
@@ -64,10 +66,14 @@ export function AgencyCard({
   distanceKm?: number | null;
   isNearest?: boolean;
 }) {
+  // La lista completa hace falta para desempatar nombres repetidos en la
+  // misma ciudad al armar el slug del perfil.
+  const { agencies } = useInmobiliarias();
+
   return (
     <button
       type="button"
-      onClick={() => { rememberDirectoryUrl(); navigateTo(`/inmobiliarias/${agency.id}`); }}
+      onClick={() => { rememberDirectoryUrl(); navigateTo(agencyProfilePath(agency, agencies)); }}
       className="group flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm shadow-slate-900/5 transition-[transform,border-color,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:border-[#FF8000]/20 hover:shadow-xl hover:shadow-[#FF8000]/10"
     >
       <div
@@ -138,6 +144,8 @@ export function AgencyResultRow({
   selected?: boolean;
   onToggle?: (id: string) => void;
 }) {
+  // Necesaria para desempatar nombres repetidos al armar el slug del perfil.
+  const { agencies } = useInmobiliarias();
   const [showPhone, setShowPhone] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -154,8 +162,7 @@ export function AgencyResultRow({
     // Conserva la query completa (q, lat, lng) de la página de resultados
     // para que el perfil pueda mostrar la distancia real en su mapa.
     rememberDirectoryUrl();
-    const href = `/inmobiliarias/${agency.id}${window.location.search}`;
-    navigateTo(href);
+    navigateTo(agencyProfilePath(agency, agencies, window.location.search));
   };
 
   const handleActivate = () => {

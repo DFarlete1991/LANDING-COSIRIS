@@ -28,6 +28,7 @@ import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo, rememberDirectoryUrl } from '@/lib/utils';
+import { agencyProfilePath } from '@/lib/agency-url';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
@@ -405,7 +406,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.2 }}
-                    onClick={() => { rememberDirectoryUrl(); navigateTo(`/inmobiliarias/${agency.id}`); }}
+                    onClick={() => { rememberDirectoryUrl(); navigateTo(agencyProfilePath(agency, agencies)); }}
                     className="group relative w-36 shrink-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-44 md:w-56 lg:w-64"
                     style={{ aspectRatio: '9/16' }}
                   >
