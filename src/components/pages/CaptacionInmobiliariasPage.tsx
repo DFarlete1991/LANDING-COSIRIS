@@ -3,6 +3,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Building2, Check, ChevronDown } from 'lucide-react';
 import { FormNavbar } from '../ui/form-navbar';
 import { SharedLandingSections } from '../ui/shared-landing-sections';
+import { notifyWhatsAppLead } from '@/lib/whatsapp-webhook';
+import { DEFAULT_COUNTRY_DIAL, toInternationalPhone } from '@/data/country-codes';
+import { CountryCodeSelect } from '../ui/CountryCodeSelect';
 
 const PROVINCES = [
   'Álava', 'Albacete', 'Alicante', 'Almería', 'Asturias', 'Ávila',
@@ -28,6 +31,7 @@ type SubmitPhase = 'idle' | 'loading' | 'sent';
 type FormData = {
   name: string;
   email: string;
+  countryCode: string;
   phone: string;
   province: string;
   employees: string;
@@ -35,8 +39,8 @@ type FormData = {
 
 type FormErrors = Record<keyof FormData, string>;
 
-const emptyForm: FormData = { name: '', email: '', phone: '', province: '', employees: '' };
-const emptyErrors: FormErrors = { name: '', email: '', phone: '', province: '', employees: '' };
+const emptyForm: FormData = { name: '', email: '', countryCode: DEFAULT_COUNTRY_DIAL, phone: '', province: '', employees: '' };
+const emptyErrors: FormErrors = { name: '', email: '', countryCode: '', phone: '', province: '', employees: '' };
 
 function ProvinceField({
   value,
@@ -164,7 +168,7 @@ function CaptacionForm() {
   const validatePhone = (phone: string) => /^[+]?[\d\s]{9,15}$/.test(phone.trim());
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name as keyof FormErrors]) {
@@ -226,12 +230,14 @@ function CaptacionForm() {
     const payload = {
       name: formData.name,
       email: formData.email,
-      phone: formData.phone,
+      phone: toInternationalPhone(formData.countryCode, formData.phone),
       province: formData.province,
       employees: formData.employees,
       services: selectedServices,
       source_context: 'captacion_inmobiliarias_page',
     };
+
+    notifyWhatsAppLead(payload);
 
     try {
       const response = await fetch('https://n8n.srv1123447.hstgr.cloud/webhook/d0652f82-339e-44be-b627-6d03353c2037', {
@@ -333,16 +339,25 @@ function CaptacionForm() {
                       <label htmlFor="cp-phone" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
                         Telefono
                       </label>
-                      <input
-                        id="cp-phone"
-                        name="phone"
-                        type="tel"
-                        autoComplete="tel"
-                        placeholder="671 355 775"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        className={`${baseInputClass} ${errors.phone ? 'border-red-500 focus:border-red-500' : 'border-slate-200 focus:border-[#FF8000]'}`}
-                      />
+                      <div className="flex gap-2">
+                        <CountryCodeSelect
+                          id="cp-country-code"
+                          value={formData.countryCode}
+                          onChange={(dial) => setFormData((prev) => ({ ...prev, countryCode: dial }))}
+                          ariaLabel="Indicativo de país"
+                          className="w-32 shrink-0"
+                        />
+                        <input
+                          id="cp-phone"
+                          name="phone"
+                          type="tel"
+                          autoComplete="tel"
+                          placeholder="671 355 775"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          className={`${baseInputClass} ${errors.phone ? 'border-red-500 focus:border-red-500' : 'border-slate-200 focus:border-[#FF8000]'}`}
+                        />
+                      </div>
                       {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
                     </div>
 
