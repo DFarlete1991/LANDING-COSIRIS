@@ -17,6 +17,7 @@ import { navigateTo, getLastDirectoryUrl } from '@/lib/utils';
 import { findAgencyByProfilePath } from '@/lib/agency-url';
 import { fetchPlaceReviews, type GoogleReview } from '@/lib/google-places';
 import { optimizedImageUrl } from '@/lib/image-optimize';
+import { FadeImage } from '../ui/FadeImage';
 import { fetchResenasManuales, type ResenaManual } from '@/data/live-resenas';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 
@@ -223,7 +224,7 @@ function VideoCard({
           className="relative z-10 -mb-8 mt-5 flex justify-center"
         >
           <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-white shadow-lg shadow-slate-900/10">
-            <img
+            <FadeImage
               src={optimizedImageUrl(logoUrl, 130)}
               alt={nombre}
               style={{ objectPosition: logoPos ?? '50% 50%' }}
@@ -1002,7 +1003,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                     <span className="absolute -left-7 -top-6 h-14 w-14 rounded-full bg-primary/10" aria-hidden="true" />
                     <span className="absolute -bottom-5 -right-4 h-9 w-9 rounded-full bg-primary/15" aria-hidden="true" />
                     <span className="absolute -right-8 top-8 h-5 w-5 rounded-full bg-primary/20" aria-hidden="true" />
-                    <img
+                    <FadeImage
                       src={optimizedImageUrl(agency.foto_url, 480)}
                       alt={agency.nombre_agente}
                       style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}

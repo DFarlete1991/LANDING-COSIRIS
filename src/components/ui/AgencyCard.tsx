@@ -8,6 +8,7 @@ import { navigateTo, rememberDirectoryUrl } from '@/lib/utils';
 import { agencyProfilePath } from '@/lib/agency-url';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { optimizedImageUrl } from '@/lib/image-optimize';
+import { FadeImage } from './FadeImage';
 import { AgencyLeadForm } from './AgencyLeadForm';
 
 function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: InmobiliariaPublica; sizeClass?: string }) {
@@ -15,7 +16,7 @@ function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: Inmobilia
   const image = agency.foto_url ?? agency.logo_url;
   if (image) {
     return (
-      <img
+      <FadeImage
         src={optimizedImageUrl(image, 200)}
         alt={agency.foto_url ? agency.nombre_agente : agency.nombre_comercial}
         style={{ objectPosition: agency.foto_pos ?? agency.logo_pos ?? '50% 50%' }}
@@ -42,7 +43,7 @@ function AgencyThumbnail({ agency, sizeClass }: { agency: InmobiliariaPublica; s
   const image = agency.logo_url;
   if (image) {
     return (
-      <img
+      <FadeImage
         src={optimizedImageUrl(image, 60)}
         alt={agency.nombre_comercial}
         style={{ objectPosition: agency.foto_pos ?? agency.logo_pos ?? '50% 50%' }}
@@ -86,7 +87,7 @@ export function AgencyCard({
         style={{ background: `linear-gradient(135deg, ${agency.color_hex} 0%, #0F172A 140%)` }}
       >
         {agency.banner_url && (
-          <img src={optimizedImageUrl(agency.banner_url, 700)} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+          <FadeImage src={optimizedImageUrl(agency.banner_url, 700)} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         {isNearest && (
@@ -95,7 +96,7 @@ export function AgencyCard({
           </span>
         )}
         {agency.foto_url ? (
-          <img
+          <FadeImage
             src={optimizedImageUrl(agency.foto_url, 100)}
             alt={agency.nombre_agente}
             style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
@@ -104,7 +105,7 @@ export function AgencyCard({
             decoding="async"
           />
         ) : agency.logo_url ? (
-          <img
+          <FadeImage
             src={optimizedImageUrl(agency.logo_url, 100)}
             alt={agency.nombre_comercial}
             style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}

@@ -31,6 +31,7 @@ import { navigateTo, rememberDirectoryUrl } from '@/lib/utils';
 import { agencyProfilePath } from '@/lib/agency-url';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 import { optimizedImageUrl } from '@/lib/image-optimize';
+import { FadeImage } from '../../ui/FadeImage';
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -423,7 +424,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                     style={{ aspectRatio: '9/16' }}
                   >
                     {!isActiveSlot ? (
-                      <img
+                      <FadeImage
                         src={optimizedImageUrl(staticFallback, 500) ?? staticFallback}
                         alt={agency.nombre_comercial}
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -449,7 +450,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                         autoPlay muted loop playsInline
                       />
                     ) : showProfilePhoto ? (
-                      <img
+                      <FadeImage
                         src={optimizedImageUrl(agency.foto_url, 500)}
                         alt={agency.nombre_comercial}
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

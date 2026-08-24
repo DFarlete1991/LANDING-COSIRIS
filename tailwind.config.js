@@ -66,9 +66,18 @@ export default {
           '33%': { transform: 'translate(30px, -50px) scale(1.05)' },
           '66%': { transform: 'translate(-20px, 30px) scale(0.95)' },
         },
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
       },
       animation: {
         'float-blob': 'float-blob 18s ease-in-out infinite',
+        // Independiente de cualquier transition-transform en el mismo
+        // elemento (ej. el hover-scale de las miniaturas) — al ser
+        // `animation` y no `transition`, no compite por la propiedad
+        // transition-property con otras utilidades de Tailwind.
+        'fade-in': 'fade-in 500ms ease-out forwards',
       },
     },
   },
