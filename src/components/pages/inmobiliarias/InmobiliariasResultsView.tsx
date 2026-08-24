@@ -67,7 +67,7 @@ export function InmobiliariasResultsView({
       <div
         className="relative bg-black px-6 py-9"
         style={{
-          backgroundImage: 'url(/assets/inmobiliarias/results-banner.png)',
+          backgroundImage: 'url(/assets/inmobiliarias/results-banner.webp)',
           // >100% empuja el recorte más allá del borde derecho real de la imagen
           // (el negro de fondo rellena el hueco, se funde con el degradado).
           backgroundPosition: '130% center',
