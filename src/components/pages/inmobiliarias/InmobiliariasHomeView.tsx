@@ -30,6 +30,7 @@ import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo, rememberDirectoryUrl } from '@/lib/utils';
 import { agencyProfilePath } from '@/lib/agency-url';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
+import { optimizedImageUrl } from '@/lib/image-optimize';
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -400,6 +401,17 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                   ? agency.media_presentacion_url
                   : null;
                 const showProfilePhoto = !embed && !directVideoSrc && !!agency.foto_url;
+                // Los vídeos de las inmobiliarias pueden pesar decenas de MB (no
+                // se transcodifican al subirse, a diferencia de antes con
+                // Cloudinary) — reproducir los 5 a la vez en autoplay dispara
+                // esa cantidad de descargas simultáneas. Solo la primera tarjeta
+                // (la más visible del carrusel) reproduce de verdad; el resto
+                // muestra una miniatura estática hasta que le toque ser la
+                // primera en la rotación.
+                const isActiveSlot = i === 0;
+                const staticFallback = agency.foto_url
+                  ?? (embed?.platform === 'youtube' ? `https://img.youtube.com/vi/${embed.id}/mqdefault.jpg` : null)
+                  ?? '/assets/inmobiliarias/ciudades/madrid.jpg';
                 return (
                   <motion.button
                     key={`${agency.id}-${videoStartIdx + i}`}
@@ -410,7 +422,15 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                     className="group relative w-36 shrink-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-44 md:w-56 lg:w-64"
                     style={{ aspectRatio: '9/16' }}
                   >
-                    {embed ? (
+                    {!isActiveSlot ? (
+                      <img
+                        src={optimizedImageUrl(staticFallback, 500) ?? staticFallback}
+                        alt={agency.nombre_comercial}
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : embed ? (
                       <iframe
                         className="pointer-events-none absolute inset-0 h-full w-full"
                         src={
@@ -430,9 +450,11 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                       />
                     ) : showProfilePhoto ? (
                       <img
-                        src={agency.foto_url!}
+                        src={optimizedImageUrl(agency.foto_url, 500)}
                         alt={agency.nombre_comercial}
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <video

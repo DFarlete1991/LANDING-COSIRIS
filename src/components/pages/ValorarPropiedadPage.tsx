@@ -7,6 +7,7 @@ import { LandingNavbar } from './landing-navbar';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo } from '@/lib/utils';
 import { haversineKm } from '@/lib/geo';
+import { optimizedImageUrl } from '@/lib/image-optimize';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 
 const EXPO = [0.19, 1, 0.22, 1] as const;
@@ -130,17 +131,21 @@ function MinimalAgencyCard({
       <div className="flex items-center gap-3 pr-7">
         {agency.foto_url ? (
           <img
-            src={agency.foto_url}
+            src={optimizedImageUrl(agency.foto_url, 90)}
             alt={agency.nombre_agente}
             style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
             className="h-11 w-11 shrink-0 rounded-full border border-slate-100 object-cover"
+            loading="lazy"
+            decoding="async"
           />
         ) : agency.logo_url ? (
           <img
-            src={agency.logo_url}
+            src={optimizedImageUrl(agency.logo_url, 90)}
             alt={agency.nombre_comercial}
             style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
             className="h-11 w-11 shrink-0 rounded-xl border border-slate-100 object-cover"
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div

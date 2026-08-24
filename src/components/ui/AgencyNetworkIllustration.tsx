@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Search, Home, MapPin } from 'lucide-react';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
+import { optimizedImageUrl } from '@/lib/image-optimize';
 
 const PING_DURATION = 3;
 
@@ -48,7 +49,7 @@ function LogoCard({ agency, x, y, rotate = 0, delay = 0 }: LogoCardProps) {
         style={{ backgroundColor: agency.logo_url ? 'transparent' : (agency.color_hex ?? '#FF8000') }}
       >
         {agency.logo_url ? (
-          <img src={agency.logo_url} alt="" className="h-full w-full object-contain" />
+          <img src={optimizedImageUrl(agency.logo_url, 50)} alt="" className="h-full w-full object-contain" loading="lazy" decoding="async" />
         ) : (
           agency.nombre_comercial.split(' ').map((w) => w[0]).slice(0, 2).join('')
         )}
