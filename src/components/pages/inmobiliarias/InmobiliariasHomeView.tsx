@@ -31,6 +31,8 @@ import { navigateTo, rememberDirectoryUrl } from '@/lib/utils';
 import { agencyProfilePath } from '@/lib/agency-url';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 import { useValidImageUrl } from '@/lib/use-valid-image-url';
+import { optimizedImageUrl } from '@/lib/image-optimize';
+import { FadeImage } from '../../ui/FadeImage';
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -58,9 +60,11 @@ function hasShowcaseMedia(agency: InmobiliariaPublica): boolean {
 function ShowcaseCard({
   agency,
   agencies,
+  isActiveSlot,
 }: {
   agency: InmobiliariaPublica;
   agencies: InmobiliariaPublica[];
+  isActiveSlot: boolean;
 }) {
   const [directVideoBroken, setDirectVideoBroken] = useState(false);
   const fotoUrl = useValidImageUrl(agency.foto_url);
@@ -75,6 +79,14 @@ function ShowcaseCard({
     ? agency.media_presentacion_url
     : null;
   const showProfilePhoto = !embed && !directVideoSrc && !!fotoUrl;
+  // Los vídeos de las inmobiliarias pueden pesar decenas de MB (no se
+  // transcodifican al subirse, a diferencia de antes con Cloudinary) —
+  // reproducir los 5 a la vez en autoplay dispara esa cantidad de descargas
+  // simultáneas. Solo la tarjeta activa (la más visible del carrusel)
+  // reproduce de verdad; el resto muestra una miniatura estática.
+  const staticFallback = fotoUrl
+    ?? (embed?.platform === 'youtube' ? `https://img.youtube.com/vi/${embed.id}/mqdefault.jpg` : null)
+    ?? '/assets/inmobiliarias/ciudades/madrid.jpg';
 
   return (
     <motion.button
@@ -85,7 +97,15 @@ function ShowcaseCard({
       className="group relative w-36 shrink-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-44 md:w-56 lg:w-64"
       style={{ aspectRatio: '9/16' }}
     >
-      {embed ? (
+      {!isActiveSlot ? (
+        <FadeImage
+          src={optimizedImageUrl(staticFallback, 500) ?? staticFallback}
+          alt={agency.nombre_comercial}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : embed ? (
         <iframe
           className="pointer-events-none absolute inset-0 h-full w-full"
           src={
@@ -105,10 +125,12 @@ function ShowcaseCard({
           onError={() => setDirectVideoBroken(true)}
         />
       ) : showProfilePhoto ? (
-        <img
-          src={fotoUrl!}
+        <FadeImage
+          src={optimizedImageUrl(fotoUrl, 500)}
           alt={agency.nombre_comercial}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          decoding="async"
         />
       ) : (
         <video
@@ -469,7 +491,12 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {visibleForVideo.map((agency, i) => (
-                <ShowcaseCard key={`${agency.id}-${videoStartIdx + i}`} agency={agency} agencies={agencies} />
+                <ShowcaseCard
+                  key={`${agency.id}-${videoStartIdx + i}`}
+                  agency={agency}
+                  agencies={agencies}
+                  isActiveSlot={i === 0}
+                />
               ))}
             </div>
           </div>

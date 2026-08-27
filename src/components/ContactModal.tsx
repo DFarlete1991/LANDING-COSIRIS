@@ -7,6 +7,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, Check, ChevronDown } from 'lucide-react';
 import { useUI } from '../context/UIContext';
 import { getAttributionFields } from '@/lib/utm';
+import { notifyWhatsAppLead } from '@/lib/whatsapp-webhook';
+import { DEFAULT_COUNTRY_DIAL, toInternationalPhone } from '@/data/country-codes';
+import { CountryCodeSelect } from './ui/CountryCodeSelect';
 
 // ─── Spain Provinces ─────────────────────────────────────────────────────────
 
@@ -221,8 +224,8 @@ function SentScreen() {
 
 // ─── Empty state helpers ──────────────────────────────────────────────────────
 
-const emptyForm = { name: '', email: '', phone: '', province: '', employees: '' };
-const emptyErrors = { name: '', email: '', phone: '', province: '', employees: '' };
+const emptyForm = { name: '', email: '', countryCode: DEFAULT_COUNTRY_DIAL, phone: '', province: '', employees: '' };
+const emptyErrors = { name: '', email: '', countryCode: '', phone: '', province: '', employees: '' };
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -245,7 +248,7 @@ export default function ContactModal() {
   const validatePhone = (phone: string) => /^[+]?[\d\s]{9,15}$/.test(phone.trim());
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name as keyof typeof errors]) {
@@ -311,13 +314,15 @@ export default function ContactModal() {
     const payload = {
       name: formData.name,
       email: formData.email,
-      phone: formData.phone,
+      phone: toInternationalPhone(formData.countryCode, formData.phone),
       province: formData.province,
       employees: formData.employees,
       services: selectedServices,
       source_context: modalParams.sourceContext ?? 'direct',
       ...getAttributionFields(),
     };
+
+    notifyWhatsAppLead(payload);
 
     try {
       const response = await fetch('https://n8n.srv1123447.hstgr.cloud/webhook/8383a34e-98f6-45b0-adda-77a6cdaf8abe', {
@@ -460,13 +465,22 @@ export default function ContactModal() {
                             <label htmlFor="cm-phone" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
                               Teléfono
                             </label>
-                            <input
-                              id="cm-phone" name="phone" type="tel"
-                              autoComplete="tel" placeholder="671 355 775"
-                              value={formData.phone}
-                              onChange={handleInputChange}
-                              className={`${baseInputClass} ${errors.phone ? 'border-red-500 focus:border-red-500' : 'border-slate-200 focus:border-[#FF8000]'}`}
-                            />
+                            <div className="flex gap-2">
+                              <CountryCodeSelect
+                                id="cm-country-code"
+                                value={formData.countryCode}
+                                onChange={(dial) => setFormData((prev) => ({ ...prev, countryCode: dial }))}
+                                ariaLabel="Indicativo de país"
+                                className="w-32 shrink-0"
+                              />
+                              <input
+                                id="cm-phone" name="phone" type="tel"
+                                autoComplete="tel" placeholder="671 355 775"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                                className={`${baseInputClass} ${errors.phone ? 'border-red-500 focus:border-red-500' : 'border-slate-200 focus:border-[#FF8000]'}`}
+                              />
+                            </div>
                             {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
                           </motion.div>
 

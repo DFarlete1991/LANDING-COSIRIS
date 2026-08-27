@@ -7,6 +7,8 @@ import { formatDistanceKm } from '@/lib/geo';
 import { navigateTo, rememberDirectoryUrl } from '@/lib/utils';
 import { agencyProfilePath } from '@/lib/agency-url';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
+import { optimizedImageUrl } from '@/lib/image-optimize';
+import { FadeImage } from './FadeImage';
 import { AgencyLeadForm } from './AgencyLeadForm';
 import { useValidImageUrl } from '@/lib/use-valid-image-url';
 
@@ -18,11 +20,13 @@ function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: Inmobilia
   const image = fotoUrl ?? logoUrl;
   if (image) {
     return (
-      <img
-        src={image}
+      <FadeImage
+        src={optimizedImageUrl(image, 200)}
         alt={fotoUrl ? agency.nombre_agente : agency.nombre_comercial}
         style={{ objectPosition: agency.foto_pos ?? agency.logo_pos ?? '50% 50%' }}
         className={`shrink-0 rounded-full border-2 border-white object-cover shadow-lg ${sizeClass}`}
+        loading="lazy"
+        decoding="async"
       />
     );
   }
@@ -43,11 +47,13 @@ function AgencyThumbnail({ agency, sizeClass }: { agency: InmobiliariaPublica; s
   const image = useValidImageUrl(agency.logo_url);
   if (image) {
     return (
-      <img
-        src={image}
+      <FadeImage
+        src={optimizedImageUrl(image, 60)}
         alt={agency.nombre_comercial}
         style={{ objectPosition: agency.foto_pos ?? agency.logo_pos ?? '50% 50%' }}
         className={`shrink-0 border-2 border-white object-cover shadow-sm ${sizeClass}`}
+        loading="lazy"
+        decoding="async"
       />
     );
   }
@@ -88,7 +94,7 @@ export function AgencyCard({
         style={{ background: `linear-gradient(135deg, ${agency.color_hex} 0%, #0F172A 140%)` }}
       >
         {bannerUrl && (
-          <img src={bannerUrl} alt="" className="h-full w-full object-cover" />
+          <FadeImage src={optimizedImageUrl(bannerUrl, 700)} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         {isNearest && (
@@ -97,18 +103,22 @@ export function AgencyCard({
           </span>
         )}
         {fotoUrl ? (
-          <img
-            src={fotoUrl}
+          <FadeImage
+            src={optimizedImageUrl(fotoUrl, 100)}
             alt={agency.nombre_agente}
             style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
             className="absolute -bottom-4 left-4 h-10 w-10 rounded-full border-[3px] border-white object-cover shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-110"
+            loading="lazy"
+            decoding="async"
           />
         ) : logoUrl ? (
-          <img
-            src={logoUrl}
+          <FadeImage
+            src={optimizedImageUrl(logoUrl, 100)}
             alt={agency.nombre_comercial}
             style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
             className="absolute -bottom-4 left-4 h-10 w-10 rounded-full border-2 border-white object-cover shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-110"
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div

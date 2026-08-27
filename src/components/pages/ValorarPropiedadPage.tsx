@@ -10,6 +10,8 @@ import { useSEO } from '@/lib/seo';
 import { useValidImageUrl } from '@/lib/use-valid-image-url';
 import { haversineKm } from '@/lib/geo';
 import { getAttributionFields, getAttributionSummaryLine } from '@/lib/utm';
+import { optimizedImageUrl } from '@/lib/image-optimize';
+import { FadeImage } from '../ui/FadeImage';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 
 const EXPO = [0.19, 1, 0.22, 1] as const;
@@ -134,18 +136,22 @@ function MinimalAgencyCard({
 
       <div className="flex items-center gap-3 pr-7">
         {fotoUrl ? (
-          <img
-            src={fotoUrl}
+          <FadeImage
+            src={optimizedImageUrl(fotoUrl, 90)}
             alt={agency.nombre_agente}
             style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
             className="h-11 w-11 shrink-0 rounded-full border border-slate-100 object-cover"
+            loading="lazy"
+            decoding="async"
           />
         ) : logoUrl ? (
-          <img
-            src={logoUrl}
+          <FadeImage
+            src={optimizedImageUrl(logoUrl, 90)}
             alt={agency.nombre_comercial}
             style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
             className="h-11 w-11 shrink-0 rounded-xl border border-slate-100 object-cover"
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div

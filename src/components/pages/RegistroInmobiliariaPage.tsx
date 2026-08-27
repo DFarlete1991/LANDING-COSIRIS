@@ -8,6 +8,9 @@ import { gmapsAvailable } from '@/lib/map-static';
 import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
 import { formatSpanishAddressLabel } from '@/lib/geo';
 import { getAttributionFields } from '@/lib/utm';
+import { notifyWhatsAppLead } from '@/lib/whatsapp-webhook';
+import { DEFAULT_COUNTRY_DIAL, toInternationalPhone } from '@/data/country-codes';
+import { CountryCodeSelect } from '../ui/CountryCodeSelect';
 
 const AVAILABLE_LANGUAGES = [
   'Español', 'Inglés', 'Francés', 'Alemán', 'Italiano', 'Portugués',
@@ -59,12 +62,13 @@ type ClientFormState = {
   nombre_comercial: string;
   cif: string;
   email: string;
+  countryCode: string;
   telefono: string;
   nombre_agente: string;
 };
 
 const emptyClientForm: ClientFormState = {
-  nombre_comercial: '', cif: '', email: '', telefono: '', nombre_agente: '',
+  nombre_comercial: '', cif: '', email: '', countryCode: DEFAULT_COUNTRY_DIAL, telefono: '', nombre_agente: '',
 };
 
 type Step1Phase = 'idle' | 'loading';
@@ -477,7 +481,7 @@ export function RegistroInmobiliariaPage() {
   const [phase, setPhase] = useState<SubmitPhase>('idle');
   const [error, setError] = useState<string | null>(null);
 
-  function handleClientChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleClientChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
     setClientForm((prev) => ({ ...prev, [name]: value }));
   }
@@ -571,6 +575,18 @@ export function RegistroInmobiliariaPage() {
       }
 
       setPhase('sent');
+
+      notifyWhatsAppLead({
+        name: clientForm.nombre_agente || clientForm.nombre_comercial,
+        email: clientForm.email,
+        phone: toInternationalPhone(clientForm.countryCode, clientForm.telefono),
+        nombre_comercial: clientForm.nombre_comercial,
+        cif: clientForm.cif,
+        especialidades,
+        idiomas,
+        source_context: 'registro_inmobiliaria_page',
+        solicitud_id: solicitudId,
+      });
 
       // Igual que en el paso 1: sin esto GTM no se entera de que la
       // solicitud se completó, porque no hay recarga ni cambio de URL.
@@ -696,7 +712,17 @@ export function RegistroInmobiliariaPage() {
                         </div>
                         <div className="space-y-1.5">
                           <label htmlFor="ri-telefono" className="block text-sm font-semibold text-slate-800">Teléfono</label>
-                          <input id="ri-telefono" name="telefono" type="tel" value={clientForm.telefono} onChange={handleClientChange} disabled={step1Phase === 'loading'} placeholder="671 355 775" className={baseInputClass} />
+                          <div className="flex gap-2">
+                            <CountryCodeSelect
+                              id="ri-country-code"
+                              value={clientForm.countryCode}
+                              onChange={(dial) => setClientForm((prev) => ({ ...prev, countryCode: dial }))}
+                              disabled={step1Phase === 'loading'}
+                              ariaLabel="Indicativo de país"
+                              className="w-32 shrink-0"
+                            />
+                            <input id="ri-telefono" name="telefono" type="tel" value={clientForm.telefono} onChange={handleClientChange} disabled={step1Phase === 'loading'} placeholder="671 355 775" className={baseInputClass} />
+                          </div>
                         </div>
                       </div>
 

@@ -17,6 +17,8 @@ import { navigateTo, getLastDirectoryUrl } from '@/lib/utils';
 import { findAgencyByProfilePath, agencyProfilePath } from '@/lib/agency-url';
 import { useSEO } from '@/lib/seo';
 import { fetchPlaceReviews, type GoogleReview } from '@/lib/google-places';
+import { optimizedImageUrl } from '@/lib/image-optimize';
+import { FadeImage } from '../ui/FadeImage';
 import { fetchResenasManuales, type ResenaManual } from '@/data/live-resenas';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 import { useValidImageUrl } from '@/lib/use-valid-image-url';
@@ -184,6 +186,7 @@ function VideoCard({
             <video
               ref={videoRef}
               controls={playing}
+              preload="none"
               className="h-full w-full object-contain"
               src={url}
               onPlay={() => setPlaying(true)}
@@ -227,11 +230,13 @@ function VideoCard({
           className="relative z-10 -mb-8 mt-5 flex justify-center"
         >
           <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-white shadow-lg shadow-slate-900/10">
-            <img
-              src={resolvedLogoUrl}
+            <FadeImage
+              src={optimizedImageUrl(resolvedLogoUrl, 130)}
               alt={nombre}
               style={{ objectPosition: logoPos ?? '50% 50%' }}
               className="h-full w-full rounded-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </motion.div>
@@ -1027,11 +1032,12 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                     <span className="absolute -left-7 -top-6 h-14 w-14 rounded-full bg-primary/10" aria-hidden="true" />
                     <span className="absolute -bottom-5 -right-4 h-9 w-9 rounded-full bg-primary/15" aria-hidden="true" />
                     <span className="absolute -right-8 top-8 h-5 w-5 rounded-full bg-primary/20" aria-hidden="true" />
-                    <img
-                      src={heroFotoUrl}
+                    <FadeImage
+                      src={optimizedImageUrl(heroFotoUrl, 480)}
                       alt={agency.nombre_agente}
                       style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
                       className="relative h-40 w-40 rounded-full border-4 border-white object-cover shadow-2xl shadow-slate-900/15 sm:h-52 sm:w-52 xl:h-60 xl:w-60"
+                      decoding="async"
                     />
                   </div>
                 </motion.div>
