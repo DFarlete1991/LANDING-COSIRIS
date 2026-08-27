@@ -6,6 +6,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Check, ChevronDown } from 'lucide-react';
 import { useUI } from '../context/UIContext';
+import { getAttributionFields } from '@/lib/utm';
 
 // ─── Spain Provinces ─────────────────────────────────────────────────────────
 
@@ -315,6 +316,7 @@ export default function ContactModal() {
       employees: formData.employees,
       services: selectedServices,
       source_context: modalParams.sourceContext ?? 'direct',
+      ...getAttributionFields(),
     };
 
     try {

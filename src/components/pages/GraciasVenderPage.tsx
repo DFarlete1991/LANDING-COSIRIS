@@ -1,8 +1,18 @@
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { LandingNavbar } from './landing-navbar';
+import { useSEO } from '@/lib/seo';
 
 export function GraciasVenderPage() {
+  // Página de agradecimiento sin contenido propio para un buscador — no debe
+  // indexarse (evita ruido/duplicados en Search Console).
+  useSEO({
+    path: '/gracias-vender',
+    title: 'Solicitud recibida | Cosiris',
+    description: 'Hemos recibido tu solicitud. Nuestro equipo se pondrá en contacto contigo en menos de 24 horas.',
+    noindex: true,
+  });
+
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#FF8000]/30 flex flex-col items-center">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-70"></div>

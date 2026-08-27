@@ -9,6 +9,7 @@ import {
 import { useUI } from '@/context/UIContext';
 import { LandingNavbar } from '@/components/pages/landing-navbar';
 import { Footer } from '@/components/Footer';
+import { useSEO } from '@/lib/seo';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -484,6 +485,12 @@ function FAQ() {
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
 export function ServiciosPage() {
+  useSEO({
+    path: '/servicios',
+    title: 'Servicios de marketing inmobiliario | Cosiris',
+    description: 'Captación y digitalización automatizada para inmobiliarias: gestión de redes, ads, email marketing y agente IA. Descubre cómo funciona el sistema de Cosiris.',
+  });
+
   const { openContactModal } = useUI();
 
   useEffect(() => {

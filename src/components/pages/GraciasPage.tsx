@@ -1,8 +1,18 @@
 import { motion, type Variants } from 'framer-motion';
 import { Check, Clock, Youtube, ShieldCheck } from 'lucide-react';
 import { FormNavbar } from '../ui/form-navbar';
+import { useSEO } from '@/lib/seo';
 
 export function GraciasPage() {
+  // Página de agradecimiento sin contenido propio para un buscador — no debe
+  // indexarse (evita ruido/duplicados en Search Console).
+  useSEO({
+    path: '/gracias',
+    title: 'Solicitud recibida | Cosiris',
+    description: 'Hemos recibido tu solicitud. Nuestro equipo se pondrá en contacto contigo en menos de 24 horas.',
+    noindex: true,
+  });
+
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: { 

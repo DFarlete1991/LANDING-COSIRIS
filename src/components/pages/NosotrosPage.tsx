@@ -4,6 +4,7 @@ import { X, Play, Youtube, MapPin, Calendar, Users, Check, Volume2, VolumeX } fr
 import { useUI } from '@/context/UIContext';
 import { LandingNavbar } from '@/components/pages/landing-navbar';
 import { Footer } from '@/components/Footer';
+import { useSEO } from '@/lib/seo';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -345,6 +346,12 @@ function CinematicVideo({ videoId }: { videoId: string }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function NosotrosPage() {
+  useSEO({
+    path: '/nosotros',
+    title: 'Sobre Cosiris | Agencia de marketing inmobiliario',
+    description: 'Conoce al equipo detrás de Cosiris y cómo ayudamos a inmobiliarias a captar y digitalizar su negocio con un sistema, no con suerte.',
+  });
+
   const { openContactModal } = useUI();
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
   const closeVideo = useCallback(() => setActiveVideo(null), []);

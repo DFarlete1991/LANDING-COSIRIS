@@ -14,10 +14,12 @@ import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { REVIEWS_PLACEHOLDER } from '@/data/reviews-placeholder';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo, getLastDirectoryUrl } from '@/lib/utils';
-import { findAgencyByProfilePath } from '@/lib/agency-url';
+import { findAgencyByProfilePath, agencyProfilePath } from '@/lib/agency-url';
+import { useSEO } from '@/lib/seo';
 import { fetchPlaceReviews, type GoogleReview } from '@/lib/google-places';
 import { fetchResenasManuales, type ResenaManual } from '@/data/live-resenas';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
+import { useValidImageUrl } from '@/lib/use-valid-image-url';
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -127,13 +129,16 @@ function VideoCard({
   logoUrl,
   logoPos,
   colorHex,
+  onError,
 }: {
   url: string;
   nombre: string;
   logoUrl?: string | null;
   logoPos?: string | null;
   colorHex?: string;
+  onError?: () => void;
 }) {
+  const resolvedLogoUrl = useValidImageUrl(logoUrl);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const embed = useMemo(() => getVideoEmbed(url), [url]);
@@ -183,6 +188,7 @@ function VideoCard({
               src={url}
               onPlay={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
+              onError={onError}
               onLoadedMetadata={(e) => {
                 const v = e.currentTarget;
                 if (v.videoWidth && v.videoHeight) {
@@ -212,7 +218,7 @@ function VideoCard({
         )}
       </div>
 
-      {logoUrl && (
+      {resolvedLogoUrl && (
         <motion.div
           initial={{ opacity: 0, scale: 0.85 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -222,7 +228,7 @@ function VideoCard({
         >
           <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-white shadow-lg shadow-slate-900/10">
             <img
-              src={logoUrl}
+              src={resolvedLogoUrl}
               alt={nombre}
               style={{ objectPosition: logoPos ?? '50% 50%' }}
               className="h-full w-full rounded-full object-cover"
@@ -236,9 +242,9 @@ function VideoCard({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
         transition={{ duration: 0.5, delay: 0.15, ease: [0.19, 1, 0.22, 1] }}
-        className={`flex items-center gap-3 rounded-[22px] border border-[#ECE8E1] bg-white px-5 py-4 shadow-[0_10px_30px_rgba(30,35,50,.05)] ${logoUrl ? 'pt-9' : 'mt-5'}`}
+        className={`flex items-center gap-3 rounded-[22px] border border-[#ECE8E1] bg-white px-5 py-4 shadow-[0_10px_30px_rgba(30,35,50,.05)] ${resolvedLogoUrl ? 'pt-9' : 'mt-5'}`}
       >
-        {!logoUrl && (
+        {!resolvedLogoUrl && (
           <div
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-primary bg-primary/8"
             style={colorHex ? { backgroundColor: `${colorHex}14`, color: colorHex } : undefined}
@@ -246,7 +252,7 @@ function VideoCard({
             <ShieldCheck size={18} />
           </div>
         )}
-        <div className={logoUrl ? 'w-full text-center' : ''}>
+        <div className={resolvedLogoUrl ? 'w-full text-center' : ''}>
           <p className="text-sm font-bold text-[#0F172A]">Transparencia, compromiso y resultados comprobados.</p>
           <p className="text-xs text-[#68707F]">Así trabajamos en {nombre}.</p>
         </div>
@@ -869,6 +875,12 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
   // párrafo en vez de enlazar a otro lado.
   const [bioExpanded, setBioExpanded] = useState(false);
 
+  // Si el archivo de vídeo subido falla al cargar (ej. hosting caído), se
+  // oculta toda la sección en vez de dejar un reproductor negro sin vídeo.
+  const [videoBroken, setVideoBroken] = useState(false);
+
+  const heroFotoUrl = useValidImageUrl(agency?.foto_url);
+
   // Si se llegó desde una búsqueda (lista de resultados), conserva el punto
   // buscado para poder mostrar distancia real en el mapa del perfil.
   const searchPoint = useMemo(() => {
@@ -882,6 +894,22 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
    * (resultados con sus filtros, sección principal, carrusel de vídeos...),
    * no siempre al inicio del directorio. */
   const backUrl = useMemo(() => getLastDirectoryUrl(), []);
+
+  // Canonical siempre en formato legible (ciudad + slug), incluso si se
+  // llegó por el enlace viejo /inmobiliarias/<uuid> — así Google consolida
+  // ambas URLs en una sola página indexada en vez de verlas como duplicadas.
+  useSEO({
+    enabled: !!agency,
+    path: agency ? agencyProfilePath(agency, agencies) : '',
+    title: agency
+      ? `${agency.nombre_comercial} en ${agency.poblacion || agency.provincia || 'España'} — Inmobiliaria verificada | Cosiris`
+      : '',
+    description: agency
+      ? (agency.texto_presentacion
+          ? excerpt(agency.texto_presentacion, 155)
+          : `${agency.nombre_comercial}, inmobiliaria verificada en ${agency.poblacion || agency.provincia}. Solicita una valoración gratuita de tu propiedad.`)
+      : '',
+  });
 
   // Al entrar por un enlace directo, `agencies` todavía es el mock (no
   // contiene este id) mientras Supabase responde — sin este chequeo se
@@ -919,7 +947,8 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
   // web) — mejor no mostrar la sección de vídeo que mostrar un reproductor
   // roto sin sonido ni imagen.
   const hasPlayableVideo = !!agency.media_presentacion_url
-    && (!!getVideoEmbed(agency.media_presentacion_url) || isDirectVideoUrl(agency.media_presentacion_url));
+    && (!!getVideoEmbed(agency.media_presentacion_url) || isDirectVideoUrl(agency.media_presentacion_url))
+    && !videoBroken;
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 antialiased">
@@ -987,7 +1016,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                   la izquierda para que se sienta parte del bloque informativo y no
                   compita con el formulario. Se mantiene limpia, sin etiquetas ni
                   badges superpuestos — el nombre va en la ficha de abajo. */}
-              {agency.foto_url && (
+              {heroFotoUrl && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -999,7 +1028,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                     <span className="absolute -bottom-5 -right-4 h-9 w-9 rounded-full bg-primary/15" aria-hidden="true" />
                     <span className="absolute -right-8 top-8 h-5 w-5 rounded-full bg-primary/20" aria-hidden="true" />
                     <img
-                      src={agency.foto_url}
+                      src={heroFotoUrl}
                       alt={agency.nombre_agente}
                       style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
                       className="relative h-40 w-40 rounded-full border-4 border-white object-cover shadow-2xl shadow-slate-900/15 sm:h-52 sm:w-52 xl:h-60 xl:w-60"
@@ -1113,6 +1142,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                   logoUrl={agency.logo_url}
                   logoPos={agency.logo_pos}
                   colorHex={agency.color_hex}
+                  onError={() => setVideoBroken(true)}
                 />
               </div>
             )}

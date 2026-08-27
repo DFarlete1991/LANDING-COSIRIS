@@ -4,6 +4,8 @@ import { ArrowRight, Check, Loader2 } from 'lucide-react';
 import { AddressAutocomplete } from '../ui/AddressAutocomplete';
 import { FormNavbar } from '../ui/form-navbar';
 import { WhyChooseCosiris, HowItWorks } from '../ui/valoracion-blocks';
+import { useSEO } from '@/lib/seo';
+import { getAttributionFields } from '@/lib/utm';
 
 const EXPO = [0.19, 1, 0.22, 1] as const;
 
@@ -16,6 +18,14 @@ type Timeframe = 'Aún no la he puesto a la venta.' | 'Ya se la he dado a otras 
 export function ValoracionPage() {
   const [currentPath, setCurrentPath] = useState(typeof window !== 'undefined' ? window.location.pathname : '');
   const isFormsPath = currentPath.includes('/forms');
+
+  useSEO({
+    path: isFormsPath ? '/vendetuvivienda/forms' : '/vendetuvivienda',
+    title: isFormsPath
+      ? 'Valora tu vivienda con precisión | Cosiris'
+      : 'Vende tu vivienda con una buena valoración de mercado | Cosiris',
+    description: 'Vender una vivienda empieza por una buena valoración de mercado. Solicita la tuya gratis y te conectamos con la inmobiliaria adecuada.',
+  });
 
   const [step, setStep] = useState(isFormsPath ? 2 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -103,7 +113,8 @@ export function ValoracionPage() {
     const payload = {
       address, postalCode, reason, timeframe, email, name, phone,
       source_context: 'landing_vendetuvivienda_boutique',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      ...getAttributionFields(),
     };
 
     try {

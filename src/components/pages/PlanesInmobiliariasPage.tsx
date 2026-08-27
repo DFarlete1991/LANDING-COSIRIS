@@ -3,6 +3,7 @@ import { ArrowRight, Check, Megaphone, Share2, Bot, Mail } from 'lucide-react';
 import { FormNavbar } from '../ui/form-navbar';
 import { SharedLandingSections } from '../ui/shared-landing-sections';
 import { navigateTo } from '@/lib/utils';
+import { useSEO } from '@/lib/seo';
 
 const EXPO: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -37,6 +38,12 @@ const TRIAL_BULLETS = [
 ];
 
 export function PlanesInmobiliariasPage() {
+  useSEO({
+    path: '/inmobiliarias/planes',
+    title: 'Planes para inmobiliarias | Cosiris',
+    description: 'Haz crecer tu inmobiliaria con Cosiris: gestión de redes, captación ads, email marketing y agente IA. Prueba gratis 30 días.',
+  });
+
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#FF8000]/30">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-70 pointer-events-none" />

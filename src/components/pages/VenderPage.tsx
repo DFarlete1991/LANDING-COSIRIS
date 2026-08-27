@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
 import { AddressAutocomplete } from '../ui/AddressAutocomplete';
 import { LandingNavbar } from './landing-navbar';
+import { useSEO } from '@/lib/seo';
+import { getAttributionFields } from '@/lib/utm';
 
 const EXPO = [0.19, 1, 0.22, 1] as const;
 
@@ -13,6 +15,12 @@ const primaryButtonClass =
   'w-full mt-6 flex items-center justify-center gap-2 rounded-md bg-[#FF8000] py-4 text-sm font-bold text-white transition-all duration-200 hover:bg-[#E67300] active:scale-[0.99]';
 
 export function VenderPage() {
+  useSEO({
+    path: '/valoratuvivienda',
+    title: 'Valora tu vivienda gratis en 2 pasos | Cosiris',
+    description: 'Formulario gratuito para particulares que quieren vender su vivienda. Recibe una valoración y te conectamos con la mejor inmobiliaria de tu zona.',
+  });
+
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -53,6 +61,7 @@ export function VenderPage() {
       address,
       source_context: 'landing_valoratuvivienda_particulares',
       timestamp: new Date().toISOString(),
+      ...getAttributionFields(),
     };
 
     try {

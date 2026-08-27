@@ -2,7 +2,7 @@ import { LegalPageLayout } from './LegalPageLayout';
 
 export function AvisoLegalPage() {
   return (
-    <LegalPageLayout title="Aviso Legal">
+    <LegalPageLayout title="Aviso Legal" path="/aviso-legal">
       <p>CONSULTORA NEGOCIO COSIRIS, S.L., responsable de este sitio web, pone a disposición de los usuarios de Internet el presente documento, cuya finalidad es cumplir las obligaciones establecidas en la Ley 34/2002, de 11 de junio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSICE), como en la LO 3/2018, de 5 de diciembre, de Protección de Datos de Carácter Personal y garantía de los derechos digitales, y en el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo de 27 de abril de 2016 y demás normativa aplicable, así como proporcionar información sobre las condiciones de uso.</p>
 
       <section>

@@ -3,8 +3,17 @@ import { HeroPage } from '@/components/pages/page-hero';
 import { EvolutionPage } from '@/components/pages/page-evolution';
 import { AuthorityPage } from '@/components/pages/page-authority';
 import { Footer } from '@/components/Footer';
+import { useSEO } from '@/lib/seo';
 
 export default function LandingPages() {
+  // index.html ya trae el título/descripción correctos para "/" — aquí solo
+  // se añade el canonical explícito, que el HTML estático no define.
+  useSEO({
+    path: '/',
+    title: 'Cosiris · La captación es un sistema',
+    description: 'Cosiris | Agencia de marketing especializada en el sector inmobiliario. Captación y digitalización automatizada.',
+  });
+
   return (
     <div className="relative flex w-full flex-col">
       <LandingNavbar />

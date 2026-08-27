@@ -5,8 +5,15 @@ import type { SearchSuggestion } from '../ui/AgencySearchBar';
 import { InmobiliariasHomeView } from './inmobiliarias/InmobiliariasHomeView';
 import { InmobiliariasResultsView } from './inmobiliarias/InmobiliariasResultsView';
 import { navigateTo } from '@/lib/utils';
+import { useSEO } from '@/lib/seo';
 
 export function BuscadorInmobiliariasPage() {
+  useSEO({
+    path: '/inmobiliarias',
+    title: 'Escoge la mejor inmobiliaria para venta de tu casa | Cosiris',
+    description: '¿Cuánto vale tu propiedad? Escoge los mejores profesionales inmobiliarios verificados. Marketing para inmobiliarias, compradores y vendedores.',
+  });
+
   const [query, setQuery] = useState('');
   const [searchPoint, setSearchPoint] = useState<{ lat: number; lng: number } | null>(null);
 

@@ -3,9 +3,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { GoogleMap, MarkerF, useJsApiLoader } from '@react-google-maps/api';
 import { ArrowRight, Check, CheckCircle2, ChevronDown, ImageIcon, Link2, Loader2, MapPin, Search, Video, Upload, X } from 'lucide-react';
 import { navigateTo } from '@/lib/utils';
+import { useSEO } from '@/lib/seo';
 import { gmapsAvailable } from '@/lib/map-static';
 import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
 import { formatSpanishAddressLabel } from '@/lib/geo';
+import { getAttributionFields } from '@/lib/utm';
 
 const AVAILABLE_LANGUAGES = [
   'Español', 'Inglés', 'Francés', 'Alemán', 'Italiano', 'Portugués',
@@ -451,6 +453,12 @@ function LocationField({
 }
 
 export function RegistroInmobiliariaPage() {
+  useSEO({
+    path: '/inmobiliarias/registro',
+    title: 'Regístrate como inmobiliaria y recibe leads reales | Cosiris',
+    description: 'Da de alta tu inmobiliaria en el directorio de Cosiris y empieza a recibir leads reales de propietarios que quieren vender.',
+  });
+
   const [step, setStep] = useState<1 | 2>(1);
   const [solicitudId, setSolicitudId] = useState<string | null>(null);
 
@@ -499,6 +507,7 @@ export function RegistroInmobiliariaPage() {
       body.append('cp', place.cp);
       body.append('lat', String(place.lat));
       body.append('lng', String(place.lng));
+      for (const [key, value] of Object.entries(getAttributionFields())) body.append(key, value);
 
       const response = await fetch(`${CRM_API_URL}/api/public/registro-inmobiliaria`, {
         method: 'POST',
