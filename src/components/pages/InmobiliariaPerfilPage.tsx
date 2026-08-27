@@ -131,6 +131,7 @@ function VideoCard({
   logoUrl,
   logoPos,
   colorHex,
+  posterUrl,
   onError,
 }: {
   url: string;
@@ -138,6 +139,7 @@ function VideoCard({
   logoUrl?: string | null;
   logoPos?: string | null;
   colorHex?: string;
+  posterUrl?: string | null;
   onError?: () => void;
 }) {
   const resolvedLogoUrl = useValidImageUrl(logoUrl);
@@ -187,6 +189,7 @@ function VideoCard({
               ref={videoRef}
               controls={playing}
               preload="none"
+              poster={posterUrl ? optimizedImageUrl(posterUrl, 640) : undefined}
               className="h-full w-full object-contain"
               src={url}
               onPlay={() => setPlaying(true)}
@@ -1148,6 +1151,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                   logoUrl={agency.logo_url}
                   logoPos={agency.logo_pos}
                   colorHex={agency.color_hex}
+                  posterUrl={heroFotoUrl}
                   onError={() => setVideoBroken(true)}
                 />
               </div>
