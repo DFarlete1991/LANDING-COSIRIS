@@ -95,6 +95,22 @@ export function parseAgencyProfilePath(pathname: string): { city: string; slug: 
   return { city, slug: slug ? decodeURIComponent(slug) : null };
 }
 
+/**
+ * slug de ciudad de la URL → nombre legible, para cuando `poblacion` llega
+ * vacío de la vista del CRM (ver comentario de `slugify`). "donosti" →
+ * "Donosti", "san-sebastian" → "San Sebastian". No recupera acentos/eñes
+ * perdidos al hacer el slug — es un fallback de emergencia, no un dato
+ * fiable — pero evita el hueco vacío ("Estamos en , Gipuzkoa") mientras se
+ * corrige el dato real en el CRM.
+ */
+export function humanizeCitySlug(slug: string): string {
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 export function findAgencyByProfilePath(
   agencies: InmobiliariaPublica[],
   city: string,

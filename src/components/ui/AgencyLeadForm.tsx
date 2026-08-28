@@ -49,7 +49,24 @@ async function submitAgencyLead(payload: Record<string, unknown>): Promise<{ ok:
 
 const TOTAL_STEPS = 5;
 
-export function AgencyLeadForm({ agency, onSuccess }: { agency: InmobiliariaPublica; onSuccess?: () => void }) {
+export type TipoInmueble = 'Piso' | 'Casa' | 'Otro';
+
+export function AgencyLeadForm({
+  agency,
+  onSuccess,
+  tipoInmueble,
+  showStepCounter,
+}: {
+  agency: InmobiliariaPublica;
+  onSuccess?: () => void;
+  /** Elegido en el paso previo a este formulario (selector Piso/Casa/Otro) —
+      opcional porque el botón "Solicitar valoración" del hero abre este
+      mismo formulario sin pasar por ese selector. */
+  tipoInmueble?: TipoInmueble | null;
+  /** Contador "Paso X de Y" sobre la barra de progreso — solo tiene sentido
+      dentro del pop-up, donde no hay más contexto visual del avance. */
+  showStepCounter?: boolean;
+}) {
   const [step, setStep] = useState(1);
   const [phase, setPhase] = useState<Phase>('idle');
   const [isAutoAdvancing, setIsAutoAdvancing] = useState(false);
@@ -96,6 +113,7 @@ export function AgencyLeadForm({ agency, onSuccess }: { agency: InmobiliariaPubl
     setPhase('loading');
 
     const mensaje = [
+      tipoInmueble && `Tipo de inmueble: ${tipoInmueble}`,
       `Dirección: ${direccion} (CP ${cp})`,
       motivo && `Motivo de venta: ${motivo}`,
       tiempo && `Tiempo intentando vender: ${tiempo}`,
@@ -111,6 +129,7 @@ export function AgencyLeadForm({ agency, onSuccess }: { agency: InmobiliariaPubl
       // Campos sueltos además del `mensaje` ya armado — así el correo de
       // notificación puede mostrarlos como filas separadas en vez de un solo
       // bloque de texto (ver metadataFormulario en portal-lead/route.ts).
+      tipo_inmueble: tipoInmueble || null,
       direccion,
       cp,
       motivo: motivo || null,
@@ -156,6 +175,11 @@ export function AgencyLeadForm({ agency, onSuccess }: { agency: InmobiliariaPubl
 
   return (
     <div className="space-y-3">
+      {showStepCounter && (
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">
+          Paso {step} de {TOTAL_STEPS}
+        </p>
+      )}
       <div className="flex items-center gap-1.5">
         {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
           <div key={i} className={`h-1 flex-1 rounded-full ${i < step ? 'bg-[#FF8000]' : 'bg-slate-100'}`} />

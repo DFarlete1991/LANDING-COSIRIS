@@ -56,6 +56,109 @@ function hasShowcaseMedia(agency: InmobiliariaPublica): boolean {
   return !!getVideoEmbed(agency.media_presentacion_url) || isDirectVideoUrl(agency.media_presentacion_url);
 }
 
+/**
+ * Cada tarjeta decide por sí misma, con su propio IntersectionObserver, si
+ * está visible en pantalla — antes solo la primera tarjeta del grupo
+ * reproducía vídeo de verdad (el resto se quedaba en foto fija) para no
+ * descargar 5 vídeos pesados a la vez. Ahora reproduce cualquiera que esté
+ * realmente a la vista: en el scroll horizontal de móvil eso sigue siendo
+ * 1-2 tarjetas, y en desktop (donde las 5 caben juntas sin scroll) puede
+ * ser el grupo entero — el ahorro de banda ancha sigue estando en que una
+ * tarjeta fuera de pantalla nunca llega a montar su <video>/<iframe>.
+ */
+function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica; agencies: InmobiliariaPublica[] }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.6 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const embed = agency.media_presentacion_url ? getVideoEmbed(agency.media_presentacion_url) : null;
+  // Si no es ni YouTube/Vimeo ni un archivo de vídeo reproducible (por
+  // ejemplo, quedó guardado un link a una página web), se muestra la foto de
+  // perfil de la agencia en vez de repetir el vídeo genérico — y solo si
+  // tampoco hay foto cae al vídeo de fondo como último recurso.
+  const directVideoSrc = !embed && agency.media_presentacion_url && isDirectVideoUrl(agency.media_presentacion_url)
+    ? agency.media_presentacion_url
+    : null;
+  const showProfilePhoto = !embed && !directVideoSrc && !!agency.foto_url;
+  const staticFallback = agency.foto_url
+    ?? (embed?.platform === 'youtube' ? `https://img.youtube.com/vi/${embed.id}/mqdefault.jpg` : null)
+    ?? '/assets/inmobiliarias/ciudades/madrid.jpg';
+
+  return (
+    <motion.button
+      ref={ref}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
+      onClick={() => { rememberDirectoryUrl(); navigateTo(agencyProfilePath(agency, agencies)); }}
+      className="group relative w-36 shrink-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-44 md:w-56 lg:w-64"
+      style={{ aspectRatio: '9/16' }}
+    >
+      {!inView ? (
+        <FadeImage
+          src={optimizedImageUrl(staticFallback, 500) ?? staticFallback}
+          alt={agency.nombre_comercial}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : embed ? (
+        <iframe
+          className="pointer-events-none absolute inset-0 h-full w-full"
+          src={
+            embed.platform === 'youtube'
+              ? `${embed.embedUrl}?autoplay=1&mute=1&loop=1&playlist=${embed.id}&controls=0&modestbranding=1&playsinline=1&rel=0`
+              : `${embed.embedUrl}?autoplay=1&loop=1&muted=1&background=1&controls=0`
+          }
+          title={agency.nombre_comercial}
+          allow="autoplay; encrypted-media"
+        />
+      ) : directVideoSrc ? (
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          src={directVideoSrc}
+          poster={optimizedImageUrl(staticFallback, 500) ?? staticFallback}
+          preload="metadata"
+          autoPlay muted loop playsInline
+        />
+      ) : showProfilePhoto ? (
+        <FadeImage
+          src={optimizedImageUrl(agency.foto_url, 500)}
+          alt={agency.nombre_comercial}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          src="/assets/inmobiliarias/hero-bg.mp4"
+          poster="/assets/inmobiliarias/ciudades/madrid.jpg"
+          autoPlay muted loop playsInline
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-3 text-left sm:p-4">
+        <div
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold text-white sm:h-10 sm:w-10 sm:text-sm"
+          style={{ backgroundColor: agency.color_hex ?? '#FF8000' }}
+        >
+          {agency.nombre_comercial.split(' ').map((w: string) => w[0]).slice(0, 2).join('')}
+        </div>
+        <h3 className="mt-2 text-xs font-bold text-white sm:text-sm">{agency.nombre_comercial}</h3>
+        <p className="mt-0.5 text-[10px] text-white/50 sm:text-xs">{agency.poblacion}</p>
+      </div>
+    </motion.button>
+  );
+}
+
 export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSuggestion) => void }) {
   const { agencies } = useInmobiliarias();
   const allCities = useMemo(() => getAllCitiesWithCounts(agencies), [agencies]);
@@ -391,94 +494,9 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
               className="flex items-end gap-2 overflow-x-auto overscroll-x-contain px-4 sm:gap-3 md:gap-4 md:justify-center md:overflow-visible md:px-10 [&::-webkit-scrollbar]:hidden"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {visibleForVideo.map((agency, i) => {
-                const embed = agency.media_presentacion_url ? getVideoEmbed(agency.media_presentacion_url) : null;
-                // Si no es ni YouTube/Vimeo ni un archivo de vídeo reproducible
-                // (por ejemplo, quedó guardado un link a una página web), se
-                // muestra la foto de perfil de la agencia en vez de repetir el
-                // vídeo genérico — y solo si tampoco hay foto cae al vídeo de
-                // fondo como último recurso.
-                const directVideoSrc = !embed && agency.media_presentacion_url && isDirectVideoUrl(agency.media_presentacion_url)
-                  ? agency.media_presentacion_url
-                  : null;
-                const showProfilePhoto = !embed && !directVideoSrc && !!agency.foto_url;
-                // Los vídeos de las inmobiliarias pueden pesar decenas de MB (no
-                // se transcodifican al subirse, a diferencia de antes con
-                // Cloudinary) — reproducir los 5 a la vez en autoplay dispara
-                // esa cantidad de descargas simultáneas. Solo la primera tarjeta
-                // (la más visible del carrusel) reproduce de verdad; el resto
-                // muestra una miniatura estática hasta que le toque ser la
-                // primera en la rotación.
-                const isActiveSlot = i === 0;
-                const staticFallback = agency.foto_url
-                  ?? (embed?.platform === 'youtube' ? `https://img.youtube.com/vi/${embed.id}/mqdefault.jpg` : null)
-                  ?? '/assets/inmobiliarias/ciudades/madrid.jpg';
-                return (
-                  <motion.button
-                    key={`${agency.id}-${videoStartIdx + i}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.2 }}
-                    onClick={() => { rememberDirectoryUrl(); navigateTo(agencyProfilePath(agency, agencies)); }}
-                    className="group relative w-36 shrink-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-44 md:w-56 lg:w-64"
-                    style={{ aspectRatio: '9/16' }}
-                  >
-                    {!isActiveSlot ? (
-                      <FadeImage
-                        src={optimizedImageUrl(staticFallback, 500) ?? staticFallback}
-                        alt={agency.nombre_comercial}
-                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : embed ? (
-                      <iframe
-                        className="pointer-events-none absolute inset-0 h-full w-full"
-                        src={
-                          embed.platform === 'youtube'
-                            ? `${embed.embedUrl}?autoplay=1&mute=1&loop=1&playlist=${embed.id}&controls=0&modestbranding=1&playsinline=1&rel=0`
-                            : `${embed.embedUrl}?autoplay=1&loop=1&muted=1&background=1&controls=0`
-                        }
-                        title={agency.nombre_comercial}
-                        allow="autoplay; encrypted-media"
-                      />
-                    ) : directVideoSrc ? (
-                      <video
-                        className="absolute inset-0 h-full w-full object-cover"
-                        src={directVideoSrc}
-                        poster="/assets/inmobiliarias/ciudades/madrid.jpg"
-                        autoPlay muted loop playsInline
-                      />
-                    ) : showProfilePhoto ? (
-                      <FadeImage
-                        src={optimizedImageUrl(agency.foto_url, 500)}
-                        alt={agency.nombre_comercial}
-                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <video
-                        className="absolute inset-0 h-full w-full object-cover"
-                        src="/assets/inmobiliarias/hero-bg.mp4"
-                        poster="/assets/inmobiliarias/ciudades/madrid.jpg"
-                        autoPlay muted loop playsInline
-                      />
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                    <div className="absolute inset-x-0 bottom-0 p-3 text-left sm:p-4">
-                      <div
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold text-white sm:h-10 sm:w-10 sm:text-sm"
-                        style={{ backgroundColor: agency.color_hex ?? '#FF8000' }}
-                      >
-                        {agency.nombre_comercial.split(' ').map((w: string) => w[0]).slice(0, 2).join('')}
-                      </div>
-                      <h3 className="mt-2 text-xs font-bold text-white sm:text-sm">{agency.nombre_comercial}</h3>
-                      <p className="mt-0.5 text-[10px] text-white/50 sm:text-xs">{agency.poblacion}</p>
-                    </div>
-                  </motion.button>
-                );
-              })}
+              {visibleForVideo.map((agency, i) => (
+                <AgencyShowcaseCard key={`${agency.id}-${videoStartIdx + i}`} agency={agency} agencies={agencies} />
+              ))}
             </div>
           </div>
 

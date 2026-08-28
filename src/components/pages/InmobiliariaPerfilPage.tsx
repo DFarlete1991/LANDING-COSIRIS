@@ -1,25 +1,32 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
 import {
-  ArrowLeft, BadgeCheck, Check, ChevronLeft, ChevronRight, Copy, Home, MapPin, MapPinned,
-  MessageCircle, Phone, ShieldCheck, Star, User, Users, Wallet, Briefcase, Zap, X,
+  ArrowLeft, BadgeCheck, Building2, Check, ChevronLeft, ChevronRight, Copy, Home, LayoutGrid, MapPin, MapPinned,
+  MessageCircle, Phone, ShieldCheck, Star, User, Users, Volume2, VolumeX, Wallet, Briefcase, Zap, X,
 } from 'lucide-react';
 import { Footer } from '../Footer';
-import { AgencyLeadForm } from '../ui/AgencyLeadForm';
+import { AgencyLeadForm, type TipoInmueble } from '../ui/AgencyLeadForm';
 import { AgencyMap } from '../ui/AgencyMap';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { REVIEWS_PLACEHOLDER } from '@/data/reviews-placeholder';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo, getLastDirectoryUrl } from '@/lib/utils';
-import { findAgencyByProfilePath } from '@/lib/agency-url';
+import { findAgencyByProfilePath, humanizeCitySlug } from '@/lib/agency-url';
 import { fetchPlaceReviews, type GoogleReview } from '@/lib/google-places';
 import { optimizedImageUrl } from '@/lib/image-optimize';
 import { FadeImage } from '../ui/FadeImage';
 import { fetchResenasManuales, type ResenaManual } from '@/data/live-resenas';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
+
+// three.js + fiber pesan varios cientos de KB — nada de esto debe entrar en
+// el bundle inicial de una landing de campaña de pago. Se carga solo si el
+// visitante entra en desktop (ver `show3D` más abajo), y ni siquiera
+// entonces hasta que React decide pintarlo.
+const ProfileHeroOrbs = lazy(() => import('../ui/ProfileHeroOrbs'));
+const LocationGlobe = lazy(() => import('../ui/LocationGlobe'));
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -27,11 +34,6 @@ function formatPrice(price: number): string {
   if (price >= 1000000) return `${(price / 1000000).toFixed(1)}M€`;
   if (price >= 1000) return `${Math.round(price / 1000)}k€`;
   return `${price}€`;
-}
-
-function excerpt(text: string, max = 168): string {
-  if (text.length <= max) return text;
-  return `${text.slice(0, max).replace(/\s+\S*$/, '')}…`;
 }
 
 function prefersReducedMotion(): boolean {
@@ -129,15 +131,18 @@ function VideoCard({
   logoUrl,
   logoPos,
   colorHex,
+  posterUrl,
 }: {
   url: string;
   nombre: string;
   logoUrl?: string | null;
   logoPos?: string | null;
   colorHex?: string;
+  posterUrl?: string | null;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [muted, setMuted] = useState(true);
   const embed = useMemo(() => getVideoEmbed(url), [url]);
   // null mientras se detecta (o si no se pudo saber) — de momento se trata
   // como horizontal, el caso más común, hasta que llegue la respuesta.
@@ -149,6 +154,26 @@ function VideoCard({
     let cancelled = false;
     fetchEmbedOrientation(embed).then((o) => { if (!cancelled) setOrientation(o); });
     return () => { cancelled = true; };
+  }, [embed]);
+
+  // Se reproduce solo (en silencio, como un Reel) en cuanto entra en
+  // pantalla, y se pausa al salir — así no se gasta ancho de banda de fondo
+  // en un vídeo que nadie está viendo. El sonido lo activa quien quiera con
+  // el botón; los navegadores bloquean el autoplay con sonido de todas
+  // formas, así que arrancar silenciado no es opcional.
+  useEffect(() => {
+    if (embed) return;
+    const el = containerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) videoRef.current?.play().catch(() => {});
+        else videoRef.current?.pause();
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, [embed]);
 
   const isVertical = orientation === 'vertical';
@@ -177,15 +202,22 @@ function VideoCard({
             />
           </div>
         ) : (
-          <div className={`relative mx-auto overflow-hidden rounded-[16px] bg-black ${isVertical ? 'aspect-[9/16] w-full max-w-[300px]' : 'aspect-video w-full max-w-[640px]'}`}>
+          <div ref={containerRef} className={`relative mx-auto overflow-hidden rounded-[16px] bg-black ${isVertical ? 'aspect-[9/16] w-full max-w-[300px]' : 'aspect-video w-full max-w-[640px]'}`}>
             <video
               ref={videoRef}
-              controls={playing}
-              preload="none"
+              muted={muted}
+              loop
+              playsInline
+              // "none" nunca dispara onLoadedMetadata sin que el usuario le dé
+              // a play — así que un vídeo vertical se quedaba encajonado en la
+              // caja horizontal 16:9 (barras negras a los lados) hasta que se
+              // reproducía. "metadata" solo descarga la cabecera del archivo
+              // (unos KB), suficiente para conocer el ancho/alto real ya en
+              // la carga de la página, sin descargar el vídeo completo.
+              preload="metadata"
+              poster={posterUrl ?? undefined}
               className="h-full w-full object-contain"
               src={url}
-              onPlay={() => setPlaying(true)}
-              onPause={() => setPlaying(false)}
               onLoadedMetadata={(e) => {
                 const v = e.currentTarget;
                 if (v.videoWidth && v.videoHeight) {
@@ -194,23 +226,15 @@ function VideoCard({
               }}
             />
 
-            {!playing && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-transparent via-transparent to-black/55">
-                <p className="mb-4 max-w-[200px] text-center text-sm font-semibold leading-snug text-white drop-shadow-md">
-                  Conoce nuestra inmobiliaria<br />y cómo trabajamos por ti.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => { videoRef.current?.play(); }}
-                  className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-white shadow-lg shadow-black/20 transition-transform duration-200 hover:scale-105 active:scale-95"
-                  aria-label="Reproducir vídeo"
-                >
-                  <svg viewBox="0 0 24 24" className="ml-0.5 h-7 w-7 fill-primary">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </button>
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={() => setMuted((m) => !m)}
+              aria-label={muted ? 'Activar sonido' : 'Silenciar'}
+              aria-pressed={!muted}
+              className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/65 active:scale-90"
+            >
+              {muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
+            </button>
           </div>
         )}
       </div>
@@ -274,11 +298,54 @@ type DisplayReview = {
   avatarUrl?: string;
 };
 
+function ReviewMiniCard({ review, paused, reducedMotion }: { review: DisplayReview; paused: boolean; reducedMotion: boolean }) {
+  return (
+    <div className="group overflow-hidden rounded-[24px] border border-[#ECE8E1] bg-white p-6 shadow-[0_8px_28px_rgba(24,35,52,.04)]">
+      <motion.div
+        initial={{ scale: 1 }}
+        animate={{ scale: paused || reducedMotion ? 1 : 1.03 }}
+        transition={{ duration: 3.9, ease: 'easeOut', delay: 0.6 }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/8 text-primary">
+              {review.avatarUrl ? (
+                <img src={review.avatarUrl} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+              ) : (
+                <User size={16} />
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-lg font-semibold text-[#0F172A]">{review.autor}</p>
+            </div>
+          </div>
+          <span className="inline-flex shrink-0 items-center rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
+            {review.fecha}
+          </span>
+        </div>
+
+        <p className="mt-3 text-sm leading-[160%] text-[#68707F]">&ldquo;{review.comentario}&rdquo;</p>
+
+        <div className="mt-3 flex items-center gap-0.5">
+          {Array.from({ length: 5 }).map((_, s) => (
+            <Star
+              key={s}
+              size={15}
+              className={s < review.rating ? 'fill-[#F5A524] text-[#F5A524]' : 'text-[#E2DCD3]'}
+            />
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 /** Carrusel tipo ruleta vertical para cuando hay más de 3 reseñas: cada
-    reseña entra desde abajo, hace un pequeño zoom mientras se muestra y
-    después sube para dejar paso a la siguiente. Se queda estático al pasar
-    el cursor (o al tocarlo en móvil). */
+    par entra desde abajo, hace un pequeño zoom mientras se muestra y
+    después sube para dejar paso al siguiente par. Se queda estático al
+    pasar el cursor (o al tocarlo en móvil). */
 function ReviewsCarousel({ reviews }: { reviews: DisplayReview[] }) {
+  const PAGE_SIZE = 2;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [inView, setInView] = useState(true);
@@ -299,24 +366,31 @@ function ReviewsCarousel({ reviews }: { reviews: DisplayReview[] }) {
     return () => io.disconnect();
   }, []);
 
-  const active = reviews[index];
+  // Avanza de dos en dos — si al par le toca un impar de vuelta (número de
+  // reseñas impar), el último "par" del ciclo se queda en una sola tarjeta
+  // en vez de repetir la primera para completar el hueco.
+  const pair = index + 1 < reviews.length ? [reviews[index], reviews[index + 1]] : [reviews[index]];
+  const nextPageIndex = (i: number) => (i + PAGE_SIZE >= reviews.length ? 0 : i + PAGE_SIZE);
+  const prevPageIndex = (i: number) => (i - PAGE_SIZE < 0 ? Math.max(reviews.length - (reviews.length % PAGE_SIZE || PAGE_SIZE), 0) : i - PAGE_SIZE);
 
   // Avanza la ruleta solo si está visible, no está en pausa y el usuario no ha
   // interactuado con ella. En táctil, en cuanto se toca, queda estática.
   useEffect(() => {
     if (reducedMotion || paused || !inView || (isTouch && wasTouched)) return;
-    const t = setTimeout(() => setIndex((i) => (i + 1) % reviews.length), 4600);
+    const t = setTimeout(() => {
+      setIndex((i) => (i + PAGE_SIZE >= reviews.length ? 0 : i + PAGE_SIZE));
+    }, 4600);
     return () => clearTimeout(t);
   }, [reducedMotion, paused, inView, isTouch, wasTouched, index, reviews.length]);
 
   const goPrev = () => {
     setPaused(true);
-    setIndex((i) => (i - 1 + reviews.length) % reviews.length);
+    setIndex(prevPageIndex);
   };
 
   const goNext = () => {
     setPaused(true);
-    setIndex((i) => (i + 1) % reviews.length);
+    setIndex(nextPageIndex);
   };
 
   return (
@@ -333,44 +407,16 @@ function ReviewsCarousel({ reviews }: { reviews: DisplayReview[] }) {
       <div className="min-h-[300px]">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
-            key={active.key}
+            key={pair.map((r) => r.key).join('-')}
             initial={{ y: 84, opacity: 0, scale: 0.94 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -84, opacity: 0, scale: 0.94 }}
             transition={{ duration: 0.5, ease: EASE }}
-            className="group overflow-hidden rounded-[24px] border border-[#ECE8E1] bg-white p-6 shadow-[0_8px_28px_rgba(24,35,52,.04)]"
+            className="grid grid-cols-1 gap-4"
           >
-            <motion.div
-              initial={{ scale: 1 }}
-              animate={{ scale: paused || reducedMotion ? 1 : 1.04 }}
-              transition={{ duration: 3.9, ease: 'easeOut', delay: 0.6 }}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
-                    <User size={16} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-lg font-semibold text-[#0F172A]">{active.autor}</p>
-                  </div>
-                </div>
-                <span className="inline-flex shrink-0 items-center rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
-                  {active.fecha}
-                </span>
-              </div>
-
-              <p className="mt-3 text-sm leading-[160%] text-[#68707F]">&ldquo;{active.comentario}&rdquo;</p>
-
-              <div className="mt-3 flex items-center gap-0.5">
-                {Array.from({ length: 5 }).map((_, s) => (
-                  <Star
-                    key={s}
-                    size={15}
-                    className={s < active.rating ? 'fill-[#F5A524] text-[#F5A524]' : 'text-[#E2DCD3]'}
-                  />
-                ))}
-              </div>
-            </motion.div>
+            {pair.map((review) => (
+              <ReviewMiniCard key={review.key} review={review} paused={paused} reducedMotion={reducedMotion} />
+            ))}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -478,6 +524,34 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
         <p className="mt-3 text-lg leading-[170%] text-[#68707F]">
           {source === 'google' ? 'Opiniones verificadas de Google' : 'La confianza de quienes ya han vendido con nosotros.'}
         </p>
+
+        {/* Cifras propias justo junto a las reseñas — refuerzan la prueba
+            social con datos concretos en vez de dejar que las reseñas
+            trabajen solas. Solo se muestran los campos que la inmobiliaria
+            haya rellenado en el CRM (>0). */}
+        <div className="mt-6 flex flex-wrap gap-3">
+          {agency.num_propiedades > 0 && (
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#ECE8E1] bg-white px-4 py-2 text-sm shadow-[0_4px_16px_rgba(24,35,52,.04)]">
+              <Home size={14} className="text-primary" />
+              <span className="font-bold text-[#0F172A]">{agency.num_propiedades}</span>
+              <span className="text-[#68707F]">viviendas vendidas</span>
+            </div>
+          )}
+          {agency.anos_experiencia > 0 && (
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#ECE8E1] bg-white px-4 py-2 text-sm shadow-[0_4px_16px_rgba(24,35,52,.04)]">
+              <Briefcase size={14} className="text-primary" />
+              <span className="font-bold text-[#0F172A]">{agency.anos_experiencia}</span>
+              <span className="text-[#68707F]">años de experiencia</span>
+            </div>
+          )}
+          {agency.precio_medio > 0 && (
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#ECE8E1] bg-white px-4 py-2 text-sm shadow-[0_4px_16px_rgba(24,35,52,.04)]">
+              <Wallet size={14} className="text-primary" />
+              <span className="font-bold text-[#0F172A]">{formatPrice(agency.precio_medio)}</span>
+              <span className="text-[#68707F]">precio medio</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {loading && (
@@ -502,8 +576,12 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
-                  <User size={16} />
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/8 text-primary">
+                  {review.avatarUrl ? (
+                    <img src={review.avatarUrl} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                  ) : (
+                    <User size={16} />
+                  )}
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-[#0F172A]">{review.autor}</p>
@@ -538,7 +616,7 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
   );
 }
 
-function LocationSection({ agency, searchPoint }: { agency: InmobiliariaPublica; searchPoint: { lat: number; lng: number } | null }) {
+function LocationSection({ agency, searchPoint, displayCity }: { agency: InmobiliariaPublica; searchPoint: { lat: number; lng: number } | null; displayCity: string }) {
   if (agency.lat == null || agency.lng == null) return null;
 
   const location = { lat: agency.lat, lng: agency.lng };
@@ -548,7 +626,7 @@ function LocationSection({ agency, searchPoint }: { agency: InmobiliariaPublica;
       <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">📍 Ubicación</span>
 
       <h3 className="mt-4 text-[48px] font-bold leading-[110%] tracking-[-0.02em] text-[#0F172A]">
-        Estamos en {agency.poblacion}, {agency.provincia}
+        Estamos en {[displayCity, agency.provincia].filter(Boolean).join(', ')}
       </h3>
 
       <p className="mt-4 text-lg leading-[170%] text-[#68707F]">
@@ -557,7 +635,7 @@ function LocationSection({ agency, searchPoint }: { agency: InmobiliariaPublica;
 
       <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary/8 px-4 py-2 text-sm font-semibold text-[#0F172A]">
         <span className="text-base">📍</span>
-        Especialistas en {agency.poblacion} y municipios cercanos
+        Especialistas en {displayCity || 'tu zona'} y municipios cercanos
       </div>
 
       <motion.div
@@ -587,7 +665,7 @@ function LocationSection({ agency, searchPoint }: { agency: InmobiliariaPublica;
             <div className="flex items-center gap-4">
               <span className="text-xl">📍</span>
               <div>
-                <p className="text-sm font-bold text-[#0F172A]">{agency.poblacion}</p>
+                <p className="text-sm font-bold text-[#0F172A]">{displayCity || agency.provincia}</p>
                 <p className="text-xs text-[#68707F]">Zona centro</p>
               </div>
             </div>
@@ -849,6 +927,108 @@ function CtaButton({
   );
 }
 
+const PROPERTY_TYPES: { value: TipoInmueble; label: string; icon: typeof Building2 }[] = [
+  { value: 'Piso', label: 'Piso', icon: Building2 },
+  { value: 'Casa', label: 'Casa', icon: Home },
+  { value: 'Otro', label: 'Otro', icon: LayoutGrid },
+];
+
+/** Primer paso visual antes del formulario: elegir tipo de inmueble abre el
+    resto de pasos (dirección, motivo, contacto...) en el pop-up — así no se
+    le pide nada al visitante hasta que ha decidido interactuar. */
+function PropertyTypeSelector({ colorHex, onSelect }: { colorHex?: string; onSelect: (tipo: TipoInmueble) => void }) {
+  return (
+    <div className="grid grid-cols-3 gap-3">
+      {PROPERTY_TYPES.map(({ value, label, icon: Icon }) => (
+        <button
+          key={value}
+          type="button"
+          onClick={() => onSelect(value)}
+          className="group flex flex-col items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-[0_10px_28px_rgba(255,128,0,0.15)] active:scale-[0.97]"
+        >
+          <div
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/8 text-primary transition-colors duration-200 group-hover:bg-primary group-hover:text-white"
+            style={colorHex ? { color: colorHex, backgroundColor: `${colorHex}14` } : undefined}
+          >
+            <Icon size={20} />
+          </div>
+          <span className="text-sm font-bold text-slate-900">{label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Envuelve el formulario multi-paso ya existente (misma lógica de pasos y
+    validación, ver AgencyLeadForm) en un diálogo superpuesto con fondo
+    oscurecido — el único cambio real es el contenedor. */
+function LeadFormModal({
+  agency,
+  tipoInmueble,
+  onClose,
+  onSuccess,
+}: {
+  agency: InmobiliariaPublica;
+  tipoInmueble: TipoInmueble;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
+
+  return createPortal(
+    <AnimatePresence>
+      <motion.div
+        key="lead-modal-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-40 bg-black/65 backdrop-blur-sm"
+        aria-hidden="true"
+        onClick={onClose}
+      />
+      <motion.div
+        key="lead-modal-panel"
+        role="dialog"
+        aria-modal
+        aria-label={`Solicita una valoración gratuita de tu ${tipoInmueble.toLowerCase()}`}
+        initial={{ opacity: 0, y: 24, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 16, scale: 0.97 }}
+        transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+        className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
+        onClick={onClose}
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl shadow-black/20 sm:p-7"
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar"
+            className="absolute right-4 top-4 z-10 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+          >
+            <X size={18} />
+          </button>
+          <p className="mb-1 pr-8 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Sin compromiso</p>
+          <h3 className="mb-5 pr-8 text-lg font-extrabold text-slate-900">
+            Solicita la valoración de tu {tipoInmueble.toLowerCase()}
+          </h3>
+          <AgencyLeadForm agency={agency} tipoInmueble={tipoInmueble} showStepCounter onSuccess={onSuccess} />
+        </div>
+      </motion.div>
+    </AnimatePresence>,
+    document.body,
+  );
+}
+
 /**
  * Se llega por la URL nueva (`city` + `slug`, legible y con la ciudad para
  * SEO) o por la vieja (`id`, un uuid), que sigue viva porque ya se
@@ -869,10 +1049,53 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
   // revelar el teléfono también en el otro, no solo en el que se usó.
   const [showPhone, setShowPhone] = useState(false);
 
+  // `agency.poblacion` puede llegar vacío de la vista del CRM (ver
+  // agency-url.ts) — al entrar por la URL nueva, la ciudad ya viaja en el
+  // propio path (/inmobiliarias-en-<ciudad>/...), así que se usa como
+  // respaldo para no dejar huecos tipo "Estamos en , Gipuzkoa" en ninguna
+  // campaña por ciudad.
+  const displayCity = agency?.poblacion || (city ? humanizeCitySlug(city) : '');
+
   // La presentación se recorta en el hero — no se muestra completa en
   // ningún otro sitio de la página, así que "Leer más" expande este mismo
   // párrafo en vez de enlazar a otro lado.
   const [bioExpanded, setBioExpanded] = useState(false);
+
+  // Antes el botón "Leer más" solo salía si el texto pasaba de 168
+  // caracteres — pero lo que de verdad lo recorta es el line-clamp-3 (3
+  // líneas, no caracteres), que varía según el ancho de pantalla y el largo
+  // de las palabras. Con textos cortos pero de palabras largas, o en
+  // pantallas más angostas, el texto se recortaba igual sin que apareciera
+  // el botón para expandirlo. Se mide si el párrafo realmente desborda sus
+  // 3 líneas y solo entonces se muestra el botón.
+  const bioRef = useRef<HTMLParagraphElement>(null);
+  const [bioOverflowing, setBioOverflowing] = useState(false);
+  useEffect(() => {
+    if (bioExpanded) return;
+    const el = bioRef.current;
+    if (!el) return;
+    const check = () => setBioOverflowing(el.scrollHeight > el.clientHeight + 1);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, [agency?.texto_presentacion, bioExpanded]);
+
+  // Tipo de inmueble elegido en el selector del hero — no-null abre el resto
+  // del formulario (dirección, motivo, contacto...) en el pop-up.
+  const [selectedTipo, setSelectedTipo] = useState<TipoInmueble | null>(null);
+
+  // Ambientación 3D del hero: solo en desktop (en el móvil de una campaña de
+  // pago no vale la pena el peso de three.js) y solo si el visitante no pidió
+  // menos movimiento. Se revisa por si acaso cambia el tamaño de ventana o la
+  // preferencia en caliente, no solo en el primer render.
+  const [show3D, setShow3D] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const update = () => setShow3D(mq.matches && !prefersReducedMotion());
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
   // Si se llegó desde una búsqueda (lista de resultados), conserva el punto
   // buscado para poder mostrar distancia real en el mapa del perfil.
@@ -978,6 +1201,14 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
             </defs>
             <rect width="100%" height="100%" fill="url(#honeycomb)"/>
           </svg>
+
+          {show3D && (
+            <div className="absolute -right-10 top-1/2 hidden h-[380px] w-[400px] -translate-y-1/2 opacity-80 lg:block">
+              <Suspense fallback={null}>
+                <ProfileHeroOrbs colorHex={agency.color_hex} />
+              </Suspense>
+            </div>
+          )}
           </div>
 
           <div className="relative z-10 mt-10 grid grid-cols-1 items-start gap-12 lg:grid-cols-[1.3fr_1fr] lg:gap-16">
@@ -1016,7 +1247,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
               <div className="flex items-center gap-2">
                 <span className="rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
-                  {agency.poblacion}
+                  {displayCity || agency.provincia}
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-primary shadow-soft">
                   <BadgeCheck size={12} /> Verificada
@@ -1040,17 +1271,17 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
               </div>
 
               <p className="mt-4 flex items-center gap-1.5 text-body-sm text-ink-muted">
-                <MapPin size={15} className="shrink-0 text-primary" /> {agency.poblacion}, {agency.provincia}
+                <MapPin size={15} className="shrink-0 text-primary" /> {[displayCity, agency.provincia].filter(Boolean).join(', ')}
               </p>
 
               <p className="mt-2 flex items-center gap-1.5 text-body-sm text-ink-muted">
                 <BadgeCheck size={15} className="shrink-0 text-primary" /> Inmobiliaria verificada por Cosiris
               </p>
 
-              <p className={`mt-6 max-w-[520px] text-body leading-relaxed text-ink-muted ${bioExpanded ? '' : 'line-clamp-3'}`}>
-                {bioExpanded ? agency.texto_presentacion : excerpt(agency.texto_presentacion)}
+              <p ref={bioRef} className={`mt-6 max-w-[520px] text-body leading-relaxed text-ink-muted ${bioExpanded ? '' : 'line-clamp-3'}`}>
+                {agency.texto_presentacion}
               </p>
-              {agency.texto_presentacion.length > 168 && (
+              {(bioOverflowing || bioExpanded) && (
                 <button
                   type="button"
                   onClick={() => setBioExpanded((v) => !v)}
@@ -1080,16 +1311,25 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
               transition={{ duration: 0.5, ease: EASE, delay: 0.08 }}
               className="scroll-mt-24 rounded-card border border-border bg-card p-6 shadow-[0_24px_64px_rgba(0,0,0,0.12)] sm:p-8"
             >
-              <h2 className="text-xl font-bold text-foreground">Solicita una valoración gratuita</h2>
+              <h2 className="text-xl font-bold text-foreground">¿Qué tipo de inmueble quieres valorar?</h2>
               <p className="mt-2 text-body-sm leading-relaxed text-ink-muted">
-                Cuéntanos qué necesitas y uno de nuestros asesores se pondrá en contacto contigo sin compromiso.
+                Elige una opción para empezar tu valoración gratuita — sin compromiso.
               </p>
               <div className="mt-6">
-                <AgencyLeadForm agency={agency} onSuccess={() => setShowPhone(true)} />
+                <PropertyTypeSelector colorHex={agency.color_hex} onSelect={setSelectedTipo} />
               </div>
             </motion.div>
           </div>
         </div>
+
+        {selectedTipo && (
+          <LeadFormModal
+            agency={agency}
+            tipoInmueble={selectedTipo}
+            onClose={() => setSelectedTipo(null)}
+            onSuccess={() => setShowPhone(true)}
+          />
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 14 }}
@@ -1119,6 +1359,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                   logoUrl={agency.logo_url}
                   logoPos={agency.logo_pos}
                   colorHex={agency.color_hex}
+                  posterUrl={agency.foto_url}
                 />
               </div>
             )}
@@ -1152,10 +1393,28 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
       {/* Bloque 3 — mapa a la izquierda, reseñas a la derecha */}
       <section className="bg-white">
         <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
+          {/* El globo va en la esquina del bloque, no encima del texto — un
+              detalle que casi no se nota a primer vistazo, no algo que
+              compita con el título de la sección. */}
+          {show3D && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 0.6 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
+              aria-hidden="true"
+              className="pointer-events-none absolute right-4 top-4 hidden h-[130px] w-[130px] lg:block"
+            >
+              <Suspense fallback={null}>
+                <LocationGlobe colorHex={agency.color_hex} />
+              </Suspense>
+            </motion.div>
+          )}
+
           <div className={`grid grid-cols-1 gap-10 ${agency.lat != null && agency.lng != null ? 'lg:grid-cols-[3fr_2fr] lg:gap-[72px]' : ''}`}>
             {agency.lat != null && agency.lng != null && (
               <div>
-                <LocationSection agency={agency} searchPoint={searchPoint} />
+                <LocationSection agency={agency} searchPoint={searchPoint} displayCity={displayCity} />
               </div>
             )}
             <div className="flex">
@@ -1180,8 +1439,34 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
           </div>
           <Accordion items={FAQ} />
         </div>
-        <Footer />
       </section>
+
+      {/* Bloque 4 — CTA de cierre. Justo el hueco que quedaba entre las FAQ y
+          el footer: quien baja leyendo toda la página sin rellenar el
+          formulario de arriba, no tenía ninguna otra oportunidad de
+          convertir. */}
+      <section className="bg-primary">
+        <div className="mx-auto max-w-[1400px] px-6 py-16 text-center sm:py-20">
+          <h2 className="text-[32px] font-bold leading-[110%] tracking-[-0.02em] text-white sm:text-[40px]">
+            ¿Listo para saber cuánto vale tu vivienda?
+          </h2>
+          <p className="mx-auto mt-4 max-w-[480px] text-lg leading-[170%] text-white/80">
+            Pide tu valoración gratuita y sin compromiso — te respondemos el mismo día.
+          </p>
+          <a
+            href="#contactar"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('contactar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 text-sm font-bold uppercase tracking-[0.1em] text-primary shadow-lg shadow-black/10 transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+          >
+            Quiero saber cuánto vale mi vivienda
+          </a>
+        </div>
+      </section>
+
+      <Footer />
 
       {/* CTA fija en móvil — el formulario grande vive arriba del todo en el hero,
           así que en móvil, tras hacer scroll por el resto del perfil, esto ofrece
