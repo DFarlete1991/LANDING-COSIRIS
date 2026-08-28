@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
+import { getAttributionFields, getAttributionSummaryLine } from '@/lib/utm';
 
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:border-[#FF8000] focus:ring-4 focus:ring-[#FF8000]/15';
@@ -114,6 +115,7 @@ export function AgencyLeadForm({
 
     const mensaje = [
       tipoInmueble && `Tipo de inmueble: ${tipoInmueble}`,
+      getAttributionSummaryLine(),
       `Dirección: ${direccion} (CP ${cp})`,
       motivo && `Motivo de venta: ${motivo}`,
       tiempo && `Tiempo intentando vender: ${tiempo}`,
@@ -136,6 +138,9 @@ export function AgencyLeadForm({
       tiempo: tiempo || null,
       plazo: plazo || null,
       tipo_origen: 'Portal Inmobiliarias',
+      // utm_source, utm_campaign, fbclid, gclid... de la campaña que trajo
+      // la visita — capturados por lib/utm.ts al entrar al sitio.
+      ...getAttributionFields(),
     });
 
     if (result.ok) {

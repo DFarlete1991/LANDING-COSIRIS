@@ -6,6 +6,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Check, ChevronDown } from 'lucide-react';
 import { useUI } from '../context/UIContext';
+import { getAttributionFields } from '@/lib/utm';
 import { notifyWhatsAppLead } from '@/lib/whatsapp-webhook';
 import { DEFAULT_COUNTRY_DIAL, toInternationalPhone } from '@/data/country-codes';
 import { CountryCodeSelect } from './ui/CountryCodeSelect';
@@ -318,6 +319,7 @@ export default function ContactModal() {
       employees: formData.employees,
       services: selectedServices,
       source_context: modalParams.sourceContext ?? 'direct',
+      ...getAttributionFields(),
     };
 
     notifyWhatsAppLead(payload);

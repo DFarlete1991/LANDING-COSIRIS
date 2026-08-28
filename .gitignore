@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Generado en build por scripts/generate-sitemap.mjs — siempre fresco en cada
+# deploy, no hace falta versionarlo.
+/public/sitemap.xml
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

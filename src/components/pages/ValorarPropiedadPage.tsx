@@ -6,7 +6,10 @@ import { Footer } from '../Footer';
 import { LandingNavbar } from './landing-navbar';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo } from '@/lib/utils';
+import { useSEO } from '@/lib/seo';
+import { useValidImageUrl } from '@/lib/use-valid-image-url';
 import { haversineKm } from '@/lib/geo';
+import { getAttributionFields, getAttributionSummaryLine } from '@/lib/utm';
 import { optimizedImageUrl } from '@/lib/image-optimize';
 import { FadeImage } from '../ui/FadeImage';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
@@ -110,6 +113,8 @@ function MinimalAgencyCard({
   onToggle: (id: string) => void;
 }) {
   const filledStars = agency.rating != null ? Math.min(5, Math.round(agency.rating)) : 0;
+  const fotoUrl = useValidImageUrl(agency.foto_url);
+  const logoUrl = useValidImageUrl(agency.logo_url);
   return (
     <button
       type="button"
@@ -130,18 +135,18 @@ function MinimalAgencyCard({
       </span>
 
       <div className="flex items-center gap-3 pr-7">
-        {agency.foto_url ? (
+        {fotoUrl ? (
           <FadeImage
-            src={optimizedImageUrl(agency.foto_url, 90)}
+            src={optimizedImageUrl(fotoUrl, 90)}
             alt={agency.nombre_agente}
             style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
             className="h-11 w-11 shrink-0 rounded-full border border-slate-100 object-cover"
             loading="lazy"
             decoding="async"
           />
-        ) : agency.logo_url ? (
+        ) : logoUrl ? (
           <FadeImage
-            src={optimizedImageUrl(agency.logo_url, 90)}
+            src={optimizedImageUrl(logoUrl, 90)}
             alt={agency.nombre_comercial}
             style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
             className="h-11 w-11 shrink-0 rounded-xl border border-slate-100 object-cover"
@@ -196,6 +201,12 @@ function MinimalAgencyCard({
 }
 
 export function ValorarPropiedadPage() {
+  useSEO({
+    path: '/inmobiliarias/valorar',
+    title: 'Valora tu propiedad gratis | Cosiris',
+    description: 'Solicita la valoración gratuita de tu propiedad y te ponemos en contacto con la inmobiliaria verificada más cercana.',
+  });
+
   const { agencies } = useInmobiliarias();
 
   const [phase, setPhase] = useState<Phase>('form');
@@ -284,6 +295,7 @@ export function ValorarPropiedadPage() {
     setPhase('sending');
 
     const mensaje = [
+      getAttributionSummaryLine(),
       `Dirección: ${address} (CP ${postalCode})`,
       motivo && `Motivo de venta: ${motivo}`,
       tiempo && `Tiempo intentando vender: ${tiempo}`,
@@ -302,6 +314,7 @@ export function ValorarPropiedadPage() {
           motivo: motivo || null,
           tiempo: tiempo || null,
           tipo_origen: 'Portal Inmobiliarias',
+          ...getAttributionFields(),
         }),
       ),
     );

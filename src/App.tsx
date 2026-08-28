@@ -21,6 +21,7 @@ import { PlanesInmobiliariasPage } from './components/pages/PlanesInmobiliariasP
 import { RegistroInmobiliariaPage } from './components/pages/RegistroInmobiliariaPage';
 import { InmobiliariasProvider } from './context/InmobiliariasContext';
 import { parseAgencyProfilePath } from '@/lib/agency-url';
+import { captureAttribution } from '@/lib/utm';
 
 declare global {
   interface Window {
@@ -81,6 +82,13 @@ export default function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [currentPath]);
+
+  // Solo al cargar la página (no en cada cambio de ruta interna): guarda los
+  // UTM/click-ids de la URL de entrada para que los formularios de leads
+  // puedan adjuntarlos aunque el envío ocurra varias páginas después.
+  useEffect(() => {
+    captureAttribution();
+  }, []);
 
   useEffect(() => {
     window.dataLayer = window.dataLayer || [];

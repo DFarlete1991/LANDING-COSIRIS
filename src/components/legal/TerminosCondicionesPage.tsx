@@ -2,7 +2,7 @@ import { LegalPageLayout } from './LegalPageLayout';
 
 export function TerminosCondicionesPage() {
   return (
-    <LegalPageLayout title="Términos y Condiciones">
+    <LegalPageLayout title="Términos y Condiciones" path="/terminos-condiciones">
       <p>Bienvenido a Cosiris.</p>
       <p>Cosiris le ayuda a encontrar, comprar y administrar propiedades de inversión utilizando nuestra plataforma en línea y algoritmos de IA patentados. Por favor, lea atentamente nuestros Términos y Condiciones antes de acceder o utilizar nuestra plataforma.</p>
 

@@ -2,7 +2,7 @@ import { LegalPageLayout } from './LegalPageLayout';
 
 export function CookiesPage() {
   return (
-    <LegalPageLayout title="Política de Cookies">
+    <LegalPageLayout title="Política de Cookies" path="/cookies">
       <p>www.cosiris.com utiliza cookies propias y de terceros para obtener datos estadísticos de la navegación que realizan los usuarios y así poder recopilar información que permita optimizar su visita a las páginas web. Las cookies no serán utilizadas para recabar datos de carácter personal. Si acepta o continúa navegando, se entiende que acepta su uso. Puede optar por rechazar las cookies cuando lo desee, ya sea cambiando la configuración del explorador (si su explorador lo permite), dejando de usar este sitio web o usando las funciones de cancelación correspondientes.</p>
 
       <section>

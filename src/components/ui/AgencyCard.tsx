@@ -10,15 +10,19 @@ import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { optimizedImageUrl } from '@/lib/image-optimize';
 import { FadeImage } from './FadeImage';
 import { AgencyLeadForm } from './AgencyLeadForm';
+import { useValidImageUrl } from '@/lib/use-valid-image-url';
 
 function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: InmobiliariaPublica; sizeClass?: string }) {
-  // Primero la foto de perfil; si no hay, el logo; y si tampoco, la inicial.
-  const image = agency.foto_url ?? agency.logo_url;
+  // Primero la foto de perfil; si no hay (o no carga: ej. el hosting de
+  // imágenes caído), el logo; y si tampoco, la inicial.
+  const fotoUrl = useValidImageUrl(agency.foto_url);
+  const logoUrl = useValidImageUrl(agency.logo_url);
+  const image = fotoUrl ?? logoUrl;
   if (image) {
     return (
       <FadeImage
         src={optimizedImageUrl(image, 200)}
-        alt={agency.foto_url ? agency.nombre_agente : agency.nombre_comercial}
+        alt={fotoUrl ? agency.nombre_agente : agency.nombre_comercial}
         style={{ objectPosition: agency.foto_pos ?? agency.logo_pos ?? '50% 50%' }}
         className={`shrink-0 rounded-full border-2 border-white object-cover shadow-lg ${sizeClass}`}
         loading="lazy"
@@ -39,8 +43,8 @@ function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: Inmobilia
 function AgencyThumbnail({ agency, sizeClass }: { agency: InmobiliariaPublica; sizeClass: string }) {
   // Mini-identificador de marca debajo del avatar: siempre el logo de la
   // inmobiliaria (nunca la foto de perfil, que ya va arriba); si no hay
-  // logo, iniciales sobre el color de la marca.
-  const image = agency.logo_url;
+  // logo (o no carga), iniciales sobre el color de la marca.
+  const image = useValidImageUrl(agency.logo_url);
   if (image) {
     return (
       <FadeImage
@@ -75,6 +79,9 @@ export function AgencyCard({
   // La lista completa hace falta para desempatar nombres repetidos en la
   // misma ciudad al armar el slug del perfil.
   const { agencies } = useInmobiliarias();
+  const bannerUrl = useValidImageUrl(agency.banner_url);
+  const fotoUrl = useValidImageUrl(agency.foto_url);
+  const logoUrl = useValidImageUrl(agency.logo_url);
 
   return (
     <button
@@ -86,8 +93,8 @@ export function AgencyCard({
         className="relative h-36 w-full shrink-0 overflow-hidden"
         style={{ background: `linear-gradient(135deg, ${agency.color_hex} 0%, #0F172A 140%)` }}
       >
-        {agency.banner_url && (
-          <FadeImage src={optimizedImageUrl(agency.banner_url, 700)} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+        {bannerUrl && (
+          <FadeImage src={optimizedImageUrl(bannerUrl, 700)} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         {isNearest && (
@@ -95,18 +102,18 @@ export function AgencyCard({
             Más cercana
           </span>
         )}
-        {agency.foto_url ? (
+        {fotoUrl ? (
           <FadeImage
-            src={optimizedImageUrl(agency.foto_url, 100)}
+            src={optimizedImageUrl(fotoUrl, 100)}
             alt={agency.nombre_agente}
             style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
             className="absolute -bottom-4 left-4 h-10 w-10 rounded-full border-[3px] border-white object-cover shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-110"
             loading="lazy"
             decoding="async"
           />
-        ) : agency.logo_url ? (
+        ) : logoUrl ? (
           <FadeImage
-            src={optimizedImageUrl(agency.logo_url, 100)}
+            src={optimizedImageUrl(logoUrl, 100)}
             alt={agency.nombre_comercial}
             style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
             className="absolute -bottom-4 left-4 h-10 w-10 rounded-full border-2 border-white object-cover shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-110"

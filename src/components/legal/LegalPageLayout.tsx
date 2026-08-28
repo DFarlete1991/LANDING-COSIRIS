@@ -1,13 +1,21 @@
 import { ArrowLeft } from 'lucide-react';
 import { LandingNavbar } from '@/components/pages/landing-navbar';
 import { Footer } from '@/components/Footer';
+import { useSEO } from '@/lib/seo';
 
 interface LegalPageLayoutProps {
   children: React.ReactNode;
   title: string;
+  path: string;
 }
 
-export function LegalPageLayout({ children, title }: LegalPageLayoutProps) {
+export function LegalPageLayout({ children, title, path }: LegalPageLayoutProps) {
+  useSEO({
+    path,
+    title: `${title} | Cosiris`,
+    description: `${title} de Cosiris, agencia de marketing especializada en el sector inmobiliario.`,
+  });
+
   const handleGoBack = () => {
     window.history.pushState({}, '', '/');
     window.dispatchEvent(new PopStateEvent('popstate'));

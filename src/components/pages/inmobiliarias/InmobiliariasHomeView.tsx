@@ -30,6 +30,7 @@ import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo, rememberDirectoryUrl } from '@/lib/utils';
 import { agencyProfilePath } from '@/lib/agency-url';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
+import { useValidImageUrl } from '@/lib/use-valid-image-url';
 import { optimizedImageUrl } from '@/lib/image-optimize';
 import { FadeImage } from '../../ui/FadeImage';
 
@@ -69,6 +70,8 @@ function hasShowcaseMedia(agency: InmobiliariaPublica): boolean {
 function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica; agencies: InmobiliariaPublica[] }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [inView, setInView] = useState(false);
+  const [directVideoBroken, setDirectVideoBroken] = useState(false);
+  const fotoUrl = useValidImageUrl(agency.foto_url);
 
   useEffect(() => {
     const el = ref.current;
@@ -80,14 +83,15 @@ function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica;
 
   const embed = agency.media_presentacion_url ? getVideoEmbed(agency.media_presentacion_url) : null;
   // Si no es ni YouTube/Vimeo ni un archivo de vídeo reproducible (por
-  // ejemplo, quedó guardado un link a una página web), se muestra la foto de
-  // perfil de la agencia en vez de repetir el vídeo genérico — y solo si
-  // tampoco hay foto cae al vídeo de fondo como último recurso.
-  const directVideoSrc = !embed && agency.media_presentacion_url && isDirectVideoUrl(agency.media_presentacion_url)
+  // ejemplo, quedó guardado un link a una página web, o el archivo subido ya
+  // no responde — hosting caído), se muestra la foto de perfil de la agencia
+  // en vez de repetir el vídeo genérico — y solo si tampoco hay foto cae al
+  // vídeo de fondo como último recurso.
+  const directVideoSrc = !embed && !directVideoBroken && agency.media_presentacion_url && isDirectVideoUrl(agency.media_presentacion_url)
     ? agency.media_presentacion_url
     : null;
-  const showProfilePhoto = !embed && !directVideoSrc && !!agency.foto_url;
-  const staticFallback = agency.foto_url
+  const showProfilePhoto = !embed && !directVideoSrc && !!fotoUrl;
+  const staticFallback = fotoUrl
     ?? (embed?.platform === 'youtube' ? `https://img.youtube.com/vi/${embed.id}/mqdefault.jpg` : null)
     ?? '/assets/inmobiliarias/ciudades/madrid.jpg';
 
@@ -127,10 +131,11 @@ function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica;
           poster={optimizedImageUrl(staticFallback, 500) ?? staticFallback}
           preload="metadata"
           autoPlay muted loop playsInline
+          onError={() => setDirectVideoBroken(true)}
         />
       ) : showProfilePhoto ? (
         <FadeImage
-          src={optimizedImageUrl(agency.foto_url, 500)}
+          src={optimizedImageUrl(fotoUrl, 500)}
           alt={agency.nombre_comercial}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
