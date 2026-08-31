@@ -95,15 +95,41 @@ export function parseAgencyProfilePath(pathname: string): { city: string; slug: 
   return { city, slug: slug ? decodeURIComponent(slug) : null };
 }
 
+// `slugify()` quita tildes/eñes a propósito (para que la URL quede en ASCII
+// limpio), así que revertirlo letra por letra no puede recuperar "España" ni
+// "Málaga" — sale "Espana", "Malaga". Estos son los nombres que de verdad
+// aparecen en URLs de perfil (las 50 provincias españolas, ya usadas en
+// CaptacionInmobiliariasPage/ContactModal, más "España", el valor con el que
+// citySlugOf() rellena la URL cuando la inmobiliaria no tiene población).
+// Si el slug no está en esta lista (una ciudad suelta tipo "donosti"),
+// humanizeCitySlug cae a capitalizar cada palabra sin más.
+const KNOWN_PLACE_NAMES = [
+  'España',
+  'Álava', 'Albacete', 'Alicante', 'Almería', 'Asturias', 'Ávila',
+  'Badajoz', 'Barcelona', 'Bizkaia', 'Burgos', 'Cáceres', 'Cádiz',
+  'Cantabria', 'Castellón', 'Ciudad Real', 'Córdoba', 'Cuenca',
+  'Gipuzkoa', 'Girona', 'Granada', 'Guadalajara', 'Huelva', 'Huesca',
+  'Islas Baleares', 'Jaén', 'La Coruña', 'La Rioja', 'Las Palmas',
+  'León', 'Lleida', 'Lugo', 'Madrid', 'Málaga', 'Murcia', 'Navarra',
+  'Ourense', 'Palencia', 'Pontevedra', 'Salamanca',
+  'Santa Cruz de Tenerife', 'Segovia', 'Sevilla', 'Soria', 'Tarragona',
+  'Teruel', 'Toledo', 'Valencia', 'Valladolid', 'Zamora', 'Zaragoza',
+];
+
+const KNOWN_PLACE_NAMES_BY_SLUG = new Map(KNOWN_PLACE_NAMES.map((name) => [slugify(name), name]));
+
 /**
  * slug de ciudad de la URL → nombre legible, para cuando `poblacion` llega
  * vacío de la vista del CRM (ver comentario de `slugify`). "donosti" →
- * "Donosti", "san-sebastian" → "San Sebastian". No recupera acentos/eñes
- * perdidos al hacer el slug — es un fallback de emergencia, no un dato
- * fiable — pero evita el hueco vacío ("Estamos en , Gipuzkoa") mientras se
- * corrige el dato real en el CRM.
+ * "Donosti", "san-sebastian" → "San Sebastian". Para provincias y "España"
+ * (ver KNOWN_PLACE_NAMES) recupera la tilde real; cualquier otro slug es un
+ * fallback de emergencia sin acentos — mejor eso que dejar el hueco vacío
+ * ("Estamos en , Gipuzkoa") mientras se corrige el dato real en el CRM.
  */
 export function humanizeCitySlug(slug: string): string {
+  const known = KNOWN_PLACE_NAMES_BY_SLUG.get(slug);
+  if (known) return known;
+
   return slug
     .split('-')
     .filter(Boolean)
