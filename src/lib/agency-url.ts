@@ -24,8 +24,14 @@ export function slugify(text: string | null | undefined): string {
     .replace(/^-+|-+$/g, '');
 }
 
+// Relleno de la URL cuando la inmobiliaria no tiene población — solo para
+// que /inmobiliarias-en-<ciudad>/... nunca quede con un hueco vacío. No es
+// una ciudad real: nada debe mostrarlo como si lo fuera (ver `displayCity`
+// en InmobiliariaPerfilPage, que lo excluye a propósito de ese respaldo).
+export const NO_CITY_SLUG = 'espana';
+
 function citySlugOf(agency: InmobiliariaPublica): string {
-  return slugify(agency.poblacion) || 'espana';
+  return slugify(agency.poblacion) || NO_CITY_SLUG;
 }
 
 function baseNameSlugOf(agency: InmobiliariaPublica): string {

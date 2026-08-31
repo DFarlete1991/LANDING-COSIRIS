@@ -14,7 +14,7 @@ import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { REVIEWS_PLACEHOLDER } from '@/data/reviews-placeholder';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo, getLastDirectoryUrl } from '@/lib/utils';
-import { findAgencyByProfilePath, humanizeCitySlug, agencyProfilePath } from '@/lib/agency-url';
+import { findAgencyByProfilePath, humanizeCitySlug, agencyProfilePath, NO_CITY_SLUG } from '@/lib/agency-url';
 import { useSEO } from '@/lib/seo';
 import { fetchPlaceReviews, type GoogleReview } from '@/lib/google-places';
 import { optimizedImageUrl } from '@/lib/image-optimize';
@@ -1064,8 +1064,12 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
   // agency-url.ts) — al entrar por la URL nueva, la ciudad ya viaja en el
   // propio path (/inmobiliarias-en-<ciudad>/...), así que se usa como
   // respaldo para no dejar huecos tipo "Estamos en , Gipuzkoa" en ninguna
-  // campaña por ciudad.
-  const displayCity = agency?.poblacion || (city ? humanizeCitySlug(city) : '');
+  // campaña por ciudad. `NO_CITY_SLUG` ("espana") es el relleno que usa la
+  // URL cuando ni siquiera hay ciudad — no es una ciudad real, así que no se
+  // muestra como si lo fuera ("Estamos en España, Gipuzkoa" no tiene
+  // sentido): se deja vacío y el resto de la página ya sabe caer solo a la
+  // provincia.
+  const displayCity = agency?.poblacion || (city && city !== NO_CITY_SLUG ? humanizeCitySlug(city) : '');
 
   // La presentación se recorta en el hero — no se muestra completa en
   // ningún otro sitio de la página, así que "Leer más" expande este mismo
