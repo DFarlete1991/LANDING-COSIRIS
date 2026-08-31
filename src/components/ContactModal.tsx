@@ -10,6 +10,7 @@ import { getAttributionFields } from '@/lib/utm';
 import { notifyWhatsAppLead } from '@/lib/whatsapp-webhook';
 import { DEFAULT_COUNTRY_DIAL, toInternationalPhone } from '@/data/country-codes';
 import { CountryCodeSelect } from './ui/CountryCodeSelect';
+import { ConsentCheckbox } from './ui/ConsentCheckbox';
 
 // ─── Spain Provinces ─────────────────────────────────────────────────────────
 
@@ -237,6 +238,8 @@ export default function ContactModal() {
   const [formData, setFormData] = useState(emptyForm);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [errors, setErrors] = useState(emptyErrors);
+  const [consent, setConsent] = useState(false);
+  const [consentError, setConsentError] = useState('');
 
   // Pre-populate services from context whenever modal opens
   useEffect(() => {
@@ -306,6 +309,9 @@ export default function ContactModal() {
       newErrors.province = 'Selecciona tu provincia de la lista.'; hasErrors = true;
     }
     if (!formData.employees) { newErrors.employees = 'Por favor, selecciona el número de empleados.'; hasErrors = true; }
+
+    if (!consent) { setConsentError('Debes aceptar la Política de Privacidad para continuar.'); hasErrors = true; }
+    else setConsentError('');
 
     if (hasErrors) { setErrors(newErrors); return; }
 
@@ -565,6 +571,16 @@ export default function ContactModal() {
                             ))}
                           </div>
                           {errors.employees && <p className="mt-1 text-xs text-red-500">{errors.employees}</p>}
+                        </motion.div>
+
+                        {/* Consentimiento */}
+                        <motion.div variants={fieldVariants}>
+                          <ConsentCheckbox
+                            id="cm-consent"
+                            checked={consent}
+                            onChange={(v) => { setConsent(v); if (v) setConsentError(''); }}
+                            error={consentError}
+                          />
                         </motion.div>
 
                         {/* Submit */}

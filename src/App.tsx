@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import LandingPages from '@/components/pages/landing-pages';
 import IntroScreen from '@/components/IntroScreen';
 import ContactModal from './components/ContactModal';
+import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { AvisoLegalPage } from './components/legal/AvisoLegalPage';
 import { TerminosCondicionesPage } from './components/legal/TerminosCondicionesPage';
 import { PrivacidadPage } from './components/legal/PrivacidadPage';
@@ -22,6 +23,7 @@ import { RegistroInmobiliariaPage } from './components/pages/RegistroInmobiliari
 import { InmobiliariasProvider } from './context/InmobiliariasContext';
 import { parseAgencyProfilePath } from '@/lib/agency-url';
 import { captureAttribution } from '@/lib/utm';
+import { applyStoredConsentOnLoad } from '@/lib/cookieConsent';
 
 declare global {
   interface Window {
@@ -88,6 +90,7 @@ export default function App() {
   // puedan adjuntarlos aunque el envío ocurra varias páginas después.
   useEffect(() => {
     captureAttribution();
+    applyStoredConsentOnLoad();
   }, []);
 
   useEffect(() => {
@@ -107,12 +110,18 @@ export default function App() {
       <>
         <PlanesInmobiliariasPage />
         <ContactModal />
+        <CookieConsentBanner />
       </>
     );
   }
 
   if (currentPath === '/inmobiliarias/registro') {
-    return <RegistroInmobiliariaPage />;
+    return (
+      <>
+        <RegistroInmobiliariaPage />
+        <CookieConsentBanner />
+      </>
+    );
   }
 
   if (currentPath === '/inmobiliarias/valorar') {
@@ -120,6 +129,7 @@ export default function App() {
       <InmobiliariasProvider>
         <ValorarPropiedadPage />
         <ContactModal />
+        <CookieConsentBanner />
       </InmobiliariasProvider>
     );
   }
@@ -137,6 +147,7 @@ export default function App() {
           <BuscadorInmobiliariasPage />
         )}
         <ContactModal />
+        <CookieConsentBanner />
       </InmobiliariasProvider>
     );
   }
@@ -149,6 +160,7 @@ export default function App() {
       <InmobiliariasProvider>
         <InmobiliariaPerfilPage id={agencyId} />
         <ContactModal />
+        <CookieConsentBanner />
       </InmobiliariasProvider>
     );
   }
@@ -158,6 +170,7 @@ export default function App() {
       <InmobiliariasProvider>
         <BuscadorInmobiliariasPage />
         <ContactModal />
+        <CookieConsentBanner />
       </InmobiliariasProvider>
     );
   }
@@ -167,6 +180,7 @@ export default function App() {
     <>
       <StandalonePage />
       <ContactModal />
+      <CookieConsentBanner />
     </>
   );
 
@@ -188,6 +202,7 @@ export default function App() {
       </AnimatePresence>
 
       <ContactModal />
+      <CookieConsentBanner />
     </main>
   );
 }

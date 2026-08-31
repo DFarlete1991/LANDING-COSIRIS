@@ -8,6 +8,7 @@ import { getAttributionFields } from '@/lib/utm';
 import { notifyWhatsAppLead } from '@/lib/whatsapp-webhook';
 import { DEFAULT_COUNTRY_DIAL, toInternationalPhone } from '@/data/country-codes';
 import { CountryCodeSelect } from '../ui/CountryCodeSelect';
+import { ConsentCheckbox } from '../ui/ConsentCheckbox';
 
 const PROVINCES = [
   'Álava', 'Albacete', 'Alicante', 'Almería', 'Asturias', 'Ávila',
@@ -166,6 +167,8 @@ function CaptacionForm() {
   const [formData, setFormData] = useState<FormData>(emptyForm);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [errors, setErrors] = useState<FormErrors>(emptyErrors);
+  const [consent, setConsent] = useState(false);
+  const [consentError, setConsentError] = useState('');
 
   const validatePhone = (phone: string) => /^[+]?[\d\s]{9,15}$/.test(phone.trim());
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
@@ -220,6 +223,13 @@ function CaptacionForm() {
     if (!formData.employees) {
       newErrors.employees = 'Por favor, selecciona el número de empleados.';
       hasErrors = true;
+    }
+
+    if (!consent) {
+      setConsentError('Debes aceptar la Política de Privacidad para continuar.');
+      hasErrors = true;
+    } else {
+      setConsentError('');
     }
 
     if (hasErrors) {
@@ -430,6 +440,13 @@ function CaptacionForm() {
                     </div>
                     {errors.employees && <p className="mt-1 text-xs text-red-500">{errors.employees}</p>}
                   </div>
+
+                  <ConsentCheckbox
+                    id="captacion-consent"
+                    checked={consent}
+                    onChange={(v) => { setConsent(v); if (v) setConsentError(''); }}
+                    error={consentError}
+                  />
 
                   <div className="pt-2">
                     <button

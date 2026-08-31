@@ -11,6 +11,7 @@ import { getAttributionFields } from '@/lib/utm';
 import { notifyWhatsAppLead } from '@/lib/whatsapp-webhook';
 import { DEFAULT_COUNTRY_DIAL, toInternationalPhone } from '@/data/country-codes';
 import { CountryCodeSelect } from '../ui/CountryCodeSelect';
+import { ConsentCheckbox } from '../ui/ConsentCheckbox';
 
 const AVAILABLE_LANGUAGES = [
   'Español', 'Inglés', 'Francés', 'Alemán', 'Italiano', 'Portugués',
@@ -470,6 +471,7 @@ export function RegistroInmobiliariaPage() {
   const [place, setPlace] = useState<GeocodedPlace | null>(null);
   const [step1Phase, setStep1Phase] = useState<Step1Phase>('idle');
   const [step1Error, setStep1Error] = useState<string | null>(null);
+  const [consent, setConsent] = useState(false);
 
   const [especialidades, setEspecialidades] = useState<string[]>([]);
   const [idiomas, setIdiomas] = useState<string[]>([]);
@@ -496,6 +498,10 @@ export function RegistroInmobiliariaPage() {
     }
     if (!place) {
       setStep1Error('Fija la dirección de tu inmobiliaria en el mapa para continuar.');
+      return;
+    }
+    if (!consent) {
+      setStep1Error('Debes aceptar la Política de Privacidad para continuar.');
       return;
     }
 
@@ -727,6 +733,12 @@ export function RegistroInmobiliariaPage() {
                       </div>
 
                       <LocationField place={place} onChange={setPlace} disabled={step1Phase === 'loading'} />
+
+                      <ConsentCheckbox
+                        id="registro-consent"
+                        checked={consent}
+                        onChange={setConsent}
+                      />
 
                       {step1Error && <p className="text-sm text-red-500">{step1Error}</p>}
 
