@@ -1,0 +1,6 @@
+#!/bin/sh
+# Auditoría de seguridad local antes de cada commit. Se activa una vez por
+# clon con: git config core.hooksPath .githooks
+# (mismas comprobaciones que corren en CI — .github/workflows/security-audit.yml —
+# esto solo da feedback más rápido, en local, antes de siquiera hacer push).
+npm run security-audit

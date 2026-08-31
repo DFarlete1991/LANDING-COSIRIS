@@ -2,6 +2,25 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Seguridad
+
+El proyecto tiene una auditoría de seguridad basada en las categorías del [OWASP WSTG](https://github.com/OWASP/wstg) que aplican a esta SPA (cabeceras de seguridad, secretos commiteados, dependencias vulnerables, patrones de XSS/`postMessage` inseguros). Corre automáticamente en cada push/PR (`.github/workflows/security-audit.yml`) — un cambio no debería llegar a `main`/`qa` si la falla.
+
+```bash
+npm run security-audit   # corre todas las comprobaciones
+npm run sync-headers     # regenera vercel.json y nginx.conf a partir de scripts/security-headers.mjs
+```
+
+Las cabeceras de seguridad (incluida la Content-Security-Policy) viven en una única fuente, `scripts/security-headers.mjs`, y se propagan a tres lugares: `nginx.conf` (lo que **de verdad** aplica en producción — el sitio se despliega en Dokploy vía el `Dockerfile` de este repo, no en Vercel), `vercel.json` (queda por si algún día se vuelve a desplegar ahí; hoy es config inerte) y `vite.config.ts` (`preview.headers`, para poder probar la CSP en local con `npm run build && npm run preview` antes de cada deploy). Si tocas la CSP porque agregaste un proveedor nuevo (otro pixel, otro mapa, otro webhook), corre `npm run sync-headers` y prueba `npm run preview` en un navegador real antes de mergear — GTM/Google Ads inyecta scripts inline dinámicos que no se pueden fijar por hash, así que cualquier cambio ahí conviene verificarlo visualmente, no solo confiar en la teoría.
+
+**Importante sobre Dokploy:** el "Build Type" del servicio en el dashboard de Dokploy tiene que ser **"Dockerfile"**, no "Nixpacks" ni "Static" — esos dos tipos generan su propio nginx sin forma de agregar cabeceras personalizadas ni el ruteo SPA que esta app necesita (ver `Dockerfile` y `nginx.conf` en la raíz). Se probó localmente con `docker build . && docker run -p 8080:80 <imagen>`: sirve las cabeceras, `/inmobiliarias` carga su HTML propio, y rutas del lado del cliente (`/nosotros`, perfiles de agencia) caen a `index.html` en vez de dar 404.
+
+Para activar la misma auditoría como pre-commit local (feedback antes de hacer push, además de lo que ya corre en CI):
+
+```bash
+git config core.hooksPath .githooks
+```
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
