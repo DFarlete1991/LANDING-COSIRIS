@@ -10,7 +10,9 @@
     "dev": "vite",
     "build": "node scripts/generate-sitemap.mjs && tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "security-audit": "node scripts/security-audit.mjs",
+    "sync-headers": "node scripts/sync-vercel-headers.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",

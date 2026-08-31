@@ -111,7 +111,12 @@ const STATIC_PATHS = [
 ];
 
 function xmlEscape(value) {
-  return value.replace(/&/g, '&amp;');
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 }
 
 async function main() {

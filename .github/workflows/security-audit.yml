@@ -1,0 +1,35 @@
+name: Security audit
+
+# Se corre en cada push/PR — así ningún cambio llega a main/qa sin pasar por
+# las comprobaciones de scripts/security-audit.mjs (OWASP WSTG: cabeceras,
+# secretos commiteados, dependencias vulnerables, patrones de XSS/postMessage
+# inseguros), ni sin que el proyecto siga compilando y sin errores de lint.
+on:
+  push:
+    branches: [main, qa]
+  pull_request:
+    branches: [main, qa]
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Auditoría de seguridad (OWASP WSTG)
+        run: npm run security-audit
+
+      - name: Build de producción
+        run: npm run build

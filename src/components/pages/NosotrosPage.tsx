@@ -316,7 +316,7 @@ function CinematicVideo({ videoId }: { videoId: string }) {
     const command = isMuted ? 'unMute' : 'mute';
     iframeRef.current.contentWindow.postMessage(
       JSON.stringify({ event: 'command', func: command, args: [] }),
-      '*'
+      'https://www.youtube.com'
     );
   };
   
