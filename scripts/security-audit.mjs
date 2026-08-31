@@ -101,7 +101,7 @@ if (trackedEnvFiles.length > 0) {
 }
 
 // ── 3. Cabeceras de seguridad (WSTG-CONF-07/08: CSP, clickjacking, MIME) ───
-section('Cabeceras de seguridad (vercel.json)');
+section('Cabeceras de seguridad (nginx.conf + vercel.json)');
 try {
   run('node', ['scripts/sync-vercel-headers.mjs', '--check']);
   ok('vercel.json está sincronizado con scripts/security-headers.mjs.');
@@ -109,11 +109,18 @@ try {
   fail('vercel.json desincronizado de scripts/security-headers.mjs — corre `node scripts/sync-vercel-headers.mjs`.');
   console.log(e.stdout || e.message);
 }
+try {
+  run('node', ['scripts/sync-nginx-config.mjs', '--check']);
+  ok('nginx.conf está sincronizado con scripts/security-headers.mjs (esto es lo que aplica de verdad en Dokploy).');
+} catch (e) {
+  fail('nginx.conf desincronizado de scripts/security-headers.mjs — corre `node scripts/sync-nginx-config.mjs`.');
+  console.log(e.stdout || e.message);
+}
 
-const vercelJson = JSON.parse(readFileSync(resolve(ROOT, 'vercel.json'), 'utf-8'));
-const headerMap = Object.fromEntries(
-  (vercelJson.headers?.[0]?.headers ?? []).map((h) => [h.key, h.value]),
-);
+// Se valida el contenido contra la fuente única (security-headers.mjs), no
+// contra vercel.json/nginx.conf directamente — los checks de --check de
+// arriba ya garantizan que esos archivos coincidan con ella.
+const { SECURITY_HEADERS: headerMap } = await import('./security-headers.mjs');
 const REQUIRED_HEADERS = [
   'Content-Security-Policy',
   'X-Content-Type-Options',
@@ -124,7 +131,7 @@ const REQUIRED_HEADERS = [
 ];
 for (const key of REQUIRED_HEADERS) {
   if (headerMap[key]) ok(`${key} presente.`);
-  else fail(`Falta la cabecera ${key} en vercel.json.`);
+  else fail(`Falta la cabecera ${key} en scripts/security-headers.mjs.`);
 }
 const csp = headerMap['Content-Security-Policy'] ?? '';
 for (const token of ["object-src 'none'", 'frame-ancestors', 'upgrade-insecure-requests']) {

@@ -24,7 +24,11 @@ const nextText = JSON.stringify(next, null, 2) + '\n';
 const currentText = readFileSync(vercelJsonPath, 'utf-8');
 
 if (process.argv.includes('--check')) {
-  if (nextText !== currentText) {
+  // Normaliza CRLF/LF antes de comparar: en Windows con core.autocrlf, git
+  // reescribe vercel.json a CRLF en cada checkout — eso no es una
+  // desincronización real de contenido, solo el estilo de fin de línea.
+  const normalize = (s) => s.replace(/\r\n/g, '\n');
+  if (normalize(nextText) !== normalize(currentText)) {
     console.error(
       '[sync-vercel-headers] vercel.json está desincronizado con scripts/security-headers.mjs.\n' +
         'Corre `node scripts/sync-vercel-headers.mjs` y commitea el resultado.',

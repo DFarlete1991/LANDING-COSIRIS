@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "security-audit": "node scripts/security-audit.mjs",
-    "sync-headers": "node scripts/sync-vercel-headers.mjs"
+    "sync-headers": "node scripts/sync-vercel-headers.mjs && node scripts/sync-nginx-config.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
