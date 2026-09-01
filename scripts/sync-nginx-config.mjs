@@ -32,7 +32,35 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    # Sin esto Cache-Control/gzip quedaban en cero (auditoria de rendimiento
+    # 2026-09: PageSpeed reportaba 5.4MB de ahorro potencial de cache y 60/100
+    # de performance) — nginx no comprime ni cachea nada por defecto.
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_min_length 512;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/json application/xml image/svg+xml font/ttf font/otf application/font-woff application/font-woff2 application/wasm;
+
 ${headerLines}
+
+    # JS/CSS de Vite llevan hash de contenido en el nombre (main-oWtxNc1y.js):
+    # si el contenido cambia, cambia el nombre. Cache de un año es seguro.
+    # OJO: add_header en un location NO hereda los add_header del server (los
+    # reemplaza), asi que las cabeceras de seguridad se repiten aqui.
+    location ~* \\.(js|css)$ {
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+${headerLines}
+        try_files $uri =404;
+    }
+
+    # Resto de estaticos (imagenes, video, fuentes) no llevan hash en el
+    # nombre, asi que el cache es mas corto por si se reemplaza el archivo.
+    location ~* \\.(png|jpg|jpeg|webp|gif|svg|ico|mp4|woff2?|ttf|otf)$ {
+        add_header Cache-Control "public, max-age=2592000" always;
+${headerLines}
+        try_files $uri =404;
+    }
 
     # Directorio de inmobiliarias: entrada HTML propia (og:title/og:description
     # distintos para que WhatsApp/Facebook, que no ejecutan JS, muestren el

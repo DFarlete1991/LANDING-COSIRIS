@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { ArrowRightIcon } from 'lucide-react';
-import { motion, useInView } from 'motion/react';
+import { motion, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { LogoCloud } from '@/components/ui/logo-cloud-3';
 import { HeroBadge } from '@/components/ui/hero-badge';

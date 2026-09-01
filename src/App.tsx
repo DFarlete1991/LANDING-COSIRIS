@@ -1,27 +1,32 @@
-import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
-import LandingPages from '@/components/pages/landing-pages';
-import IntroScreen from '@/components/IntroScreen';
+import { useEffect, useState, lazy, Suspense } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import ContactModal from './components/ContactModal';
-import { AvisoLegalPage } from './components/legal/AvisoLegalPage';
-import { TerminosCondicionesPage } from './components/legal/TerminosCondicionesPage';
-import { PrivacidadPage } from './components/legal/PrivacidadPage';
-import { CookiesPage } from './components/legal/CookiesPage';
-import { NosotrosPage } from './components/pages/NosotrosPage';
-import { ServiciosPage } from './components/pages/ServiciosPage';
-import { VenderPage } from './components/pages/VenderPage';
-import { ValoracionPage } from './components/pages/ValoracionPage';
-import { CaptacionInmobiliariasPage } from './components/pages/CaptacionInmobiliariasPage';
-import { GraciasVenderPage } from './components/pages/GraciasVenderPage';
-import { GraciasPage } from './components/pages/GraciasPage';
-import { BuscadorInmobiliariasPage } from './components/pages/BuscadorInmobiliariasPage';
-import { ValorarPropiedadPage } from './components/pages/ValorarPropiedadPage';
-import { InmobiliariaPerfilPage } from './components/pages/InmobiliariaPerfilPage';
-import { PlanesInmobiliariasPage } from './components/pages/PlanesInmobiliariasPage';
-import { RegistroInmobiliariaPage } from './components/pages/RegistroInmobiliariaPage';
 import { InmobiliariasProvider } from './context/InmobiliariasContext';
 import { parseAgencyProfilePath } from '@/lib/agency-url';
 import { captureAttribution } from '@/lib/utm';
+
+// Cada página se descarga solo cuando se visita esa ruta, en vez de que
+// TODAS (mapas de Leaflet, three.js, formularios de registro, etc.) vayan
+// en el bundle inicial de cualquier página, incluidas las de campaña como
+// /valoratuvivienda y /vendetuvivienda.
+const LandingPages = lazy(() => import('@/components/pages/landing-pages'));
+const IntroScreen = lazy(() => import('@/components/IntroScreen'));
+const AvisoLegalPage = lazy(() => import('./components/legal/AvisoLegalPage').then((m) => ({ default: m.AvisoLegalPage })));
+const TerminosCondicionesPage = lazy(() => import('./components/legal/TerminosCondicionesPage').then((m) => ({ default: m.TerminosCondicionesPage })));
+const PrivacidadPage = lazy(() => import('./components/legal/PrivacidadPage').then((m) => ({ default: m.PrivacidadPage })));
+const CookiesPage = lazy(() => import('./components/legal/CookiesPage').then((m) => ({ default: m.CookiesPage })));
+const NosotrosPage = lazy(() => import('./components/pages/NosotrosPage').then((m) => ({ default: m.NosotrosPage })));
+const ServiciosPage = lazy(() => import('./components/pages/ServiciosPage').then((m) => ({ default: m.ServiciosPage })));
+const VenderPage = lazy(() => import('./components/pages/VenderPage').then((m) => ({ default: m.VenderPage })));
+const ValoracionPage = lazy(() => import('./components/pages/ValoracionPage').then((m) => ({ default: m.ValoracionPage })));
+const CaptacionInmobiliariasPage = lazy(() => import('./components/pages/CaptacionInmobiliariasPage').then((m) => ({ default: m.CaptacionInmobiliariasPage })));
+const GraciasVenderPage = lazy(() => import('./components/pages/GraciasVenderPage').then((m) => ({ default: m.GraciasVenderPage })));
+const GraciasPage = lazy(() => import('./components/pages/GraciasPage').then((m) => ({ default: m.GraciasPage })));
+const BuscadorInmobiliariasPage = lazy(() => import('./components/pages/BuscadorInmobiliariasPage').then((m) => ({ default: m.BuscadorInmobiliariasPage })));
+const ValorarPropiedadPage = lazy(() => import('./components/pages/ValorarPropiedadPage').then((m) => ({ default: m.ValorarPropiedadPage })));
+const InmobiliariaPerfilPage = lazy(() => import('./components/pages/InmobiliariaPerfilPage').then((m) => ({ default: m.InmobiliariaPerfilPage })));
+const PlanesInmobiliariasPage = lazy(() => import('./components/pages/PlanesInmobiliariasPage').then((m) => ({ default: m.PlanesInmobiliariasPage })));
+const RegistroInmobiliariaPage = lazy(() => import('./components/pages/RegistroInmobiliariaPage').then((m) => ({ default: m.RegistroInmobiliariaPage })));
 
 declare global {
   interface Window {
@@ -104,21 +109,27 @@ export default function App() {
   // "planes"/"registro" se interpretarían como un id de inmobiliaria.
   if (currentPath === '/inmobiliarias/planes') {
     return (
-      <>
+      <Suspense fallback={null}>
         <PlanesInmobiliariasPage />
         <ContactModal />
-      </>
+      </Suspense>
     );
   }
 
   if (currentPath === '/inmobiliarias/registro') {
-    return <RegistroInmobiliariaPage />;
+    return (
+      <Suspense fallback={null}>
+        <RegistroInmobiliariaPage />
+      </Suspense>
+    );
   }
 
   if (currentPath === '/inmobiliarias/valorar') {
     return (
       <InmobiliariasProvider>
-        <ValorarPropiedadPage />
+        <Suspense fallback={null}>
+          <ValorarPropiedadPage />
+        </Suspense>
         <ContactModal />
       </InmobiliariasProvider>
     );
@@ -131,11 +142,13 @@ export default function App() {
   if (profilePath) {
     return (
       <InmobiliariasProvider>
-        {profilePath.slug ? (
-          <InmobiliariaPerfilPage city={profilePath.city} slug={profilePath.slug} />
-        ) : (
-          <BuscadorInmobiliariasPage />
-        )}
+        <Suspense fallback={null}>
+          {profilePath.slug ? (
+            <InmobiliariaPerfilPage city={profilePath.city} slug={profilePath.slug} />
+          ) : (
+            <BuscadorInmobiliariasPage />
+          )}
+        </Suspense>
         <ContactModal />
       </InmobiliariasProvider>
     );
@@ -147,7 +160,9 @@ export default function App() {
     const agencyId = decodeURIComponent(currentPath.slice('/inmobiliarias/'.length));
     return (
       <InmobiliariasProvider>
-        <InmobiliariaPerfilPage id={agencyId} />
+        <Suspense fallback={null}>
+          <InmobiliariaPerfilPage id={agencyId} />
+        </Suspense>
         <ContactModal />
       </InmobiliariasProvider>
     );
@@ -156,7 +171,9 @@ export default function App() {
   if (currentPath === '/inmobiliarias') {
     return (
       <InmobiliariasProvider>
-        <BuscadorInmobiliariasPage />
+        <Suspense fallback={null}>
+          <BuscadorInmobiliariasPage />
+        </Suspense>
         <ContactModal />
       </InmobiliariasProvider>
     );
@@ -164,15 +181,19 @@ export default function App() {
 
   const StandalonePage = standaloneRoutes[currentPath];
   if (StandalonePage) return (
-    <>
+    <Suspense fallback={null}>
       <StandalonePage />
       <ContactModal />
-    </>
+    </Suspense>
   );
 
   return (
     <main className="font-sans bg-white text-ink antialiased">
-      {!introDone && <IntroScreen onComplete={() => setIntroDone(true)} />}
+      {!introDone && (
+        <Suspense fallback={null}>
+          <IntroScreen onComplete={() => setIntroDone(true)} />
+        </Suspense>
+      )}
 
       <AnimatePresence mode="wait">
         {introDone && (
@@ -182,7 +203,9 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           >
-            <LandingPages />
+            <Suspense fallback={null}>
+              <LandingPages />
+            </Suspense>
           </motion.div>
         )}
       </AnimatePresence>
