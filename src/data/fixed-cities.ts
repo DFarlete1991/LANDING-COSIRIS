@@ -16,10 +16,15 @@ export function getAllCitiesWithCounts(agencies: InmobiliariaPublica[]): CityWit
   // inmobiliaria en Aranjuez (provincia Madrid) debe contar para "Madrid",
   // aunque su población no sea literalmente "Madrid".
   return FIXED_CITIES.map((c) => {
+    // "includes" en vez de "===": algunas provincias vienen del geocoding
+    // de Google con prefijo en inglés ("Province of Málaga" en vez de
+    // "Málaga"), y con la comparación exacta esas inmobiliarias no contaban
+    // para nada -- la ciudad se mostraba con 0 aunque sí tuviera resultados.
+    const provinceNeedle = c.province.trim().toLowerCase();
     // Solo cuenta inmobiliarias con ubicación fijada: son las que realmente
     // van a aparecer en los resultados filtrados por esta ciudad.
     const count = agencies.filter(
-      (a) => a.lat != null && a.lng != null && a.provincia.trim().toLowerCase() === c.province.trim().toLowerCase(),
+      (a) => a.lat != null && a.lng != null && a.provincia.trim().toLowerCase().includes(provinceNeedle),
     ).length;
     return { ...c, count };
   });
