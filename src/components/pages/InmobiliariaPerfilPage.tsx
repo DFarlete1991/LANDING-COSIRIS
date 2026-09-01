@@ -85,9 +85,12 @@ const WHY_US = [
   { icon: ShieldCheck, title: 'Verificados por Cosiris', text: 'No cualquiera aparece en el directorio — validamos cada inmobiliaria.' },
 ];
 
-function WhyUsGrid() {
+function WhyUsGrid({ fourAcross }: { fourAcross?: boolean }) {
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+    // text-left explicito: en el layout de video horizontal, el bloque que
+    // envuelve esto usa text-center para el título/descripción, y sin esto
+    // esa alineación se colaría también dentro de cada tarjeta.
+    <div className={`grid grid-cols-1 gap-5 text-left sm:grid-cols-2 ${fourAcross ? 'lg:grid-cols-4' : ''}`}>
       {WHY_US.map(({ icon: Icon, title, text }, i) => (
         <motion.div
           key={title}
@@ -140,6 +143,7 @@ function VideoCard({
   colorHex,
   posterUrl,
   onError,
+  onOrientationChange,
 }: {
   url: string;
   nombre: string;
@@ -148,6 +152,11 @@ function VideoCard({
   colorHex?: string;
   posterUrl?: string | null;
   onError?: () => void;
+  // Le avisa al bloque que envuelve el video (no a este componente: la caja
+  // del video ya se ajusta sola por CSS, ver el comentario en el <video> de
+  // abajo) para decidir el layout de la seccion -- un video horizontal deja
+  // demasiado espacio vacio en la columna angosta pensada para uno vertical.
+  onOrientationChange?: (o: VideoOrientation) => void;
 }) {
   const resolvedLogoUrl = useValidImageUrl(logoUrl);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -165,6 +174,10 @@ function VideoCard({
     fetchEmbedOrientation(embed).then((o) => { if (!cancelled) setOrientation(o); });
     return () => { cancelled = true; };
   }, [embed]);
+
+  useEffect(() => {
+    onOrientationChange?.(orientation);
+  }, [orientation, onOrientationChange]);
 
   // Se reproduce solo (en silencio, como un Reel) en cuanto entra en
   // pantalla, y se pausa al salir — así no se gasta ancho de banda de fondo
@@ -218,18 +231,21 @@ function VideoCard({
               muted={muted}
               loop
               playsInline
-              // Antes se adivinaba vertical/horizontal por JS (onLoadedMetadata)
-              // y se forzaba una caja 16:9 o 9:16 según esa lectura — si la
-              // detección fallaba o llegaba tarde (rotación de móvil, timing de
-              // carga), el vídeo vertical quedaba encajonado en la caja
-              // horizontal con franjas negras a los lados. Ahora la caja se
-              // ajusta al tamaño real del vídeo (ancho automático, alto tope)
-              // sin necesidad de adivinar nada.
+              // La caja de ESTE video se ajusta sola por CSS (ancho automático,
+              // alto tope) -- no depende de esto. onLoadedMetadata aquí solo
+              // reporta la orientación hacia arriba, para que el bloque
+              // exterior decida su layout (ver onOrientationChange).
               preload="metadata"
               poster={posterUrl ? optimizedImageUrl(posterUrl, 640) : undefined}
               className="block max-h-[70vh] w-auto max-w-full object-contain sm:max-h-[560px] sm:max-w-[640px]"
               src={url}
               onError={onError}
+              onLoadedMetadata={(e) => {
+                const v = e.currentTarget;
+                if (v.videoWidth && v.videoHeight) {
+                  setOrientation(v.videoHeight > v.videoWidth ? 'vertical' : 'horizontal');
+                }
+              }}
             />
 
             <button
@@ -1110,6 +1126,12 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
   // Si el archivo de vídeo subido falla al cargar (ej. hosting caído), se
   // oculta toda la sección en vez de dejar un reproductor negro sin vídeo.
   const [videoBroken, setVideoBroken] = useState(false);
+  // Un video horizontal deja mucho espacio vacío en la columna angosta
+  // pensada para uno vertical -- con esto el bloque de "por qué elegirnos"
+  // cambia a un layout centrado (video arriba, tarjetas en fila) solo para
+  // ese caso. Empieza en null/vertical (el layout de 2 columnas de siempre)
+  // hasta que el <video> reporte su tamaño real.
+  const [videoOrientation, setVideoOrientation] = useState<VideoOrientation>(null);
 
   const heroFotoUrl = useValidImageUrl(agency?.foto_url);
 
@@ -1380,49 +1402,68 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
           redondeada flotando dentro del contenedor — el contenido interno sí
           se alinea al mismo max-width que el resto de la página. */}
 
-      {/* Bloque 2 — por qué elegirnos + video */}
-      <section className="bg-surface">
-        <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
-          <div className={`grid grid-cols-1 gap-10 ${hasPlayableVideo ? 'lg:grid-cols-[2fr_3fr] lg:gap-16' : ''}`}>
-            {hasPlayableVideo && agency.media_presentacion_url && (
-              <div className="lg:pt-16">
-                <VideoCard
-                  url={agency.media_presentacion_url}
-                  nombre={agency.nombre_comercial}
-                  logoUrl={agency.logo_url}
-                  logoPos={agency.logo_pos}
-                  colorHex={agency.color_hex}
-                  posterUrl={heroFotoUrl}
-                  onError={() => setVideoBroken(true)}
-                />
+      {/* Bloque 2 — por qué elegirnos + video. Un video horizontal deja
+          demasiado espacio vacío en la columna angosta de 2 columnas (pensada
+          para uno vertical), así que ese caso pasa a un layout centrado:
+          video arriba, texto debajo, tarjetas en una sola fila. El video y el
+          bloque de texto son siempre los mismos dos hijos en el mismo orden
+          (solo cambian clases) para que VideoCard no se desmonte al detectar
+          la orientación y reinicie el vídeo. */}
+      {(() => {
+        const isHorizontalVideo = hasPlayableVideo && videoOrientation === 'horizontal';
+        return (
+          <section className="bg-surface">
+            <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
+              <div
+                className={
+                  isHorizontalVideo
+                    ? 'flex flex-col items-center gap-10'
+                    : `grid grid-cols-1 gap-10 ${hasPlayableVideo ? 'lg:grid-cols-[2fr_3fr] lg:gap-16' : ''}`
+                }
+              >
+                {hasPlayableVideo && agency.media_presentacion_url && (
+                  <div className={isHorizontalVideo ? 'w-full max-w-2xl' : 'lg:pt-16'}>
+                    <VideoCard
+                      url={agency.media_presentacion_url}
+                      nombre={agency.nombre_comercial}
+                      logoUrl={agency.logo_url}
+                      logoPos={agency.logo_pos}
+                      colorHex={agency.color_hex}
+                      posterUrl={heroFotoUrl}
+                      onError={() => setVideoBroken(true)}
+                      onOrientationChange={setVideoOrientation}
+                    />
+                  </div>
+                )}
+
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+                  className={isHorizontalVideo ? 'w-full max-w-3xl text-center' : undefined}
+                >
+                  <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Sobre nosotros</span>
+
+                  <h2 className="mt-5 text-[44px] font-bold leading-[110%] tracking-[-0.02em] text-[#0F172A] sm:text-[48px]">
+                    ¿Por qué vender con<br />{agency.nombre_comercial} y no<br />con otra inmobiliaria?
+                  </h2>
+
+                  <div className={`mt-6 h-1 w-16 rounded-full bg-primary ${isHorizontalVideo ? 'mx-auto' : ''}`} />
+
+                  <p className={`mt-6 max-w-[520px] text-lg leading-[170%] text-[#68707F] ${isHorizontalVideo ? 'mx-auto' : ''}`}>
+                    Combinamos experiencia local, transparencia y tecnología para ayudarte a vender mejor tu propiedad.
+                  </p>
+
+                  <div className="mt-10">
+                    <WhyUsGrid fourAcross={isHorizontalVideo} />
+                  </div>
+                </motion.div>
               </div>
-            )}
-
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-            >
-              <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Sobre nosotros</span>
-
-              <h2 className="mt-5 text-[44px] font-bold leading-[110%] tracking-[-0.02em] text-[#0F172A] sm:text-[48px]">
-                ¿Por qué vender con<br />{agency.nombre_comercial} y no<br />con otra inmobiliaria?
-              </h2>
-
-              <div className="mt-6 h-1 w-16 rounded-full bg-primary" />
-
-              <p className="mt-6 max-w-[520px] text-lg leading-[170%] text-[#68707F]">
-                Combinamos experiencia local, transparencia y tecnología para ayudarte a vender mejor tu propiedad.
-              </p>
-
-              <div className="mt-10">
-                <WhyUsGrid />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Bloque 3 — mapa a la izquierda, reseñas a la derecha */}
       <section className="bg-white">
