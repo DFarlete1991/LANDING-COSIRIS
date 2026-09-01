@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { optimizedImageUrl } from './image-optimize';
 
 // Cache a nivel de módulo: si una URL ya falló una vez (ej. la cuenta de
 // Cloudinary que aloja las fotos está caída), no hace falta reintentarla en
@@ -25,7 +26,14 @@ export function useValidImageUrl(url: string | null | undefined): string | null 
       brokenUrls.add(url);
       setBroken(true);
     };
-    img.src = url;
+    // Esta imagen nunca se pinta -- solo sirve para detectar 403/404/hosting
+    // caído -- pero al pedir la URL tal cual se bajaba el original completo
+    // (fotos de Storage de hasta 7MB) SOLO para esta comprobación, encima del
+    // fetch ya redimensionado que hace el componente vía optimizedImageUrl al
+    // renderizar de verdad. PageSpeed lo marcaba como imagen a tamaño
+    // completo sin usar. Con un ancho pequeño de sobra para validar sin
+    // duplicar el peso real.
+    img.src = optimizedImageUrl(url, 64) ?? url;
 
     return () => {
       cancelled = true;
