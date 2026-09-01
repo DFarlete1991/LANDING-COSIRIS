@@ -11,7 +11,7 @@ export function FormNavbar() {
         }}
         className="transition-transform duration-200 hover:scale-105 active:scale-95"
       >
-        <img src="/assets/logo_orange.png" alt="Cosiris" className="h-9 w-auto md:h-11" />
+        <img src="/assets/logo_orange.png" alt="Cosiris" width="380" height="170" className="h-9 w-auto md:h-11" />
       </a>
     </header>
   );

@@ -80,7 +80,7 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
           }}
           className="flex items-center hover:opacity-80 transition-opacity"
         >
-          <img src="/assets/logo_orange.png" alt="Cosiris" className="h-10 w-auto" />
+          <img src="/assets/logo_orange.png" alt="Cosiris" width="380" height="170" className="h-10 w-auto" />
         </button>
         <div className="hidden items-center gap-2 md:flex">
           {links.map((link) => (

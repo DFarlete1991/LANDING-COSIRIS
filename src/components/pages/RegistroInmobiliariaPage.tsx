@@ -612,7 +612,7 @@ export function RegistroInmobiliariaPage() {
 
         <div className="relative z-10">
           <button type="button" onClick={() => navigateTo('/')} className="inline-block">
-            <img src="/assets/logo_orange.png" alt="Cosiris" className="h-16 w-auto sm:h-20" />
+            <img src="/assets/logo_orange.png" alt="Cosiris" width="380" height="170" className="h-16 w-auto sm:h-20" />
           </button>
           <p className="mt-8 max-w-md text-sm font-medium uppercase tracking-[0.18em] text-slate-300">
             Directorio de Inmobiliarias
@@ -672,7 +672,7 @@ export function RegistroInmobiliariaPage() {
             ) : (
               <motion.div key="form" initial={{ opacity: 1 }}>
                 <div className="mb-6 space-y-3">
-                  <img src="/assets/logo_orange.png" alt="Cosiris" className="h-9 w-auto" />
+                  <img src="/assets/logo_orange.png" alt="Cosiris" width="380" height="170" className="h-9 w-auto" />
                   <h2 className="text-2xl font-extrabold leading-tight text-slate-900">Registra tu inmobiliaria</h2>
                   <p className="text-sm text-slate-600">
                     {step === 1 ? 'Cuéntanos quién eres — los revisamos y te avisamos por correo.' : 'Ahora completa el perfil que verán tus futuros leads.'}

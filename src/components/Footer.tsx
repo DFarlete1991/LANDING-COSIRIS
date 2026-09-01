@@ -75,7 +75,7 @@ export function Footer() {
 
           {/* SECTION 1 — BRAND */}
           <div className="max-w-sm">
-            <img src="/assets/logo_orange.png" alt="Cosiris" className="h-12 w-auto" />
+            <img src="/assets/logo_orange.png" alt="Cosiris" width="380" height="170" className="h-12 w-auto" />
             <p className="mt-5 text-sm leading-relaxed text-white/40">
               La red que conecta a propietarios con las mejores inmobiliarias de España.
             </p>
