@@ -212,29 +212,24 @@ function VideoCard({
             />
           </div>
         ) : (
-          <div ref={containerRef} className={`relative mx-auto overflow-hidden rounded-[16px] bg-black ${isVertical ? 'aspect-[9/16] w-full max-w-[300px]' : 'aspect-video w-full max-w-[640px]'}`}>
+          <div ref={containerRef} className="relative mx-auto w-fit max-w-full overflow-hidden rounded-[16px] bg-black">
             <video
               ref={videoRef}
               muted={muted}
               loop
               playsInline
-              // "none" nunca dispara onLoadedMetadata sin que el usuario le dé
-              // a play — así que un vídeo vertical se quedaba encajonado en la
-              // caja horizontal 16:9 (barras negras a los lados) hasta que se
-              // reproducía. "metadata" solo descarga la cabecera del archivo
-              // (unos KB), suficiente para conocer el ancho/alto real ya en
-              // la carga de la página, sin descargar el vídeo completo.
+              // Antes se adivinaba vertical/horizontal por JS (onLoadedMetadata)
+              // y se forzaba una caja 16:9 o 9:16 según esa lectura — si la
+              // detección fallaba o llegaba tarde (rotación de móvil, timing de
+              // carga), el vídeo vertical quedaba encajonado en la caja
+              // horizontal con franjas negras a los lados. Ahora la caja se
+              // ajusta al tamaño real del vídeo (ancho automático, alto tope)
+              // sin necesidad de adivinar nada.
               preload="metadata"
               poster={posterUrl ? optimizedImageUrl(posterUrl, 640) : undefined}
-              className="h-full w-full object-contain"
+              className="block max-h-[70vh] w-auto max-w-full object-contain sm:max-h-[560px] sm:max-w-[640px]"
               src={url}
               onError={onError}
-              onLoadedMetadata={(e) => {
-                const v = e.currentTarget;
-                if (v.videoWidth && v.videoHeight) {
-                  setOrientation(v.videoHeight > v.videoWidth ? 'vertical' : 'horizontal');
-                }
-              }}
             />
 
             <button
