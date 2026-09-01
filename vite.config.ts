@@ -25,6 +25,25 @@ export default defineConfig({
         main: path.resolve(__dirname, 'index.html'),
         inmobiliarias: path.resolve(__dirname, 'inmobiliarias.html'),
       },
+      output: {
+        // Sin esto, Rollup crea un chunk propio por cada icono de
+        // lucide-react compartido entre 2+ páginas lazy (dedupe automático)
+        // -- PageSpeed en móvil marcaba mas de 15 peticiones de icono de
+        // 0-1KB cada una en el árbol de dependencias, y bajo la simulación
+        // de 4G lenta cada petición hace cola por su cuenta (1.3-3.5s cada
+        // una) aunque el archivo pese casi nada.
+        //
+        // OJO: no se amplió esto a src/lib o src/hooks a proposito -- ya se
+        // probo y arrastraba de rebote el cliente de Supabase y parte de
+        // Google Maps hacia este mismo chunk, y como main.js lo importa de
+        // forma estatica (no lazy), ese chunk pasa a cargarse SIEMPRE en
+        // cualquier pagina -- deshaciendo el diferido de Maps de este mismo
+        // dia. lucide-react es seguro de agrupar porque no tiene ese
+        // problema: son solo iconos, sin conexion con Supabase/Maps/three.js.
+        manualChunks(id) {
+          if (id.includes('node_modules/lucide-react')) return 'vendor-icons';
+        },
+      },
     },
   },
   server: {
