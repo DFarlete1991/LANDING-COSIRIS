@@ -85,12 +85,9 @@ const WHY_US = [
   { icon: ShieldCheck, title: 'Verificados por Cosiris', text: 'No cualquiera aparece en el directorio — validamos cada inmobiliaria.' },
 ];
 
-function WhyUsGrid({ fourAcross }: { fourAcross?: boolean }) {
+function WhyUsGrid() {
   return (
-    // text-left explicito: en el layout de video horizontal, el bloque que
-    // envuelve esto usa text-center para el título/descripción, y sin esto
-    // esa alineación se colaría también dentro de cada tarjeta.
-    <div className={`grid grid-cols-1 gap-5 text-left sm:grid-cols-2 ${fourAcross ? 'lg:grid-cols-4' : ''}`}>
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
       {WHY_US.map(({ icon: Icon, title, text }, i) => (
         <motion.div
           key={title}
@@ -143,7 +140,6 @@ function VideoCard({
   colorHex,
   posterUrl,
   onError,
-  onOrientationChange,
 }: {
   url: string;
   nombre: string;
@@ -152,11 +148,6 @@ function VideoCard({
   colorHex?: string;
   posterUrl?: string | null;
   onError?: () => void;
-  // Le avisa al bloque que envuelve el video (no a este componente: la caja
-  // del video ya se ajusta sola por CSS, ver el comentario en el <video> de
-  // abajo) para decidir el layout de la seccion -- un video horizontal deja
-  // demasiado espacio vacio en la columna angosta pensada para uno vertical.
-  onOrientationChange?: (o: VideoOrientation) => void;
 }) {
   const resolvedLogoUrl = useValidImageUrl(logoUrl);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -174,16 +165,6 @@ function VideoCard({
     fetchEmbedOrientation(embed).then((o) => { if (!cancelled) setOrientation(o); });
     return () => { cancelled = true; };
   }, [embed]);
-
-  useEffect(() => {
-    // Solo se reporta un valor conocido -- si el bloque exterior desmonta y
-    // vuelve a montar este componente en otra rama de layout al detectar
-    // "horizontal", la nueva instancia arrancaría en null y ese null
-    // rebotaría hacia arriba deshaciendo la decisión que la hizo montarse
-    // ahí, en un ciclo. Como el valor real es el mismo, no pasa nada por
-    // no re-reportar el null intermedio.
-    if (orientation) onOrientationChange?.(orientation);
-  }, [orientation, onOrientationChange]);
 
   // Se reproduce solo (en silencio, como un Reel) en cuanto entra en
   // pantalla, y se pausa al salir — así no se gasta ancho de banda de fondo
@@ -237,21 +218,14 @@ function VideoCard({
               muted={muted}
               loop
               playsInline
-              // La caja de ESTE video se ajusta sola por CSS (ancho automático,
-              // alto tope) -- no depende de esto. onLoadedMetadata aquí solo
-              // reporta la orientación hacia arriba, para que el bloque
-              // exterior decida su layout (ver onOrientationChange).
+              // La caja de este video se ajusta sola por CSS (ancho
+              // automático, alto tope) según su tamaño real -- sin adivinar
+              // la orientación de antemano.
               preload="metadata"
               poster={posterUrl ? optimizedImageUrl(posterUrl, 640) : undefined}
               className="block max-h-[70vh] w-auto max-w-full object-contain sm:max-h-[560px] sm:max-w-[640px]"
               src={url}
               onError={onError}
-              onLoadedMetadata={(e) => {
-                const v = e.currentTarget;
-                if (v.videoWidth && v.videoHeight) {
-                  setOrientation(v.videoHeight > v.videoWidth ? 'vertical' : 'horizontal');
-                }
-              }}
             />
 
             <button
@@ -1138,12 +1112,6 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
   // Si el archivo de vídeo subido falla al cargar (ej. hosting caído), se
   // oculta toda la sección en vez de dejar un reproductor negro sin vídeo.
   const [videoBroken, setVideoBroken] = useState(false);
-  // Un video horizontal deja mucho espacio vacío en la columna angosta
-  // pensada para uno vertical -- con esto el bloque de "por qué elegirnos"
-  // cambia a un layout centrado (video arriba, tarjetas en fila) solo para
-  // ese caso. Empieza en null/vertical (el layout de 2 columnas de siempre)
-  // hasta que el <video> reporte su tamaño real.
-  const [videoOrientation, setVideoOrientation] = useState<VideoOrientation>(null);
 
   const heroFotoUrl = useValidImageUrl(agency?.foto_url);
 
@@ -1414,124 +1382,49 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
           redondeada flotando dentro del contenedor — el contenido interno sí
           se alinea al mismo max-width que el resto de la página. */}
 
-      {/* Bloque 2 — por qué elegirnos + video. Un video horizontal deja
-          demasiado espacio vacío en la columna angosta de 2 columnas (pensada
-          para uno vertical) y encima queda encogido a un ancho de columna
-          de texto cuando su propia forma pide más aire. Para ese caso el
-          orden cambia: título arriba (da contexto primero), el video como
-          pieza ancha y central (es el contenido único de cada inmobiliaria,
-          se gana el protagonismo), tarjetas en fila al final como cierre.
-          El vertical no se toca.
-
-          isHorizontalVideo alterna qué rama de JSX se monta, así que
-          VideoCard SÍ se desmonta y remonta al detectarse "horizontal" (no
-          hay forma limpia de compartir una sola instancia entre un grid de
-          2 columnas y un layout apilado sin duplicar media código). Esto es
-          seguro: el <video> usa preload="metadata" (solo cabecera, no el
-          archivo completo) y no arranca a reproducirse hasta que el
-          IntersectionObserver de VideoCard lo detecta en pantalla -- la
-          detección de orientación siempre llega antes de que haya algo
-          reproduciéndose que remontar interrumpiría. */}
-      {(() => {
-        const isHorizontalVideo = hasPlayableVideo && videoOrientation === 'horizontal';
-
-        if (isHorizontalVideo) {
-          return (
-            <section className="bg-surface">
-              <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
-                <motion.div
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-60px' }}
-                  transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                  className="mx-auto max-w-2xl text-center"
-                >
-                  <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Sobre nosotros</span>
-
-                  <h2 className="mt-5 text-[44px] font-bold leading-[110%] tracking-[-0.02em] text-[#0F172A] sm:text-[48px]">
-                    ¿Por qué vender con<br />{agency.nombre_comercial} y no<br />con otra inmobiliaria?
-                  </h2>
-
-                  <div className="mx-auto mt-6 h-1 w-16 rounded-full bg-primary" />
-
-                  <p className="mx-auto mt-6 text-lg leading-[170%] text-[#68707F]">
-                    Combinamos experiencia local, transparencia y tecnología para ayudarte a vender mejor tu propiedad.
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-60px' }}
-                  transition={{ duration: 0.6, delay: 0.1, ease: [0.19, 1, 0.22, 1] }}
-                  className="mx-auto mt-12 w-full max-w-4xl"
-                >
-                  <VideoCard
-                    url={agency.media_presentacion_url!}
-                    nombre={agency.nombre_comercial}
-                    logoUrl={agency.logo_url}
-                    logoPos={agency.logo_pos}
-                    colorHex={agency.color_hex}
-                    posterUrl={heroFotoUrl}
-                    onError={() => setVideoBroken(true)}
-                    onOrientationChange={setVideoOrientation}
-                  />
-                </motion.div>
-
-                <div className="mt-16">
-                  <WhyUsGrid fourAcross />
-                </div>
+      {/* Bloque 2 — por qué elegirnos + video */}
+      <section className="bg-surface">
+        <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
+          <div className={`grid grid-cols-1 gap-10 ${hasPlayableVideo ? 'lg:grid-cols-[2fr_3fr] lg:gap-16' : ''}`}>
+            {hasPlayableVideo && agency.media_presentacion_url && (
+              <div className="lg:pt-16">
+                <VideoCard
+                  url={agency.media_presentacion_url}
+                  nombre={agency.nombre_comercial}
+                  logoUrl={agency.logo_url}
+                  logoPos={agency.logo_pos}
+                  colorHex={agency.color_hex}
+                  posterUrl={heroFotoUrl}
+                  onError={() => setVideoBroken(true)}
+                />
               </div>
-            </section>
-          );
-        }
+            )}
 
-        return (
-          <section className="bg-surface">
-            <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
-              <div className={`grid grid-cols-1 gap-10 ${hasPlayableVideo ? 'lg:grid-cols-[2fr_3fr] lg:gap-16' : ''}`}>
-                {hasPlayableVideo && agency.media_presentacion_url && (
-                  <div className="lg:pt-16">
-                    <VideoCard
-                      url={agency.media_presentacion_url}
-                      nombre={agency.nombre_comercial}
-                      logoUrl={agency.logo_url}
-                      logoPos={agency.logo_pos}
-                      colorHex={agency.color_hex}
-                      posterUrl={heroFotoUrl}
-                      onError={() => setVideoBroken(true)}
-                      onOrientationChange={setVideoOrientation}
-                    />
-                  </div>
-                )}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+            >
+              <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Sobre nosotros</span>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-60px' }}
-                  transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                >
-                  <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Sobre nosotros</span>
+              <h2 className="mt-5 text-[44px] font-bold leading-[110%] tracking-[-0.02em] text-[#0F172A] sm:text-[48px]">
+                ¿Por qué vender con<br />{agency.nombre_comercial} y no<br />con otra inmobiliaria?
+              </h2>
 
-                  <h2 className="mt-5 text-[44px] font-bold leading-[110%] tracking-[-0.02em] text-[#0F172A] sm:text-[48px]">
-                    ¿Por qué vender con<br />{agency.nombre_comercial} y no<br />con otra inmobiliaria?
-                  </h2>
+              <div className="mt-6 h-1 w-16 rounded-full bg-primary" />
 
-                  <div className="mt-6 h-1 w-16 rounded-full bg-primary" />
+              <p className="mt-6 max-w-[520px] text-lg leading-[170%] text-[#68707F]">
+                Combinamos experiencia local, transparencia y tecnología para ayudarte a vender mejor tu propiedad.
+              </p>
 
-                  <p className="mt-6 max-w-[520px] text-lg leading-[170%] text-[#68707F]">
-                    Combinamos experiencia local, transparencia y tecnología para ayudarte a vender mejor tu propiedad.
-                  </p>
-
-                  <div className="mt-10">
-                    <WhyUsGrid />
-                  </div>
-                </motion.div>
+              <div className="mt-10">
+                <WhyUsGrid />
               </div>
-            </div>
-          </section>
-        );
-      })()}
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       {/* Bloque 3 — mapa a la izquierda, reseñas a la derecha */}
       <section ref={mapSectionRef} className="bg-white">
