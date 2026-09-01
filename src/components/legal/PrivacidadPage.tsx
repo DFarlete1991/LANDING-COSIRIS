@@ -9,7 +9,14 @@ export function PrivacidadPage() {
 
       <section>
         <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">RESPONSABLE DEL TRATAMIENTO DE LOS DATOS PERSONALES</h2>
-        <p>El responsable del tratamiento de los datos personales que el usuario facilite al acceder y utilizar el sitio web, es, en calidad de propietario, CONSULTORA NEGOCIO COSIRIS, S.L., con C.I.F. núm. B-44913903, con domicilio social a estos efectos en Carrer Mossent Jacint Verdguer, número 4, La Senia, Tarragona, C.P. 43560. Dirección de correo electrónico de contacto comercial@cosiris.com, inscrita en el Registro Mercantil de [XXXXXX] en el tomo [XXXX] general, Libro [XXX], Folio [XXX], Hoja [XXXXXX], Inscripción [XXX].</p>
+        {/* TODO(cosiris): sustituir por los datos reales de inscripcion registral
+            (Registro Mercantil de que provincia, tomo, libro, folio, hoja e
+            inscripcion) antes de publicar. Se retiro el marcador [XXXXXX] que
+            llevaba publicado sin rellenar — un placeholder sin completar en un
+            documento legal en produccion incumple el art. 10.1.b) LSSI igual
+            que un dato inventado, asi que mientras no se confirme el dato real
+            esta frase se omite en vez de fabricar un tomo/folio falso. */}
+        <p>El responsable del tratamiento de los datos personales que el usuario facilite al acceder y utilizar el sitio web, es, en calidad de propietario, CONSULTORA NEGOCIO COSIRIS, S.L., con C.I.F. núm. B-44913903, con domicilio social a estos efectos en Carrer Mossèn Jacint Verdaguer, número 4, La Sènia, Tarragona, C.P. 43560. Dirección de correo electrónico de contacto comercial@cosiris.com.</p>
         <p>CONSULTORA NEGOCIO COSIRIS, S.L.. se compromete a aplicar las medidas de seguridad informática previstas en la normativa citada previamente, con el objetivo de impedir el acceso o uso indebido de los datos, su manipulación, deterioro o pérdida.</p>
       </section>
 
@@ -39,6 +46,13 @@ export function PrivacidadPage() {
         <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">COMUNICACIÓN DE DATOS</h2>
         <p>Con carácter general CONSULTORA NEGOCIO COSIRIS, S.L. no comunicará estos datos personales a terceros, con la salvedad de que la prestación de un servicio implique la necesidad de una relación contractual con un encargado de tratamiento y ello sea estrictamente necesario para gestionar y mantener la relación entre el usuario y la mencionada empresa, previa autorización expresa por parte del usuario. Esto se hará sólo durante el tiempo imprescindible para posibilitar la ejecución del contrato de encargo, y en las mismas condiciones y con las mismas responsabilidad que se le exigen al responsable. Una vez finalizado el encargo, el encargado del tratamiento devolverá al Responsable los datos personales y suprimirá cualquier copia de la que disponga.</p>
         <p>Por otra parte, sólo tendrán derecho a acceder a estos datos personales los terceros con los que CONSULTORA NEGOCIO COSIRIS, S.L. tenga una obligación legal o contractual de facilitarlos, entre los que se incluyen, por ejemplo, el Defensor del Pueblo y Jueces y Tribunales interesados en los procedimientos relacionados con las reclamaciones presentadas.</p>
+        <p>Además, para poder gestionar su solicitud, CONSULTORA NEGOCIO COSIRIS, S.L. se apoya en los siguientes encargados de tratamiento, con quienes tiene suscrito el correspondiente contrato de encargo:</p>
+        <ul className="list-disc pl-6 space-y-2">
+          <li><strong>n8n (alojado en infraestructura de Hostinger):</strong> automatiza el envío de su solicitud a nuestro equipo comercial y, si procede, a WhatsApp Business.</li>
+          <li><strong>Meta Platforms Ireland Ltd. (WhatsApp Business):</strong> utilizado para contactarle por WhatsApp cuando usted lo solicita a través de un formulario.</li>
+          <li><strong>Supabase Inc.:</strong> aloja la base de datos con la que gestionamos el directorio de inmobiliarias y las solicitudes recibidas.</li>
+          <li><strong>Google Ireland Limited y Meta Platforms Ireland Ltd.:</strong> únicamente si usted ha dado su consentimiento a las cookies de analítica o publicidad — ver la <a href="/cookies" className="underline hover:text-[#FF8000]">Política de Cookies</a>.</li>
+        </ul>
       </section>
 
       <section>

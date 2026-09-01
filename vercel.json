@@ -1,30 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/webhook",
-      "destination": "https://n8n.srv1123447.hstgr.cloud/webhook/8383a34e-98f6-45b0-adda-77a6cdaf8abe"
-    },
-    {
-      "source": "/api/webhook-captacion",
-      "destination": "https://n8n.srv1123447.hstgr.cloud/webhook/d0652f82-339e-44be-b627-6d03353c2037"
-    },
-    {
-      "source": "/api/webhook-valoracion",
-      "destination": "https://n8n.srv1123447.hstgr.cloud/webhook/a775df38-0b86-474d-8fad-067049def95a"
-    },
-    {
-      "source": "/inmobiliarias",
-      "destination": "/inmobiliarias.html"
-    },
-    {
-      "source": "/inmobiliarias/(.*)",
-      "destination": "/inmobiliarias.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -54,6 +28,32 @@
           "value": "max-age=63072000; includeSubDomains; preload"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/webhook",
+      "destination": "https://n8n.srv1123447.hstgr.cloud/webhook/8383a34e-98f6-45b0-adda-77a6cdaf8abe"
+    },
+    {
+      "source": "/api/webhook-captacion",
+      "destination": "https://n8n.srv1123447.hstgr.cloud/webhook/d0652f82-339e-44be-b627-6d03353c2037"
+    },
+    {
+      "source": "/api/webhook-valoracion",
+      "destination": "https://n8n.srv1123447.hstgr.cloud/webhook/a775df38-0b86-474d-8fad-067049def95a"
+    },
+    {
+      "source": "/inmobiliarias",
+      "destination": "/inmobiliarias.html"
+    },
+    {
+      "source": "/inmobiliarias/(.*)",
+      "destination": "/inmobiliarias.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

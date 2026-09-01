@@ -1,4 +1,5 @@
 import { Instagram, Linkedin, Youtube, ChevronRight } from 'lucide-react';
+import { COOKIE_PREFERENCES_EVENT } from './CookieConsentBanner';
 
 const socialLinks = [
   { icon: Instagram, href: 'https://www.instagram.com/cosiris_marketinginmobiliario', label: 'Instagram' },
@@ -124,6 +125,17 @@ export function Footer() {
                       </a>
                     </li>
                   ))}
+                  {group.title === 'Legal' && (
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => window.dispatchEvent(new Event(COOKIE_PREFERENCES_EVENT))}
+                        className="relative text-left text-sm text-white/50 transition-colors duration-200 hover:text-white/90"
+                      >
+                        Configurar cookies
+                      </button>
+                    </li>
+                  )}
                 </ul>
               </div>
             ))}

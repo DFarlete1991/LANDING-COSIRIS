@@ -1,9 +1,11 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import ContactModal from './components/ContactModal';
+import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { InmobiliariasProvider } from './context/InmobiliariasContext';
 import { parseAgencyProfilePath } from '@/lib/agency-url';
 import { captureAttribution } from '@/lib/utm';
+import { applyStoredConsentOnLoad } from '@/lib/cookieConsent';
 
 // Cada página se descarga solo cuando se visita esa ruta, en vez de que
 // TODAS (mapas de Leaflet, three.js, formularios de registro, etc.) vayan
@@ -93,6 +95,7 @@ export default function App() {
   // puedan adjuntarlos aunque el envío ocurra varias páginas después.
   useEffect(() => {
     captureAttribution();
+    applyStoredConsentOnLoad();
   }, []);
 
   useEffect(() => {
@@ -109,18 +112,24 @@ export default function App() {
   // "planes"/"registro" se interpretarían como un id de inmobiliaria.
   if (currentPath === '/inmobiliarias/planes') {
     return (
-      <Suspense fallback={null}>
-        <PlanesInmobiliariasPage />
+      <>
+        <Suspense fallback={null}>
+          <PlanesInmobiliariasPage />
+        </Suspense>
         <ContactModal />
-      </Suspense>
+        <CookieConsentBanner />
+      </>
     );
   }
 
   if (currentPath === '/inmobiliarias/registro') {
     return (
-      <Suspense fallback={null}>
-        <RegistroInmobiliariaPage />
-      </Suspense>
+      <>
+        <Suspense fallback={null}>
+          <RegistroInmobiliariaPage />
+        </Suspense>
+        <CookieConsentBanner />
+      </>
     );
   }
 
@@ -131,6 +140,7 @@ export default function App() {
           <ValorarPropiedadPage />
         </Suspense>
         <ContactModal />
+        <CookieConsentBanner />
       </InmobiliariasProvider>
     );
   }
@@ -150,6 +160,7 @@ export default function App() {
           )}
         </Suspense>
         <ContactModal />
+        <CookieConsentBanner />
       </InmobiliariasProvider>
     );
   }
@@ -164,6 +175,7 @@ export default function App() {
           <InmobiliariaPerfilPage id={agencyId} />
         </Suspense>
         <ContactModal />
+        <CookieConsentBanner />
       </InmobiliariasProvider>
     );
   }
@@ -175,16 +187,20 @@ export default function App() {
           <BuscadorInmobiliariasPage />
         </Suspense>
         <ContactModal />
+        <CookieConsentBanner />
       </InmobiliariasProvider>
     );
   }
 
   const StandalonePage = standaloneRoutes[currentPath];
   if (StandalonePage) return (
-    <Suspense fallback={null}>
-      <StandalonePage />
+    <>
+      <Suspense fallback={null}>
+        <StandalonePage />
+      </Suspense>
       <ContactModal />
-    </Suspense>
+      <CookieConsentBanner />
+    </>
   );
 
   return (
@@ -211,6 +227,7 @@ export default function App() {
       </AnimatePresence>
 
       <ContactModal />
+      <CookieConsentBanner />
     </main>
   );
 }

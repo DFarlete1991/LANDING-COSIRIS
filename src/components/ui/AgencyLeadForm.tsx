@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { getAttributionFields, getAttributionSummaryLine } from '@/lib/utm';
+import { ConsentCheckbox } from './ConsentCheckbox';
 
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:border-[#FF8000] focus:ring-4 focus:ring-[#FF8000]/15';
@@ -81,6 +82,8 @@ export function AgencyLeadForm({
   const [nombre, setNombre] = useState('');
   const [telefono, setTelefono] = useState('');
   const [email, setEmail] = useState('');
+  const [consent, setConsent] = useState(false);
+  const [consentError, setConsentError] = useState('');
 
   const advanceAfter = (next: number, delay = 280) => {
     if (isAutoAdvancing) return;
@@ -109,8 +112,13 @@ export function AgencyLeadForm({
       setErrorMessage('Introduce tu nombre y al menos un teléfono o email.');
       return;
     }
+    if (!consent) {
+      setConsentError('Debes aceptar la Política de Privacidad para continuar.');
+      return;
+    }
 
     setErrorMessage('');
+    setConsentError('');
     setPhase('loading');
 
     const mensaje = [
@@ -295,6 +303,13 @@ export function AgencyLeadForm({
                 </motion.p>
               )}
             </AnimatePresence>
+
+            <ConsentCheckbox
+              id="agency-lead-consent"
+              checked={consent}
+              onChange={(v) => { setConsent(v); if (v) setConsentError(''); }}
+              error={consentError}
+            />
 
             <div className="flex gap-2">
               <button type="button" onClick={() => setStep(4)} disabled={phase === 'loading'} className="rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-xs font-bold text-slate-500 transition hover:bg-slate-50 disabled:opacity-60">
