@@ -59,8 +59,7 @@ export function CookieConsentBanner() {
           <div className="w-full max-w-2xl rounded-xl border border-slate-200 bg-white p-5 shadow-[0_24px_64px_-12px_rgba(0,0,0,0.35)]">
             <p className="text-sm leading-relaxed text-slate-700">
               Usamos cookies técnicas (siempre activas) y, si nos das permiso, cookies de
-              analítica (Google Tag Manager / Google Analytics / Google Ads) y de
-              publicidad (Meta Pixel). Puedes cambiar tu elección cuando quieras desde
+              analítica y publicidad. Puedes cambiar tu elección cuando quieras desde
               "Configurar cookies" en el pie de página. Más info en nuestra{' '}
               <a href="/cookies" target="_blank" rel="noopener noreferrer" className="underline hover:text-[#FF8000]">
                 Política de Cookies
