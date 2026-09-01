@@ -100,7 +100,14 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
             Acceso Clientes
           </Button>
         </div>
-        <Button size="icon" variant="outline" onClick={() => setOpen(!open)} className="md:hidden">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => setOpen(!open)}
+          className="md:hidden"
+          aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={open}
+        >
           <MenuToggleIcon open={open} className="size-5" duration={300} />
         </Button>
       </nav>

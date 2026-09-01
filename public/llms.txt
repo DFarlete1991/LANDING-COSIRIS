@@ -1,0 +1,26 @@
+# Cosiris
+
+> Cosiris conecta a propietarios que quieren vender su vivienda en España con inmobiliarias profesionales verificadas de su zona, y ayuda a esas inmobiliarias a captar y gestionar leads de forma automatizada.
+
+## Para propietarios
+
+- [Vende tu vivienda](https://cosiris.com/vendetuvivienda): valoración gratuita y conexión con la inmobiliaria adecuada de tu zona.
+- [Valora tu propiedad](https://cosiris.com/valoratuvivienda): formulario rápido para particulares que quieren vender.
+- [Directorio de inmobiliarias](https://cosiris.com/inmobiliarias): busca inmobiliarias verificadas por ciudad en toda España.
+
+## Para inmobiliarias
+
+- [Servicios](https://cosiris.com/servicios): captación, marketing digital y automatización para inmobiliarias.
+- [Regístrate en el directorio](https://cosiris.com/inmobiliarias/registro): aparece en el buscador de Cosiris.
+- [Planes](https://cosiris.com/inmobiliarias/planes): condiciones para inmobiliarias asociadas.
+
+## Sobre Cosiris
+
+- [Quiénes somos](https://cosiris.com/nosotros): qué es Cosiris y cómo trabaja.
+
+## Legal
+
+- [Política de privacidad](https://cosiris.com/privacidad)
+- [Política de cookies](https://cosiris.com/cookies)
+- [Términos y condiciones](https://cosiris.com/terminos-condiciones)
+- [Aviso legal](https://cosiris.com/aviso-legal)
