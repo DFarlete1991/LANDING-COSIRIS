@@ -1450,16 +1450,24 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
             </motion.div>
           )}
 
-          <div className={`grid grid-cols-1 gap-10 ${agency.lat != null && agency.lng != null ? 'lg:grid-cols-[3fr_2fr] lg:gap-[72px]' : ''}`}>
-            {agency.lat != null && agency.lng != null && (
-              <div>
-                <LocationSection agency={agency} searchPoint={searchPoint} displayCity={displayCity} />
+          {/* LocationSection y ReviewsList son quienes de verdad llaman a
+              useJsApiLoader (Maps JS SDK, 152KB) -- sin este guard se
+              descargaba en cuanto cargaba la página, sin importar si la
+              visita llegaba a bajar hasta este bloque. mapSectionInView ya
+              existe (ver el globo 3D más arriba) y dispara con 400px de
+              antelación, así que no hay pop-in visible al hacer scroll. */}
+          {mapSectionInView && (
+            <div className={`grid grid-cols-1 gap-10 ${agency.lat != null && agency.lng != null ? 'lg:grid-cols-[3fr_2fr] lg:gap-[72px]' : ''}`}>
+              {agency.lat != null && agency.lng != null && (
+                <div>
+                  <LocationSection agency={agency} searchPoint={searchPoint} displayCity={displayCity} />
+                </div>
+              )}
+              <div className="flex">
+                <ReviewsList agency={agency} />
               </div>
-            )}
-            <div className="flex">
-              <ReviewsList agency={agency} />
             </div>
-          </div>
+          )}
         </div>
       </section>
 
