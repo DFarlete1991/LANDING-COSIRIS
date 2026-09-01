@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { AgencyNetworkIllustration } from '../../ui/AgencyNetworkIllustration';
 import { AgencySearchBar, type SearchSuggestion } from '../../ui/AgencySearchBar';
-import { getAllCitiesWithCounts, getNearbyCities } from '@/data/fixed-cities';
+import { getAllCitiesWithCounts } from '@/data/fixed-cities';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { useInmobiliarias } from '@/context/InmobiliariasContext';
 import { navigateTo, rememberDirectoryUrl } from '@/lib/utils';
@@ -166,7 +166,13 @@ function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica;
 
 export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSuggestion) => void }) {
   const { agencies } = useInmobiliarias();
-  const allCities = useMemo(() => getAllCitiesWithCounts(agencies), [agencies]);
+  // Solo ciudades con inmobiliarias reales -- un botón que lleva a un
+  // directorio vacío (o, como pasaba antes, a un toast que ni se llegaba a
+  // pintar) se percibe como un botón roto y le resta confianza al resto.
+  const allCities = useMemo(
+    () => getAllCitiesWithCounts(agencies).filter((c) => c.count > 0),
+    [agencies],
+  );
 
   const VIDEO_COUNT = 5;
   const agenciesWithMedia = useMemo(() => agencies.filter(hasShowcaseMedia), [agencies]);
@@ -194,20 +200,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
     return result;
   }, [shuffledForVideo, videoStartIdx]);
 
-  const [toast, setToast] = useState<{ city: string; nearby: string[] } | null>(null);
-
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 5000);
-    return () => clearTimeout(t);
-  }, [toast]);
-
   const handleCityClick = (c: (typeof allCities)[number]) => {
-    if (c.count === 0) {
-      const nearby = getNearbyCities(c.city);
-      setToast({ city: c.city, nearby });
-      return;
-    }
     onSearch({ label: `${c.city}, ${c.province}`, lat: c.lat, lng: c.lng });
   };
 
