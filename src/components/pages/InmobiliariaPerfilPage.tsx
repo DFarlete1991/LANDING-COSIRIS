@@ -176,7 +176,13 @@ function VideoCard({
   }, [embed]);
 
   useEffect(() => {
-    onOrientationChange?.(orientation);
+    // Solo se reporta un valor conocido -- si el bloque exterior desmonta y
+    // vuelve a montar este componente en otra rama de layout al detectar
+    // "horizontal", la nueva instancia arrancaría en null y ese null
+    // rebotaría hacia arriba deshaciendo la decisión que la hizo montarse
+    // ahí, en un ciclo. Como el valor real es el mismo, no pasa nada por
+    // no re-reportar el null intermedio.
+    if (orientation) onOrientationChange?.(orientation);
   }, [orientation, onOrientationChange]);
 
   // Se reproduce solo (en silencio, como un Reel) en cuanto entra en
@@ -1410,25 +1416,82 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
       {/* Bloque 2 — por qué elegirnos + video. Un video horizontal deja
           demasiado espacio vacío en la columna angosta de 2 columnas (pensada
-          para uno vertical), así que ese caso pasa a un layout centrado:
-          video arriba, texto debajo, tarjetas en una sola fila. El video y el
-          bloque de texto son siempre los mismos dos hijos en el mismo orden
-          (solo cambian clases) para que VideoCard no se desmonte al detectar
-          la orientación y reinicie el vídeo. */}
+          para uno vertical) y encima queda encogido a un ancho de columna
+          de texto cuando su propia forma pide más aire. Para ese caso el
+          orden cambia: título arriba (da contexto primero), el video como
+          pieza ancha y central (es el contenido único de cada inmobiliaria,
+          se gana el protagonismo), tarjetas en fila al final como cierre.
+          El vertical no se toca.
+
+          isHorizontalVideo alterna qué rama de JSX se monta, así que
+          VideoCard SÍ se desmonta y remonta al detectarse "horizontal" (no
+          hay forma limpia de compartir una sola instancia entre un grid de
+          2 columnas y un layout apilado sin duplicar media código). Esto es
+          seguro: el <video> usa preload="metadata" (solo cabecera, no el
+          archivo completo) y no arranca a reproducirse hasta que el
+          IntersectionObserver de VideoCard lo detecta en pantalla -- la
+          detección de orientación siempre llega antes de que haya algo
+          reproduciéndose que remontar interrumpiría. */}
       {(() => {
         const isHorizontalVideo = hasPlayableVideo && videoOrientation === 'horizontal';
+
+        if (isHorizontalVideo) {
+          return (
+            <section className="bg-surface">
+              <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+                  className="mx-auto max-w-2xl text-center"
+                >
+                  <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Sobre nosotros</span>
+
+                  <h2 className="mt-5 text-[44px] font-bold leading-[110%] tracking-[-0.02em] text-[#0F172A] sm:text-[48px]">
+                    ¿Por qué vender con<br />{agency.nombre_comercial} y no<br />con otra inmobiliaria?
+                  </h2>
+
+                  <div className="mx-auto mt-6 h-1 w-16 rounded-full bg-primary" />
+
+                  <p className="mx-auto mt-6 text-lg leading-[170%] text-[#68707F]">
+                    Combinamos experiencia local, transparencia y tecnología para ayudarte a vender mejor tu propiedad.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.6, delay: 0.1, ease: [0.19, 1, 0.22, 1] }}
+                  className="mx-auto mt-12 w-full max-w-4xl"
+                >
+                  <VideoCard
+                    url={agency.media_presentacion_url!}
+                    nombre={agency.nombre_comercial}
+                    logoUrl={agency.logo_url}
+                    logoPos={agency.logo_pos}
+                    colorHex={agency.color_hex}
+                    posterUrl={heroFotoUrl}
+                    onError={() => setVideoBroken(true)}
+                    onOrientationChange={setVideoOrientation}
+                  />
+                </motion.div>
+
+                <div className="mt-16">
+                  <WhyUsGrid fourAcross />
+                </div>
+              </div>
+            </section>
+          );
+        }
+
         return (
           <section className="bg-surface">
             <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
-              <div
-                className={
-                  isHorizontalVideo
-                    ? 'flex flex-col items-center gap-10'
-                    : `grid grid-cols-1 gap-10 ${hasPlayableVideo ? 'lg:grid-cols-[2fr_3fr] lg:gap-16' : ''}`
-                }
-              >
+              <div className={`grid grid-cols-1 gap-10 ${hasPlayableVideo ? 'lg:grid-cols-[2fr_3fr] lg:gap-16' : ''}`}>
                 {hasPlayableVideo && agency.media_presentacion_url && (
-                  <div className={isHorizontalVideo ? 'w-full max-w-2xl' : 'lg:pt-16'}>
+                  <div className="lg:pt-16">
                     <VideoCard
                       url={agency.media_presentacion_url}
                       nombre={agency.nombre_comercial}
@@ -1447,7 +1510,6 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-60px' }}
                   transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                  className={isHorizontalVideo ? 'w-full max-w-3xl text-center' : undefined}
                 >
                   <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Sobre nosotros</span>
 
@@ -1455,14 +1517,14 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                     ¿Por qué vender con<br />{agency.nombre_comercial} y no<br />con otra inmobiliaria?
                   </h2>
 
-                  <div className={`mt-6 h-1 w-16 rounded-full bg-primary ${isHorizontalVideo ? 'mx-auto' : ''}`} />
+                  <div className="mt-6 h-1 w-16 rounded-full bg-primary" />
 
-                  <p className={`mt-6 max-w-[520px] text-lg leading-[170%] text-[#68707F] ${isHorizontalVideo ? 'mx-auto' : ''}`}>
+                  <p className="mt-6 max-w-[520px] text-lg leading-[170%] text-[#68707F]">
                     Combinamos experiencia local, transparencia y tecnología para ayudarte a vender mejor tu propiedad.
                   </p>
 
                   <div className="mt-10">
-                    <WhyUsGrid fourAcross={isHorizontalVideo} />
+                    <WhyUsGrid />
                   </div>
                 </motion.div>
               </div>
