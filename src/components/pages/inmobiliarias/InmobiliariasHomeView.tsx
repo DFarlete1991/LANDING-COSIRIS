@@ -93,7 +93,7 @@ function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica;
   const showProfilePhoto = !embed && !directVideoSrc && !!fotoUrl;
   const staticFallback = fotoUrl
     ?? (embed?.platform === 'youtube' ? `https://img.youtube.com/vi/${embed.id}/mqdefault.jpg` : null)
-    ?? '/assets/inmobiliarias/ciudades/madrid.jpg';
+    ?? '/assets/inmobiliarias/ciudades/madrid.webp';
 
   return (
     <motion.button
@@ -145,7 +145,7 @@ function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica;
         <video
           className="absolute inset-0 h-full w-full object-cover"
           src="/assets/inmobiliarias/hero-bg.mp4"
-          poster="/assets/inmobiliarias/ciudades/madrid.jpg"
+          poster="/assets/inmobiliarias/ciudades/madrid.webp"
           autoPlay muted loop playsInline
         />
       )}
@@ -234,8 +234,14 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           <video
             className="h-full w-full scale-125 object-cover"
             src="/assets/inmobiliarias/hero-bg.mp4"
-            poster="/assets/inmobiliarias/ciudades/madrid.jpg"
+            poster="/assets/inmobiliarias/ciudades/madrid.webp"
             autoPlay muted loop playsInline
+            // Este es el elemento de LCP de la página (PageSpeed lo señala
+            // explícitamente) -- fetchPriority alto le dice al navegador que
+            // lo baje antes que el resto de recursos no críticos. El atributo
+            // es válido en HTML pero @types/react todavía no lo tipa para
+            // <video> (sí para <img>/<link>/<script>), de ahí el cast.
+            {...({ fetchPriority: 'high' } as React.VideoHTMLAttributes<HTMLVideoElement>)}
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-black/15" />
@@ -455,7 +461,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           <video
             className="h-full w-full object-cover opacity-15"
             src="/assets/inmobiliarias/hero-bg.mp4"
-            poster="/assets/inmobiliarias/ciudades/madrid.jpg"
+            poster="/assets/inmobiliarias/ciudades/madrid.webp"
             autoPlay muted loop playsInline
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black" />

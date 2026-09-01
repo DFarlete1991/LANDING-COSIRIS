@@ -26,6 +26,13 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- El directorio de inmobiliarias (y varias otras páginas) esperan a
+         esta llamada a Supabase para tener datos reales que pintar -- estaba
+         en la ruta crítica sin preconectar (PageSpeed lo marcaba como ~300ms
+         de ahorro). %VITE_SUPABASE_URL% lo sustituye Vite en build time con
+         el valor de ese .env, así que sigue el mismo proyecto que usa la app
+         en cada entorno. -->
+    <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin />
     <!-- Cargada como preload+swap para que no bloquee el primer render: el
          <link rel="stylesheet"> normal frena el pintado hasta que responde
          fonts.googleapis.com. onload la activa como stylesheet real; el
