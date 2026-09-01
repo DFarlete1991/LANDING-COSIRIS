@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
 import {
@@ -1123,6 +1123,12 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
     return () => mq.removeEventListener('change', update);
   }, []);
 
+  // El globo del Bloque 3 (mapa/ubicación) va varias pantallas más abajo del
+  // hero -- sin esto, three.js se descargaba en cuanto show3D era true, sin
+  // importar si la visita llegaba a bajar hasta ahí.
+  const mapSectionRef = useRef<HTMLElement>(null);
+  const mapSectionInView = useInView(mapSectionRef, { once: true, margin: '400px 0px' });
+
   // Si el archivo de vídeo subido falla al cargar (ej. hosting caído), se
   // oculta toda la sección en vez de dejar un reproductor negro sin vídeo.
   const [videoBroken, setVideoBroken] = useState(false);
@@ -1466,12 +1472,15 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
       })()}
 
       {/* Bloque 3 — mapa a la izquierda, reseñas a la derecha */}
-      <section className="bg-white">
+      <section ref={mapSectionRef} className="bg-white">
         <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
           {/* El globo va en la esquina del bloque, no encima del texto — un
               detalle que casi no se nota a primer vistazo, no algo que
-              compita con el título de la sección. */}
-          {show3D && (
+              compita con el título de la sección. También en desktop, three.js
+              solo se descarga cuando este bloque está a punto de entrar en
+              pantalla (margin negativo generoso) -- si no, cualquiera que no
+              llegue a bajar hasta aquí paga igual los ~900KB de la librería. */}
+          {show3D && mapSectionInView && (
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 0.6 }}
