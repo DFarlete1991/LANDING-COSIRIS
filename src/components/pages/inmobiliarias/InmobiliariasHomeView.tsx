@@ -58,6 +58,45 @@ function hasShowcaseMedia(agency: InmobiliariaPublica): boolean {
 }
 
 /**
+ * El fondo de la sección de showcase es el mismo hero-bg.mp4 (4.2MB) que ya
+ * se descarga en el hero de arriba, pero esta sección vive muy por debajo
+ * del pliegue -- sin este gate, el <video> se montaba de entrada y el
+ * navegador lo descargaba entero aunque el usuario nunca llegara a hacer
+ * scroll hasta ahí (PageSpeed lo contaba dos veces en "carga útil de red").
+ * rootMargin adelanta el montaje un poco antes de que entre en pantalla
+ * para que no se note el pop-in del vídeo.
+ */
+function LazyBgVideo({ className }: { className: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setShouldLoad(true); io.disconnect(); } },
+      { rootMargin: '200px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className={className}>
+      {shouldLoad && (
+        <video
+          className="h-full w-full object-cover"
+          src="/assets/inmobiliarias/hero-bg.mp4"
+          poster="/assets/inmobiliarias/ciudades/madrid.webp"
+          preload="none"
+          autoPlay muted loop playsInline
+        />
+      )}
+    </div>
+  );
+}
+
+/**
  * Cada tarjeta decide por sí misma, con su propio IntersectionObserver, si
  * está visible en pantalla — antes solo la primera tarjeta del grupo
  * reproducía vídeo de verdad (el resto se quedaba en foto fija) para no
@@ -458,12 +497,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
       {agenciesWithMedia.length > 0 && (
       <section className="relative overflow-hidden bg-black py-14 sm:py-28">
         <div className="absolute inset-0">
-          <video
-            className="h-full w-full object-cover opacity-15"
-            src="/assets/inmobiliarias/hero-bg.mp4"
-            poster="/assets/inmobiliarias/ciudades/madrid.webp"
-            autoPlay muted loop playsInline
-          />
+          <LazyBgVideo className="absolute inset-0 opacity-15" />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         </div>
