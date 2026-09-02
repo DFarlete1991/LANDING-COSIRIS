@@ -1,11 +1,11 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion, useInView } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { googleMapsLoaderOptions } from '@/lib/google-maps-loader';
 import {
   ArrowLeft, BadgeCheck, Building2, Check, ChevronLeft, ChevronRight, Copy, Home, LayoutGrid, MapPin, MapPinned,
-  MessageCircle, Phone, ShieldCheck, Star, User, Users, Volume2, VolumeX, Wallet, Briefcase, Zap, X,
+  MessageCircle, Pause, Phone, Play, ShieldCheck, Star, User, Users, Volume2, VolumeX, Wallet, Briefcase, Zap, X,
 } from 'lucide-react';
 import { Footer } from '../Footer';
 import { AgencyLeadForm, type TipoInmueble } from '../ui/AgencyLeadForm';
@@ -27,10 +27,40 @@ import { useValidImageUrl } from '@/lib/use-valid-image-url';
 // el bundle inicial de una landing de campaña de pago. Se carga solo si el
 // visitante entra en desktop (ver `show3D` más abajo), y ni siquiera
 // entonces hasta que React decide pintarlo.
-const ProfileHeroOrbs = lazy(() => import('../ui/ProfileHeroOrbs'));
 const LocationGlobe = lazy(() => import('../ui/LocationGlobe'));
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
+
+/** Igual que el `useInView` independiente de framer-motion (no el prop
+    `whileInView` de `motion.*`, que sí funciona bien en el resto de la
+    página), pero sin IntersectionObserver: tanto el de la librería como uno
+    propio con IntersectionObserver se comportaban de forma intermitente en
+    esta página — a veces detectaba la intersección y a veces se quedaba
+    pegado en `false` para siempre, con el mismo nodo, el mismo margen y el
+    elemento ya visible en pantalla (reproducido incluso en build de
+    producción). Comprobar la posición a mano en cada scroll es más simple y,
+    para algo que solo necesita dispararse una vez, deja de depender de esa
+    intermitencia. */
+function useEnteredViewport(ref: RefObject<HTMLElement | null>, marginPx: number): boolean {
+  const [entered, setEntered] = useState(false);
+  useEffect(() => {
+    if (entered) return;
+    const check = () => {
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top <= window.innerHeight + marginPx && rect.bottom >= -marginPx) setEntered(true);
+    };
+    check();
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    return () => {
+      window.removeEventListener('scroll', check);
+      window.removeEventListener('resize', check);
+    };
+  }, [ref, entered, marginPx]);
+  return entered;
+}
 
 function formatPrice(price: number): string {
   if (price >= 1000000) return `${(price / 1000000).toFixed(1)}M€`;
@@ -79,34 +109,39 @@ function ProofStrip({ agency }: { agency: InmobiliariaPublica }) {
 }
 
 const WHY_US = [
-  { icon: MessageCircle, title: 'Trato directo, sin intermediarios', text: 'Hablas con quien lleva tu caso, no con un call center genérico.' },
-  { icon: MapPinned, title: 'Conocemos tu zona al detalle', text: 'Sabemos qué se vende, a qué precio y en cuánto tiempo, calle por calle.' },
-  { icon: Zap, title: 'Respuesta rápida', text: 'Contestamos en el mismo día, no en una semana.' },
-  { icon: ShieldCheck, title: 'Verificados por Cosiris', text: 'No cualquiera aparece en el directorio — validamos cada inmobiliaria.' },
+  { icon: MessageCircle, title: 'Trato directo, sin intermediarios' },
+  { icon: MapPinned, title: 'Conocemos tu zona al detalle' },
+  { icon: Zap, title: 'Respuesta rápida' },
+  { icon: ShieldCheck, title: 'Verificados por Cosiris' },
 ];
 
-function WhyUsGrid() {
+/** Versión compacta de "por qué elegirnos": antes era una sección aparte con
+    titular grande y 4 tarjetas altas (mucho scroll para poco contenido
+    accionable). Ahora es una sola franja de iconos + etiqueta corta, para no
+    robarle atención (ni altura de página) a las secciones que sí convierten.
+    El cliente puede apagarla del todo desde el CRM (`mostrar_diferenciales`,
+    ver InmobiliariaPerfilPage → agency.mostrar_diferenciales). */
+function DifferentiatorsStrip() {
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-      {WHY_US.map(({ icon: Icon, title, text }, i) => (
-        <motion.div
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.45, ease: [0.19, 1, 0.22, 1] }}
+      className="flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4"
+    >
+      {WHY_US.map(({ icon: Icon, title }) => (
+        <div
           key={title}
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.4, delay: 0.1 * i, ease: [0.19, 1, 0.22, 1] }}
-          className="group flex min-h-[150px] flex-col rounded-[22px] border border-[#ECE8E1] bg-white p-6 shadow-[0_10px_30px_rgba(30,35,50,.05)] transition-all duration-[250ms] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,35,50,.1)]"
+          className="flex shrink-0 snap-start items-center gap-3 rounded-2xl border border-[#ECE8E1] bg-white px-4 py-3.5 shadow-[0_6px_20px_rgba(30,35,50,.04)] sm:shrink"
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/8 text-primary">
-            <Icon size={20} />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
+            <Icon size={16} />
           </div>
-          <div className="mt-3">
-            <p className="text-[22px] font-semibold leading-tight text-[#0F172A]">{title}</p>
-            <p className="mt-1 text-base leading-[170%] text-[#68707F]">{text}</p>
-          </div>
-        </motion.div>
+          <p className="whitespace-nowrap text-sm font-semibold text-[#0F172A] sm:whitespace-normal">{title}</p>
+        </div>
       ))}
-    </div>
+    </motion.div>
   );
 }
 
@@ -135,24 +170,21 @@ async function fetchEmbedOrientation(embed: { platform: 'youtube' | 'vimeo'; id:
 function VideoCard({
   url,
   nombre,
-  logoUrl,
-  logoPos,
-  colorHex,
   posterUrl,
   onError,
 }: {
   url: string;
   nombre: string;
-  logoUrl?: string | null;
-  logoPos?: string | null;
-  colorHex?: string;
   posterUrl?: string | null;
   onError?: () => void;
 }) {
-  const resolvedLogoUrl = useValidImageUrl(logoUrl);
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  // Si la visita pausa a propósito, el autoplay del IntersectionObserver de
+  // abajo no debe reanudarlo solo por seguir (o volver a estar) en pantalla.
+  const manuallyPausedRef = useRef(false);
   const embed = useMemo(() => getVideoEmbed(url), [url]);
   // null mientras se detecta (o si no se pudo saber) — de momento se trata
   // como horizontal, el caso más común, hasta que llegue la respuesta.
@@ -177,8 +209,11 @@ function VideoCard({
     if (!el) return;
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) videoRef.current?.play().catch(() => {});
-        else videoRef.current?.pause();
+        if (entry.isIntersecting) {
+          if (!manuallyPausedRef.current) videoRef.current?.play().catch(() => {});
+        } else {
+          videoRef.current?.pause();
+        }
       },
       { threshold: 0.4 },
     );
@@ -196,92 +231,80 @@ function VideoCard({
       transition={{ duration: 0.7, ease: [0.19, 1, 0.22, 1] }}
     >
       <div className="flex items-center gap-4 mb-4">
-        <span className="text-sm font-bold uppercase tracking-[0.18em] text-slate-400">Video de presentación</span>
-        <div className="h-px flex-1 bg-[#E5DDD3]" />
+        <span className="text-sm font-bold uppercase tracking-[0.18em] text-foreground">Video de presentación</span>
+        <div className="h-px flex-1 bg-border" />
       </div>
 
-      <div className="rounded-[24px] bg-white p-2 shadow-[0_10px_40px_rgba(30,35,50,.08)]">
-        {embed ? (
-          <div className={`mx-auto overflow-hidden rounded-[16px] bg-black ${isVertical ? 'aspect-[9/16] w-full max-w-[300px]' : 'aspect-video w-full max-w-[640px]'}`}>
-            <iframe
-              src={`${embed.embedUrl}?rel=0`}
-              title={`Vídeo de presentación de ${nombre}`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="h-full w-full"
-            />
-          </div>
-        ) : (
-          <div ref={containerRef} className="relative mx-auto w-fit max-w-full overflow-hidden rounded-[16px] bg-black">
-            <video
-              ref={videoRef}
-              muted={muted}
-              loop
-              playsInline
-              // La caja de este video se ajusta sola por CSS (ancho
-              // automático, alto tope) según su tamaño real -- sin adivinar
-              // la orientación de antemano.
-              preload="metadata"
-              poster={posterUrl ? optimizedImageUrl(posterUrl, 640) : undefined}
-              className="block max-h-[70vh] w-auto max-w-full object-contain sm:max-h-[560px] sm:max-w-[640px]"
-              src={url}
-              onError={onError}
-            />
+      {embed ? (
+        <div className={`mx-auto overflow-hidden rounded-[20px] border border-border bg-black ${isVertical ? 'aspect-[9/16] w-full max-w-[300px]' : 'aspect-video w-full max-w-[640px]'}`}>
+          <iframe
+            src={`${embed.embedUrl}?rel=0`}
+            title={`Vídeo de presentación de ${nombre}`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="h-full w-full"
+          />
+        </div>
+      ) : (
+        <div ref={containerRef} className="relative mx-auto w-fit max-w-full overflow-hidden rounded-[20px] border border-border bg-black">
+          <video
+            ref={videoRef}
+            muted={muted}
+            loop
+            playsInline
+            // La caja de este video se ajusta sola por CSS (ancho
+            // automático, alto tope) según su tamaño real -- sin adivinar
+            // la orientación de antemano.
+            preload="metadata"
+            poster={posterUrl ? optimizedImageUrl(posterUrl, 640) : undefined}
+            className="block max-h-[70vh] w-auto max-w-full object-contain sm:max-h-[560px] sm:max-w-[640px]"
+            src={url}
+            onError={onError}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+          />
 
+          {!isPlaying && (
             <button
               type="button"
-              onClick={() => setMuted((m) => !m)}
-              aria-label={muted ? 'Activar sonido' : 'Silenciar'}
-              aria-pressed={!muted}
-              className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/65 active:scale-90"
+              onClick={() => {
+                manuallyPausedRef.current = false;
+                videoRef.current?.play().catch(() => {});
+              }}
+              aria-label="Reproducir"
+              className="absolute inset-0 flex items-center justify-center"
             >
-              {muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 text-primary shadow-lg transition-transform duration-200 hover:scale-105">
+                <Play size={26} className="ml-1" fill="currentColor" />
+              </span>
             </button>
-          </div>
-        )}
-      </div>
+          )}
 
-      {resolvedLogoUrl && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.4, delay: 0.1, ease: [0.19, 1, 0.22, 1] }}
-          className="relative z-10 -mb-8 mt-5 flex justify-center"
-        >
-          <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-white shadow-lg shadow-slate-900/10">
-            <FadeImage
-              src={optimizedImageUrl(resolvedLogoUrl, 130)}
-              alt={nombre}
-              style={{ objectPosition: logoPos ?? '50% 50%' }}
-              className="h-full w-full rounded-full object-cover"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-        </motion.div>
-      )}
+          {isPlaying && (
+            <button
+              type="button"
+              onClick={() => {
+                manuallyPausedRef.current = true;
+                videoRef.current?.pause();
+              }}
+              aria-label="Pausar"
+              className="absolute bottom-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/65 active:scale-90"
+            >
+              <Pause size={17} />
+            </button>
+          )}
 
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-40px' }}
-        transition={{ duration: 0.5, delay: 0.15, ease: [0.19, 1, 0.22, 1] }}
-        className={`flex items-center gap-3 rounded-[22px] border border-[#ECE8E1] bg-white px-5 py-4 shadow-[0_10px_30px_rgba(30,35,50,.05)] ${resolvedLogoUrl ? 'pt-9' : 'mt-5'}`}
-      >
-        {!resolvedLogoUrl && (
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-primary bg-primary/8"
-            style={colorHex ? { backgroundColor: `${colorHex}14`, color: colorHex } : undefined}
+          <button
+            type="button"
+            onClick={() => setMuted((m) => !m)}
+            aria-label={muted ? 'Activar sonido' : 'Silenciar'}
+            aria-pressed={!muted}
+            className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/65 active:scale-90"
           >
-            <ShieldCheck size={18} />
-          </div>
-        )}
-        <div className={resolvedLogoUrl ? 'w-full text-center' : ''}>
-          <p className="text-sm font-bold text-[#0F172A]">Transparencia, compromiso y resultados comprobados.</p>
-          <p className="text-xs text-[#68707F]">Así trabajamos en {nombre}.</p>
+            {muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
+          </button>
         </div>
-      </motion.div>
+      )}
     </motion.div>
   );
 }
@@ -938,7 +961,7 @@ const PROPERTY_TYPES: { value: TipoInmueble; label: string; icon: typeof Buildin
 /** Primer paso visual antes del formulario: elegir tipo de inmueble abre el
     resto de pasos (dirección, motivo, contacto...) en el pop-up — así no se
     le pide nada al visitante hasta que ha decidido interactuar. */
-function PropertyTypeSelector({ colorHex, onSelect }: { colorHex?: string; onSelect: (tipo: TipoInmueble) => void }) {
+function PropertyTypeSelector({ onSelect }: { onSelect: (tipo: TipoInmueble) => void }) {
   return (
     <div className="grid grid-cols-3 gap-3">
       {PROPERTY_TYPES.map(({ value, label, icon: Icon }) => (
@@ -946,18 +969,89 @@ function PropertyTypeSelector({ colorHex, onSelect }: { colorHex?: string; onSel
           key={value}
           type="button"
           onClick={() => onSelect(value)}
-          className="group flex flex-col items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-[0_10px_28px_rgba(255,128,0,0.15)] active:scale-[0.97]"
+          className="group flex aspect-square flex-col items-center justify-center gap-2.5 rounded-2xl border-2 border-[#EAEAEA] bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-[0_10px_24px_rgba(255,128,0,0.16)] active:scale-[0.96] active:translate-y-0"
         >
-          <div
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/8 text-primary transition-colors duration-200 group-hover:bg-primary group-hover:text-white"
-            style={colorHex ? { color: colorHex, backgroundColor: `${colorHex}14` } : undefined}
-          >
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/8 text-primary transition-transform duration-200 group-hover:scale-110">
             <Icon size={20} />
           </div>
-          <span className="text-sm font-bold text-slate-900">{label}</span>
+          <span className="text-xs font-bold text-slate-900">{label}</span>
         </button>
       ))}
     </div>
+  );
+}
+
+/** Banda de ancho completo, literalmente lo primero que ve cualquier visita
+    al entrar al perfil — antes incluso del nombre de la inmobiliaria. Es el
+    cambio central del rediseño: el selector Piso/Casa/Otro (el paso que de
+    verdad arranca un lead) ya no vive metido en una tarjeta al lado de la
+    bio, donde los mapas de calor mostraban poca atención, sino que es lo
+    único que hay que mirar en esta pantalla.
+
+    La foto de fondo (si la inmobiliaria cargó `hero_image_url`) ya no lleva
+    texto encima — eso fue lo que obligaba a elegir entre lavarla con blanco
+    o arriesgar la legibilidad. En vez de eso, todo el texto vive dentro de
+    una tarjeta blanca flotando sobre la foto: la foto se ve limpia y el
+    texto siempre tiene contraste perfecto, sea cual sea la imagen de fondo. */
+function ValuationHero({
+  agency,
+  onSelect,
+}: {
+  agency: InmobiliariaPublica;
+  onSelect: (tipo: TipoInmueble) => void;
+}) {
+  const bgUrl = useValidImageUrl(agency.hero_image_url);
+
+  return (
+    <section id="contactar" className="relative scroll-mt-14 overflow-hidden bg-surface">
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        {bgUrl ? (
+          <img src={optimizedImageUrl(bgUrl, 1600)} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-surface" />
+            <div
+              className="absolute -left-16 -top-16 h-[380px] w-[380px] rounded-full opacity-[0.12]"
+              style={{ background: 'radial-gradient(circle, #FF8000, rgba(255,128,0,0.35), transparent 70%)', filter: 'blur(90px)' }}
+            />
+          </>
+        )}
+      </div>
+
+      <div className="relative z-10 flex min-h-[440px] items-center justify-center px-6 py-14 sm:min-h-[520px] sm:py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 18, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.5, ease: EASE }}
+          className="w-full max-w-[420px] rounded-[28px] bg-white p-7 text-center shadow-[0_30px_70px_rgba(15,23,42,0.25)] sm:p-9"
+        >
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/8 px-4 py-1.5 text-xs font-semibold text-primary">
+            <Check size={13} className="shrink-0" strokeWidth={3} />
+            Gratuita · Sin compromiso · Valoración final en tu primera visita
+          </span>
+
+          <h2 className="mt-5 text-[26px] font-bold tracking-[-0.01em] text-[#0F172A] sm:text-[30px]">
+            Reciba su valoración
+          </h2>
+
+          <div className="mt-6">
+            <PropertyTypeSelector onSelect={onSelect} />
+          </div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            className="mt-5 flex items-center justify-center gap-1.5 text-xs font-medium text-primary/70"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 3L19 10L12 12L12 19L9 15L5 3Z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+            </svg>
+            Haz click y empezamos
+          </motion.p>
+        </motion.div>
+      </div>
+    </section>
   );
 }
 
@@ -1107,7 +1201,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
   // hero -- sin esto, three.js se descargaba en cuanto show3D era true, sin
   // importar si la visita llegaba a bajar hasta ahí.
   const mapSectionRef = useRef<HTMLElement>(null);
-  const mapSectionInView = useInView(mapSectionRef, { once: true, margin: '400px 0px' });
+  const mapSectionInView = useEnteredViewport(mapSectionRef, 400);
 
   // Si el archivo de vídeo subido falla al cargar (ej. hosting caído), se
   // oculta toda la sección en vez de dejar un reproductor negro sin vídeo.
@@ -1207,6 +1301,17 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
         </div>
       </div>
 
+      <ValuationHero agency={agency} onSelect={setSelectedTipo} />
+
+      {selectedTipo && (
+        <LeadFormModal
+          agency={agency}
+          tipoInmueble={selectedTipo}
+          onClose={() => setSelectedTipo(null)}
+          onSuccess={() => setShowPhone(true)}
+        />
+      )}
+
       <main className="relative z-10 mx-auto w-full max-w-[1400px] px-6 pb-20 pt-12">
 
         <div className="relative">
@@ -1220,63 +1325,50 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 animation: 'float-blob 22s ease-in-out infinite',
               }}
             />
-            <svg
-              aria-hidden="true"
-              className="absolute inset-0 h-full w-full opacity-[0.07]"
-              style={{
-                maskImage: 'radial-gradient(circle at 78% 45%, transparent 0%, transparent 14%, black 42%)',
-                WebkitMaskImage: 'radial-gradient(circle at 78% 45%, transparent 0%, transparent 14%, black 42%)',
-              }}
-            >
-            <defs>
-              <pattern id="honeycomb" width="80" height="46.19" patternUnits="userSpaceOnUse" patternTransform="scale(1.5)">
-                <path d="M13.33 0L40 0L53.33 23.09L40 46.19L13.33 46.19L0 23.09Z" fill="none" className="stroke-primary" strokeWidth="0.9"/>
-                <path d="M53.33 0L80 0L93.33 23.09L80 46.19L53.33 46.19L40 23.09Z" fill="none" className="stroke-primary" strokeWidth="0.9"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#honeycomb)"/>
-          </svg>
-
-          {show3D && (
-            <div className="absolute -right-10 top-1/2 hidden h-[380px] w-[400px] -translate-y-1/2 opacity-80 lg:block">
-              <Suspense fallback={null}>
-                <ProfileHeroOrbs colorHex={agency.color_hex} />
-              </Suspense>
-            </div>
-          )}
           </div>
 
-          <div className="relative z-10 mt-10 grid grid-cols-1 items-start gap-12 lg:grid-cols-[1.3fr_1fr] lg:gap-16">
+          <div className={`relative z-10 mt-10 grid grid-cols-1 items-start gap-12 ${hasPlayableVideo ? 'lg:grid-cols-[1fr_1.3fr] lg:gap-16' : ''}`}>
+            {/* El vídeo va primero en el DOM (columna izquierda en lg+) — en
+                móvil, al ser grid-cols-1, igual queda arriba del bloque de
+                perfil. Sin vídeo, la bio de la derecha simplemente ocupa el
+                ancho completo. */}
+            {hasPlayableVideo && agency.media_presentacion_url && (
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: EASE, delay: 0.08 }}
+              >
+                <VideoCard
+                  url={agency.media_presentacion_url}
+                  nombre={agency.nombre_comercial}
+                  posterUrl={heroFotoUrl}
+                  onError={() => setVideoBroken(true)}
+                />
+              </motion.div>
+            )}
+
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
-              className="relative lg:pr-[280px] xl:pr-[320px]"
+              className="relative lg:pr-[220px] xl:pr-[260px]"
             >
-              {/* Foto del agente — en móvil se muestra centrada encima del contenido;
-                  en lg+ flota en el hueco a la derecha del texto, desplazada hacia
-                  la izquierda para que se sienta parte del bloque informativo y no
-                  compita con el formulario. Se mantiene limpia, sin etiquetas ni
-                  badges superpuestos — el nombre va en la ficha de abajo. */}
+              {/* Foto del agente junto al nombre — en móvil centrada encima
+                  del bloque, en lg+ flotando a la derecha del texto. */}
               {heroFotoUrl && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
-                  className="pointer-events-none relative z-10 mb-8 flex justify-center lg:absolute lg:right-14 lg:top-1/2 lg:mb-0 lg:-translate-y-1/2 lg:justify-start xl:right-12"
+                  transition={{ duration: 0.5, ease: EASE, delay: 0.15 }}
+                  className="pointer-events-none relative z-10 mb-6 flex justify-center lg:absolute lg:right-0 lg:top-0 lg:mb-0 lg:justify-end"
                 >
-                  <div className="relative">
-                    <span className="absolute -left-7 -top-6 h-14 w-14 rounded-full bg-primary/10" aria-hidden="true" />
-                    <span className="absolute -bottom-5 -right-4 h-9 w-9 rounded-full bg-primary/15" aria-hidden="true" />
-                    <span className="absolute -right-8 top-8 h-5 w-5 rounded-full bg-primary/20" aria-hidden="true" />
-                    <FadeImage
-                      src={optimizedImageUrl(heroFotoUrl, 480)}
-                      alt={agency.nombre_agente}
-                      style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
-                      className="relative h-40 w-40 rounded-full border-4 border-white object-cover shadow-2xl shadow-slate-900/15 sm:h-52 sm:w-52 xl:h-60 xl:w-60"
-                      decoding="async"
-                    />
-                  </div>
+                  <FadeImage
+                    src={optimizedImageUrl(heroFotoUrl, 400)}
+                    alt={agency.nombre_agente}
+                    style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
+                    className="h-28 w-28 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-36 sm:w-36 lg:h-[180px] lg:w-[180px]"
+                    decoding="async"
+                  />
                 </motion.div>
               )}
 
@@ -1338,33 +1430,8 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 <CtaButton agency={agency} showPhone={showPhone} onRevealed={() => setShowPhone(true)} />
               </div>
             </motion.div>
-
-            <motion.div
-              id="contactar"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: EASE, delay: 0.08 }}
-              className="scroll-mt-24 rounded-card border border-border bg-card p-6 shadow-[0_24px_64px_rgba(0,0,0,0.12)] sm:p-8"
-            >
-              <h2 className="text-xl font-bold text-foreground">¿Qué tipo de inmueble quieres valorar?</h2>
-              <p className="mt-2 text-body-sm leading-relaxed text-ink-muted">
-                Elige una opción para empezar tu valoración gratuita — sin compromiso.
-              </p>
-              <div className="mt-6">
-                <PropertyTypeSelector colorHex={agency.color_hex} onSelect={setSelectedTipo} />
-              </div>
-            </motion.div>
           </div>
         </div>
-
-        {selectedTipo && (
-          <LeadFormModal
-            agency={agency}
-            tipoInmueble={selectedTipo}
-            onClose={() => setSelectedTipo(null)}
-            onSuccess={() => setShowPhone(true)}
-          />
-        )}
 
         <motion.div
           initial={{ opacity: 0, y: 14 }}
@@ -1382,49 +1449,22 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
           redondeada flotando dentro del contenedor — el contenido interno sí
           se alinea al mismo max-width que el resto de la página. */}
 
-      {/* Bloque 2 — por qué elegirnos + video */}
-      <section className="bg-surface">
-        <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
-          <div className={`grid grid-cols-1 gap-10 ${hasPlayableVideo ? 'lg:grid-cols-[2fr_3fr] lg:gap-16' : ''}`}>
-            {hasPlayableVideo && agency.media_presentacion_url && (
-              <div className="lg:pt-16">
-                <VideoCard
-                  url={agency.media_presentacion_url}
-                  nombre={agency.nombre_comercial}
-                  logoUrl={agency.logo_url}
-                  logoPos={agency.logo_pos}
-                  colorHex={agency.color_hex}
-                  posterUrl={heroFotoUrl}
-                  onError={() => setVideoBroken(true)}
-                />
-              </div>
-            )}
-
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-            >
-              <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Sobre nosotros</span>
-
-              <h2 className="mt-5 text-[44px] font-bold leading-[110%] tracking-[-0.02em] text-[#0F172A] sm:text-[48px]">
-                ¿Por qué vender con<br />{agency.nombre_comercial} y no<br />con otra inmobiliaria?
-              </h2>
-
-              <div className="mt-6 h-1 w-16 rounded-full bg-primary" />
-
-              <p className="mt-6 max-w-[520px] text-lg leading-[170%] text-[#68707F]">
-                Combinamos experiencia local, transparencia y tecnología para ayudarte a vender mejor tu propiedad.
-              </p>
-
-              <div className="mt-10">
-                <WhyUsGrid />
-              </div>
-            </motion.div>
+      {/* Bloque 2 — franja compacta "por qué elegirnos". El cliente la apaga
+          desde el CRM con `mostrar_diferenciales` (por defecto encendida) —
+          ver live-inmobiliarias.ts. Antes era una sección grande con titular
+          comparativo + 4 tarjetas; se comprimió a una sola franja de iconos
+          para no competir en altura ni atención con las secciones que sí
+          convierten (valoración arriba, reseñas, mapa). */}
+      {agency.mostrar_diferenciales !== false && (
+        <section className="bg-surface">
+          <div className="relative mx-auto max-w-[1400px] px-6 py-10 sm:py-12">
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Por qué elegirnos</span>
+            <div className="mt-4">
+              <DifferentiatorsStrip />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Bloque 3 — mapa a la izquierda, reseñas a la derecha */}
       <section ref={mapSectionRef} className="bg-white">
