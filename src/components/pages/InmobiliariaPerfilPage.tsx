@@ -240,11 +240,6 @@ function VideoCard({
         <h3 className="mt-1 text-2xl font-bold text-[#0F172A] sm:text-[26px]">Video de presentación</h3>
       </div>
 
-      {/* Todo (video + logo) vive dentro de un único marco con su propio
-          borde/sombra — así, en móvil, donde todo se apila en una sola
-          columna, el logo queda claramente "cerrando" la tarjeta del vídeo
-          en vez de flotar suelto justo antes de la foto de perfil de al
-          lado (se veía como si fueran el mismo elemento repetido). */}
       <div className="rounded-[24px] border border-border bg-white p-3 shadow-[0_10px_30px_rgba(15,23,42,.06)]">
         {embed ? (
           <div className={`mx-auto overflow-hidden rounded-[16px] bg-black ${isVertical ? 'aspect-[9/16] w-full max-w-[300px]' : 'aspect-video w-full max-w-[640px]'}`}>
@@ -316,22 +311,46 @@ function VideoCard({
             </button>
           </div>
         )}
+      </div>
 
-        {resolvedLogoUrl && (
-          <div className="mt-3 flex justify-center border-t border-border pt-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-border bg-white">
-              <FadeImage
-                src={optimizedImageUrl(resolvedLogoUrl, 130)}
-                alt={nombre}
-                style={{ objectPosition: logoPos ?? '50% 50%' }}
-                className="h-full w-full rounded-full object-cover"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
+      {resolvedLogoUrl && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.4, delay: 0.1, ease: [0.19, 1, 0.22, 1] }}
+          className="relative z-10 -mb-8 mt-5 flex justify-center"
+        >
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-white shadow-lg shadow-slate-900/10">
+            <FadeImage
+              src={optimizedImageUrl(resolvedLogoUrl, 130)}
+              alt={nombre}
+              style={{ objectPosition: logoPos ?? '50% 50%' }}
+              className="h-full w-full rounded-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </motion.div>
+      )}
+
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-40px' }}
+        transition={{ duration: 0.5, delay: 0.15, ease: [0.19, 1, 0.22, 1] }}
+        className={`flex items-center gap-3 rounded-[22px] border border-[#ECE8E1] bg-white px-5 py-4 shadow-[0_10px_30px_rgba(30,35,50,.05)] ${resolvedLogoUrl ? 'pt-9' : 'mt-5'}`}
+      >
+        {!resolvedLogoUrl && (
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
+            <ShieldCheck size={18} />
           </div>
         )}
-      </div>
+        <div className={resolvedLogoUrl ? 'w-full text-center' : ''}>
+          <p className="text-sm font-bold text-[#0F172A]">Transparencia, compromiso y resultados comprobados.</p>
+          <p className="text-xs text-[#68707F]">Así trabajamos en {nombre}.</p>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
