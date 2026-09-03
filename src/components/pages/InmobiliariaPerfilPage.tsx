@@ -170,14 +170,19 @@ async function fetchEmbedOrientation(embed: { platform: 'youtube' | 'vimeo'; id:
 function VideoCard({
   url,
   nombre,
+  logoUrl,
+  logoPos,
   posterUrl,
   onError,
 }: {
   url: string;
   nombre: string;
+  logoUrl?: string | null;
+  logoPos?: string | null;
   posterUrl?: string | null;
   onError?: () => void;
 }) {
+  const resolvedLogoUrl = useValidImageUrl(logoUrl);
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
@@ -230,9 +235,9 @@ function VideoCard({
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.7, ease: [0.19, 1, 0.22, 1] }}
     >
-      <div className="flex items-center gap-4 mb-4">
-        <span className="text-sm font-bold uppercase tracking-[0.18em] text-foreground">Video de presentación</span>
-        <div className="h-px flex-1 bg-border" />
+      <div className="mb-5">
+        <span className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Conócenos</span>
+        <h3 className="mt-1 text-2xl font-bold text-[#0F172A] sm:text-[26px]">Video de presentación</h3>
       </div>
 
       {embed ? (
@@ -304,6 +309,27 @@ function VideoCard({
             {muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
           </button>
         </div>
+      )}
+
+      {resolvedLogoUrl && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.4, delay: 0.1, ease: [0.19, 1, 0.22, 1] }}
+          className="mt-5 flex justify-center"
+        >
+          <div className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-white bg-white shadow-lg shadow-slate-900/10">
+            <FadeImage
+              src={optimizedImageUrl(resolvedLogoUrl, 130)}
+              alt={nombre}
+              style={{ objectPosition: logoPos ?? '50% 50%' }}
+              className="h-full w-full rounded-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </motion.div>
       )}
     </motion.div>
   );
@@ -847,23 +873,13 @@ function Accordion({ items }: { items: { q: string; a: string }[] }) {
 function CtaButton({
   agency,
   showPhone,
-  onRevealed,
+  onOpenTypeSelector,
 }: {
   agency: InmobiliariaPublica;
   showPhone: boolean;
-  onRevealed: () => void;
+  onOpenTypeSelector: () => void;
 }) {
-  const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (!showModal) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setShowModal(false);
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [showModal]);
 
   useEffect(() => {
     if (!copied) return;
@@ -881,74 +897,23 @@ function CtaButton({
     }
   };
 
-  return (
-    <>
-      {showPhone ? (
-        <button
-          type="button"
-          onClick={handleCopyPhone}
-          className="flex w-fit items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-soft transition-all duration-200 hover:bg-primary-hover hover:shadow-card active:scale-[0.98]"
-        >
-          {copied ? <Check size={14} /> : <Copy size={14} />}
-          {copied ? '¡Copiado!' : agency.telefono}
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-soft transition-all duration-200 hover:bg-primary-hover hover:shadow-card active:scale-[0.98]"
-        >
-          <Phone size={14} /> Solicitar valoración
-        </button>
-      )}
-
-      {createPortal(
-        <AnimatePresence>
-          {showModal && (
-            <>
-              <motion.div
-                key="backdrop"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="fixed inset-0 z-40 bg-black/65 backdrop-blur-sm"
-                aria-hidden="true"
-              />
-              <motion.div
-                key="panel"
-                role="dialog"
-                aria-modal
-                initial={{ opacity: 0, y: 24, scale: 0.97 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 16, scale: 0.97 }}
-                transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
-                onClick={() => setShowModal(false)}
-                className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
-              >
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl shadow-black/20"
-                >
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    aria-label="Cerrar"
-                    className="absolute right-4 top-4 z-10 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                  >
-                    <X size={18} />
-                  </button>
-                  <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Sin compromiso</p>
-                  <h3 className="mb-5 text-lg font-extrabold text-slate-900">Cuéntale a {agency.nombre_comercial} qué necesitas</h3>
-                  <AgencyLeadForm agency={agency} onSuccess={() => { onRevealed(); setShowModal(false); }} />
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>,
-        document.body,
-      )}
-    </>
+  return showPhone ? (
+    <button
+      type="button"
+      onClick={handleCopyPhone}
+      className="flex w-fit items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-soft transition-all duration-200 hover:bg-primary-hover hover:shadow-card active:scale-[0.98]"
+    >
+      {copied ? <Check size={14} /> : <Copy size={14} />}
+      {copied ? '¡Copiado!' : agency.telefono}
+    </button>
+  ) : (
+    <button
+      type="button"
+      onClick={onOpenTypeSelector}
+      className="flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-soft transition-all duration-200 hover:bg-primary-hover hover:shadow-card active:scale-[0.98]"
+    >
+      <Phone size={14} /> Solicitar valoración
+    </button>
   );
 }
 
@@ -971,10 +936,11 @@ function PropertyTypeSelector({ onSelect }: { onSelect: (tipo: TipoInmueble) => 
           onClick={() => onSelect(value)}
           className="group flex aspect-square flex-col items-center justify-center gap-2.5 rounded-2xl border-2 border-[#EAEAEA] bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-[0_10px_24px_rgba(255,128,0,0.16)] active:scale-[0.96] active:translate-y-0"
         >
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/8 text-primary transition-transform duration-200 group-hover:scale-110">
-            <Icon size={20} />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/8 text-primary transition-transform duration-200 group-hover:scale-110 sm:h-14 sm:w-14">
+            <Icon size={22} className="sm:hidden" />
+            <Icon size={26} className="hidden sm:block" />
           </div>
-          <span className="text-xs font-bold text-slate-900">{label}</span>
+          <span className="text-sm font-bold text-slate-900">{label}</span>
         </button>
       ))}
     </div>
@@ -1018,23 +984,23 @@ function ValuationHero({
         )}
       </div>
 
-      <div className="relative z-10 flex min-h-[440px] items-center justify-center px-6 py-14 sm:min-h-[520px] sm:py-16">
+      <div className="relative z-10 flex min-h-[480px] items-center justify-center px-6 py-16 sm:min-h-[580px] sm:py-20">
         <motion.div
           initial={{ opacity: 0, y: 18, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, ease: EASE }}
-          className="w-full max-w-[420px] rounded-[28px] bg-white p-7 text-center shadow-[0_30px_70px_rgba(15,23,42,0.25)] sm:p-9"
+          className="w-full max-w-[540px] rounded-[32px] bg-white p-8 text-center shadow-[0_30px_70px_rgba(15,23,42,0.25)] sm:p-11"
         >
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/8 px-4 py-1.5 text-xs font-semibold text-primary">
-            <Check size={13} className="shrink-0" strokeWidth={3} />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/8 px-4 py-1.5 text-xs font-semibold text-primary sm:text-sm">
+            <Check size={14} className="shrink-0" strokeWidth={3} />
             Gratuita · Sin compromiso · Valoración final en tu primera visita
           </span>
 
-          <h2 className="mt-5 text-[26px] font-bold tracking-[-0.01em] text-[#0F172A] sm:text-[30px]">
-            Reciba su valoración
+          <h2 className="mt-6 text-[28px] font-bold tracking-[-0.01em] text-[#0F172A] sm:text-[36px]">
+            Solicita tu valoración
           </h2>
 
-          <div className="mt-6">
+          <div className="mt-8">
             <PropertyTypeSelector onSelect={onSelect} />
           </div>
 
@@ -1042,7 +1008,7 @@ function ValuationHero({
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 1, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className="mt-5 flex items-center justify-center gap-1.5 text-xs font-medium text-primary/70"
+            className="mt-6 flex items-center justify-center gap-1.5 text-xs font-medium text-primary/70 sm:text-sm"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M5 3L19 10L12 12L12 19L9 15L5 3Z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
@@ -1058,6 +1024,84 @@ function ValuationHero({
 /** Envuelve el formulario multi-paso ya existente (misma lógica de pasos y
     validación, ver AgencyLeadForm) en un diálogo superpuesto con fondo
     oscurecido — el único cambio real es el contenedor. */
+/** Paso 1 compartido por CUALQUIER botón de la página que arranque un lead
+    ("Solicitar valoración" en la bio, el CTA de cierre, el CTA fijo de
+    móvil): elegir tipo de inmueble en una ventana, no saltar directo al
+    formulario ni desplazar a la tarjeta del inicio. Solo la tarjeta del
+    inicio (ValuationHero) tiene el selector inline, porque ya es ella misma
+    la superficie de esa elección. */
+function TypeSelectorModal({
+  agency,
+  onClose,
+  onSelect,
+}: {
+  agency: InmobiliariaPublica;
+  onClose: () => void;
+  onSelect: (tipo: TipoInmueble) => void;
+}) {
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
+
+  return createPortal(
+    <AnimatePresence>
+      <motion.div
+        key="type-modal-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-40 bg-black/65 backdrop-blur-sm"
+        aria-hidden="true"
+        onClick={onClose}
+      />
+      <motion.div
+        key="type-modal-panel"
+        role="dialog"
+        aria-modal
+        aria-label="Elige el tipo de inmueble que quieres valorar"
+        initial={{ opacity: 0, y: 24, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 16, scale: 0.97 }}
+        transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+        className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
+        onClick={onClose}
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-md rounded-[28px] bg-white p-7 text-center shadow-2xl shadow-black/20 sm:p-9"
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar"
+            className="absolute right-4 top-4 z-10 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+          >
+            <X size={18} />
+          </button>
+
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/8 px-4 py-1.5 text-xs font-semibold text-primary">
+            <Check size={13} className="shrink-0" strokeWidth={3} />
+            Gratuita · Sin compromiso · Valoración final en tu primera visita
+          </span>
+
+          <h3 className="mt-5 text-2xl font-bold text-[#0F172A]">Solicita tu valoración</h3>
+          <p className="mt-1 text-sm text-ink-muted">¿Qué tipo de inmueble quieres valorar con {agency.nombre_comercial}?</p>
+
+          <div className="mt-6">
+            <PropertyTypeSelector onSelect={onSelect} />
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>,
+    document.body,
+  );
+}
+
 function LeadFormModal({
   agency,
   tipoInmueble,
@@ -1184,6 +1228,13 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
   // del formulario (dirección, motivo, contacto...) en el pop-up.
   const [selectedTipo, setSelectedTipo] = useState<TipoInmueble | null>(null);
 
+  // Cualquier CTA que no sea el selector inline del hero (el botón de la
+  // bio, el CTA de cierre, el fijo de móvil) abre primero esta ventana de
+  // "elige tipo" en vez de saltar directo al formulario o desplazar hasta
+  // arriba — un único punto de entrada al flujo de lead, sea cual sea el
+  // botón que lo dispara.
+  const [showTypeModal, setShowTypeModal] = useState(false);
+
   // Ambientación 3D del hero: solo en desktop (en el móvil de una campaña de
   // pago no vale la pena el peso de three.js) y solo si el visitante no pidió
   // menos movimiento. Se revisa por si acaso cambia el tamaño de ventana o la
@@ -1303,6 +1354,17 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
       <ValuationHero agency={agency} onSelect={setSelectedTipo} />
 
+      {showTypeModal && (
+        <TypeSelectorModal
+          agency={agency}
+          onClose={() => setShowTypeModal(false)}
+          onSelect={(tipo) => {
+            setShowTypeModal(false);
+            setSelectedTipo(tipo);
+          }}
+        />
+      )}
+
       {selectedTipo && (
         <LeadFormModal
           agency={agency}
@@ -1327,11 +1389,14 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
             />
           </div>
 
-          <div className={`relative z-10 mt-10 grid grid-cols-1 items-start gap-12 ${hasPlayableVideo ? 'lg:grid-cols-[1fr_1.3fr] lg:gap-16' : ''}`}>
-            {/* El vídeo va primero en el DOM (columna izquierda en lg+) — en
-                móvil, al ser grid-cols-1, igual queda arriba del bloque de
-                perfil. Sin vídeo, la bio de la derecha simplemente ocupa el
-                ancho completo. */}
+          <div className={`relative z-10 mt-10 grid grid-cols-1 items-start gap-10 ${hasPlayableVideo ? 'md:grid-cols-[1fr_1.3fr] md:gap-10 lg:gap-16' : ''}`}>
+            {/* El vídeo va primero en el DOM (columna izquierda desde
+                tablet) — en móvil, al ser grid-cols-1, igual queda arriba
+                del bloque de perfil. El corte es en `md` (768px), no `lg`
+                (1024px): de lo contrario, entre esos dos anchos, un vídeo
+                vertical angosto quedaba centrado en una columna de ancho
+                completo con muchísimo blanco a los lados. Sin vídeo, la bio
+                de la derecha simplemente ocupa el ancho completo. */}
             {hasPlayableVideo && agency.media_presentacion_url && (
               <motion.div
                 initial={{ opacity: 0, y: 14 }}
@@ -1341,6 +1406,8 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 <VideoCard
                   url={agency.media_presentacion_url}
                   nombre={agency.nombre_comercial}
+                  logoUrl={agency.logo_url}
+                  logoPos={agency.logo_pos}
                   posterUrl={heroFotoUrl}
                   onError={() => setVideoBroken(true)}
                 />
@@ -1351,22 +1418,23 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
-              className="relative lg:pr-[220px] xl:pr-[260px]"
+              className="relative md:pr-[170px] lg:pr-[220px] xl:pr-[260px]"
             >
               {/* Foto del agente junto al nombre — en móvil centrada encima
-                  del bloque, en lg+ flotando a la derecha del texto. */}
+                  del bloque, desde tablet (`md`) flotando a la derecha del
+                  texto (mismo corte que la columna del vídeo, arriba). */}
               {heroFotoUrl && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, ease: EASE, delay: 0.15 }}
-                  className="pointer-events-none relative z-10 mb-6 flex justify-center lg:absolute lg:right-0 lg:top-0 lg:mb-0 lg:justify-end"
+                  className="pointer-events-none relative z-10 mb-6 flex justify-center md:absolute md:right-0 md:top-0 md:mb-0 md:justify-end"
                 >
                   <FadeImage
                     src={optimizedImageUrl(heroFotoUrl, 400)}
                     alt={agency.nombre_agente}
                     style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
-                    className="h-28 w-28 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-36 sm:w-36 lg:h-[180px] lg:w-[180px]"
+                    className="h-28 w-28 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-36 sm:w-36 md:h-[140px] md:w-[140px] lg:h-[180px] lg:w-[180px]"
                     decoding="async"
                   />
                 </motion.div>
@@ -1427,7 +1495,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
               </div>
 
               <div className="mt-8">
-                <CtaButton agency={agency} showPhone={showPhone} onRevealed={() => setShowPhone(true)} />
+                <CtaButton agency={agency} showPhone={showPhone} onOpenTypeSelector={() => setShowTypeModal(true)} />
               </div>
             </motion.div>
           </div>
@@ -1458,8 +1526,9 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
       {agency.mostrar_diferenciales !== false && (
         <section className="bg-surface">
           <div className="relative mx-auto max-w-[1400px] px-6 py-10 sm:py-12">
-            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Por qué elegirnos</span>
-            <div className="mt-4">
+            <span className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Confianza</span>
+            <h3 className="mt-1 text-2xl font-bold text-[#0F172A] sm:text-[26px]">Por qué elegirnos</h3>
+            <div className="mt-5">
               <DifferentiatorsStrip />
             </div>
           </div>
@@ -1528,10 +1597,11 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
         </div>
       </section>
 
-      {/* Bloque 4 — CTA de cierre. Justo el hueco que quedaba entre las FAQ y
-          el footer: quien baja leyendo toda la página sin rellenar el
-          formulario de arriba, no tenía ninguna otra oportunidad de
-          convertir. */}
+      {/* Bloque 4 — CTA de cierre. Justo el hueco que quedaba después de las
+          FAQ: quien baja leyendo todo el perfil sin rellenar el formulario
+          de arriba, no tenía ninguna otra oportunidad de convertir. Es el
+          último bloque de la página — sin footer genérico del sitio detrás,
+          que solo distraía con navegación que no pinta nada aquí. */}
       <section className="bg-primary">
         <div className="mx-auto max-w-[1400px] px-6 py-16 text-center sm:py-20">
           <h2 className="text-[32px] font-bold leading-[110%] tracking-[-0.02em] text-white sm:text-[40px]">
@@ -1540,35 +1610,26 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
           <p className="mx-auto mt-4 max-w-[480px] text-lg leading-[170%] text-white/80">
             Pide tu valoración gratuita y sin compromiso — te respondemos el mismo día.
           </p>
-          <a
-            href="#contactar"
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('contactar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }}
+          <button
+            type="button"
+            onClick={() => setShowTypeModal(true)}
             className="mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 text-sm font-bold uppercase tracking-[0.1em] text-primary shadow-lg shadow-black/10 transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
           >
             Quiero saber cuánto vale mi vivienda
-          </a>
+          </button>
         </div>
       </section>
 
-      <Footer />
-
-      {/* CTA fija en móvil — el formulario grande vive arriba del todo en el hero,
-          así que en móvil, tras hacer scroll por el resto del perfil, esto ofrece
-          un atajo rápido de vuelta a él sin tener que scrollear hacia arriba a mano. */}
+      {/* CTA fija en móvil — mismo paso 1 (elegir tipo) que cualquier otro
+          botón de la página, no un atajo de scroll hacia arriba. */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 p-3 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-sm lg:hidden">
-        <a
-          href="#contactar"
-          onClick={(e) => {
-            e.preventDefault();
-            document.getElementById('contactar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
+        <button
+          type="button"
+          onClick={() => setShowTypeModal(true)}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-white shadow-md shadow-primary/25 transition-transform active:scale-[0.98]"
         >
           Contactar con {agency.nombre_comercial}
-        </a>
+        </button>
       </div>
       <div aria-hidden="true" className="h-[76px] lg:hidden" />
     </div>
