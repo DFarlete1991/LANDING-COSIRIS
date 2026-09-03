@@ -240,97 +240,98 @@ function VideoCard({
         <h3 className="mt-1 text-2xl font-bold text-[#0F172A] sm:text-[26px]">Video de presentación</h3>
       </div>
 
-      {embed ? (
-        <div className={`mx-auto overflow-hidden rounded-[20px] border border-border bg-black ${isVertical ? 'aspect-[9/16] w-full max-w-[300px]' : 'aspect-video w-full max-w-[640px]'}`}>
-          <iframe
-            src={`${embed.embedUrl}?rel=0`}
-            title={`Vídeo de presentación de ${nombre}`}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="h-full w-full"
-          />
-        </div>
-      ) : (
-        <div ref={containerRef} className="relative mx-auto w-fit max-w-full overflow-hidden rounded-[20px] border border-border bg-black">
-          <video
-            ref={videoRef}
-            muted={muted}
-            loop
-            playsInline
-            // La caja de este video se ajusta sola por CSS (ancho
-            // automático, alto tope) según su tamaño real -- sin adivinar
-            // la orientación de antemano.
-            preload="metadata"
-            poster={posterUrl ? optimizedImageUrl(posterUrl, 640) : undefined}
-            className="block max-h-[70vh] w-auto max-w-full object-contain sm:max-h-[560px] sm:max-w-[640px]"
-            src={url}
-            onError={onError}
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-          />
-
-          {!isPlaying && (
-            <button
-              type="button"
-              onClick={() => {
-                manuallyPausedRef.current = false;
-                videoRef.current?.play().catch(() => {});
-              }}
-              aria-label="Reproducir"
-              className="absolute inset-0 flex items-center justify-center"
-            >
-              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 text-primary shadow-lg transition-transform duration-200 hover:scale-105">
-                <Play size={26} className="ml-1" fill="currentColor" />
-              </span>
-            </button>
-          )}
-
-          {isPlaying && (
-            <button
-              type="button"
-              onClick={() => {
-                manuallyPausedRef.current = true;
-                videoRef.current?.pause();
-              }}
-              aria-label="Pausar"
-              className="absolute bottom-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/65 active:scale-90"
-            >
-              <Pause size={17} />
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={() => setMuted((m) => !m)}
-            aria-label={muted ? 'Activar sonido' : 'Silenciar'}
-            aria-pressed={!muted}
-            className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/65 active:scale-90"
-          >
-            {muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
-          </button>
-        </div>
-      )}
-
-      {resolvedLogoUrl && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.4, delay: 0.1, ease: [0.19, 1, 0.22, 1] }}
-          className="mt-5 flex justify-center"
-        >
-          <div className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-white bg-white shadow-lg shadow-slate-900/10">
-            <FadeImage
-              src={optimizedImageUrl(resolvedLogoUrl, 130)}
-              alt={nombre}
-              style={{ objectPosition: logoPos ?? '50% 50%' }}
-              className="h-full w-full rounded-full object-cover"
-              loading="lazy"
-              decoding="async"
+      {/* Todo (video + logo) vive dentro de un único marco con su propio
+          borde/sombra — así, en móvil, donde todo se apila en una sola
+          columna, el logo queda claramente "cerrando" la tarjeta del vídeo
+          en vez de flotar suelto justo antes de la foto de perfil de al
+          lado (se veía como si fueran el mismo elemento repetido). */}
+      <div className="rounded-[24px] border border-border bg-white p-3 shadow-[0_10px_30px_rgba(15,23,42,.06)]">
+        {embed ? (
+          <div className={`mx-auto overflow-hidden rounded-[16px] bg-black ${isVertical ? 'aspect-[9/16] w-full max-w-[300px]' : 'aspect-video w-full max-w-[640px]'}`}>
+            <iframe
+              src={`${embed.embedUrl}?rel=0`}
+              title={`Vídeo de presentación de ${nombre}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="h-full w-full"
             />
           </div>
-        </motion.div>
-      )}
+        ) : (
+          <div ref={containerRef} className="relative mx-auto w-fit max-w-full overflow-hidden rounded-[16px] bg-black">
+            <video
+              ref={videoRef}
+              muted={muted}
+              loop
+              playsInline
+              // La caja de este video se ajusta sola por CSS (ancho
+              // automático, alto tope) según su tamaño real -- sin adivinar
+              // la orientación de antemano.
+              preload="metadata"
+              poster={posterUrl ? optimizedImageUrl(posterUrl, 640) : undefined}
+              className="block max-h-[70vh] w-auto max-w-full object-contain sm:max-h-[560px] sm:max-w-[640px]"
+              src={url}
+              onError={onError}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+            />
+
+            {!isPlaying && (
+              <button
+                type="button"
+                onClick={() => {
+                  manuallyPausedRef.current = false;
+                  videoRef.current?.play().catch(() => {});
+                }}
+                aria-label="Reproducir"
+                className="absolute inset-0 flex items-center justify-center"
+              >
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 text-primary shadow-lg transition-transform duration-200 hover:scale-105">
+                  <Play size={26} className="ml-1" fill="currentColor" />
+                </span>
+              </button>
+            )}
+
+            {isPlaying && (
+              <button
+                type="button"
+                onClick={() => {
+                  manuallyPausedRef.current = true;
+                  videoRef.current?.pause();
+                }}
+                aria-label="Pausar"
+                className="absolute bottom-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/65 active:scale-90"
+              >
+                <Pause size={17} />
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setMuted((m) => !m)}
+              aria-label={muted ? 'Activar sonido' : 'Silenciar'}
+              aria-pressed={!muted}
+              className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/65 active:scale-90"
+            >
+              {muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
+            </button>
+          </div>
+        )}
+
+        {resolvedLogoUrl && (
+          <div className="mt-3 flex justify-center border-t border-border pt-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-border bg-white">
+              <FadeImage
+                src={optimizedImageUrl(resolvedLogoUrl, 130)}
+                alt={nombre}
+                style={{ objectPosition: logoPos ?? '50% 50%' }}
+                className="h-full w-full rounded-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 }
@@ -1295,10 +1296,25 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
   // mostraba "No encontramos esta inmobiliaria" un instante antes de que
   // el perfil real apareciera.
   if (!agency && loading) {
+    // El logo de Cosiris, no el de la inmobiliaria: en este punto todavía no
+    // sabemos cuál es — `agency` es justo lo que este loading está esperando
+    // (y para la URL /inmobiliarias-en-<ciudad>/<slug>, que es la que usa
+    // casi todo el tráfico real, ni siquiera se puede saber a qué
+    // inmobiliaria corresponde el slug sin haber cargado antes el
+    // directorio completo, porque el slug se calcula comparando contra
+    // todas las de esa ciudad).
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-white px-4">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-[#FF8000]" />
-        <p className="text-sm font-medium text-slate-500">Cargando inmobiliaria…</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-5 bg-white px-4">
+        <motion.img
+          src="/assets/logo_orange.png"
+          alt="Cosiris"
+          width={190}
+          height={85}
+          className="h-12 w-auto"
+          animate={{ opacity: [0.45, 1, 0.45], scale: [0.94, 1, 0.94] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <p className="text-sm font-medium text-slate-500">Cargando el perfil…</p>
       </div>
     );
   }
