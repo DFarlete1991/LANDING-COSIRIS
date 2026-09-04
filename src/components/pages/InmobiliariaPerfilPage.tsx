@@ -1011,12 +1011,7 @@ function ValuationHero({
           transition={{ duration: 0.5, ease: EASE }}
           className="w-full max-w-[540px] rounded-[32px] bg-white p-8 text-center shadow-[0_30px_70px_rgba(15,23,42,0.25)] sm:p-11"
         >
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/8 px-4 py-1.5 text-xs font-semibold text-primary sm:text-sm">
-            <Check size={14} className="shrink-0" strokeWidth={3} />
-            Gratuita · Sin compromiso · Valoración final en tu primera visita
-          </span>
-
-          <h2 className="mt-6 text-[28px] font-bold tracking-[-0.01em] text-[#0F172A] sm:text-[36px]">
+          <h2 className="text-[28px] font-bold tracking-[-0.01em] text-[#0F172A] sm:text-[36px]">
             Solicita tu valoración
           </h2>
 
@@ -1104,12 +1099,7 @@ function TypeSelectorModal({
             <X size={18} />
           </button>
 
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/8 px-4 py-1.5 text-xs font-semibold text-primary">
-            <Check size={13} className="shrink-0" strokeWidth={3} />
-            Gratuita · Sin compromiso · Valoración final en tu primera visita
-          </span>
-
-          <h3 className="mt-5 text-2xl font-bold text-[#0F172A]">Solicita tu valoración</h3>
+          <h3 className="text-2xl font-bold text-[#0F172A]">Solicita tu valoración</h3>
           <p className="mt-1 text-sm text-ink-muted">¿Qué tipo de inmueble quieres valorar con {agency.nombre_comercial}?</p>
 
           <div className="mt-6">
