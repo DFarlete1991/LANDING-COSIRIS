@@ -1421,7 +1421,10 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 (1024px): de lo contrario, entre esos dos anchos, un vídeo
                 vertical angosto quedaba centrado en una columna de ancho
                 completo con muchísimo blanco a los lados. Sin vídeo, la bio
-                de la derecha simplemente ocupa el ancho completo. */}
+                se limita a un ancho de lectura cómodo y se centra en la fila
+                completa — dejarla en columna angosta pegada a la izquierda
+                de un contenedor de 1400px, con toda esa franja vacía a la
+                derecha sin usar, se veía desangelado. */}
             {hasPlayableVideo && agency.media_presentacion_url && (
               <motion.div
                 initial={{ opacity: 0, y: 14 }}
@@ -1443,7 +1446,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
-              className="relative md:pr-[170px] lg:pr-[220px] xl:pr-[260px]"
+              className={`relative ${heroFotoUrl ? 'md:pr-[170px] lg:pr-[220px] xl:pr-[260px]' : ''} ${!hasPlayableVideo ? 'md:mx-auto md:max-w-[760px]' : ''}`}
             >
               {/* Foto del agente junto al nombre — en móvil centrada encima
                   del bloque, desde tablet (`md`) flotando a la derecha del
