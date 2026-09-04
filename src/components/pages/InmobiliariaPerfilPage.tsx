@@ -1271,12 +1271,16 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
   const heroFotoUrl = useValidImageUrl(agency?.foto_url);
 
-  // Entrada del nombre letra a letra + estrellas con rebote elástico, con
-  // anime.js en vez de framer-motion — partir el texto en caracteres y
-  // encadenar un stagger elástico es mucho más directo con `splitText` +
-  // `stagger` de anime.js que replicarlo a mano con variants.
+  // Entrada 3D del nombre (cada letra gira desde -90° en el eje X, como una
+  // persiana) + estrellas con rebote elástico, con anime.js en vez de
+  // framer-motion — partir el texto en caracteres y encadenar un stagger con
+  // rotación en 3D es mucho más directo con `splitText` + `stagger` de
+  // anime.js que replicarlo a mano con variants. El div envolvente pone la
+  // `perspective` (tiene que vivir en un ANCESTOR de lo que gira en 3D, no en
+  // el propio elemento, si no el giro se ve aplastado en vez de con volumen).
   const nameRef = useRef<HTMLHeadingElement>(null);
   const starsRef = useRef<HTMLDivElement>(null);
+  const tiltRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!agency || prefersReducedMotion()) return;
     const nameEl = nameRef.current;
@@ -1285,11 +1289,12 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
     const splitter = splitText(nameEl, { chars: true });
     animate(splitter.chars, {
       opacity: [0, 1],
-      y: [26, 0],
-      rotate: [6, 0],
-      duration: 700,
-      delay: stagger(22),
-      ease: 'outExpo',
+      rotateX: [-90, 0],
+      translateY: [30, 0],
+      translateZ: 0,
+      duration: 900,
+      delay: stagger(35),
+      ease: 'outBack',
     });
 
     const starIcons = starsRef.current?.querySelectorAll('svg');
@@ -1297,14 +1302,47 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
       animate(starIcons, {
         scale: [0, 1],
         opacity: [0, 1],
-        duration: 500,
-        delay: stagger(90, { start: 350 }),
+        rotateZ: [-25, 0],
+        duration: 550,
+        delay: stagger(100, { start: 450 }),
         ease: 'outElastic(1, .6)',
       });
     }
 
-    return () => splitter.revert();
+    return () => { splitter.revert(); };
   }, [agency?.id]);
+
+  // Tarjeta con inclinación 3D que sigue al cursor (tilt card) — todo el
+  // bloque de nombre/bio gira levemente en `rotateX`/`rotateY` según la
+  // posición del puntero, con anime.js interpolando cada frame para que el
+  // regreso al reposo tenga un rebote suave en vez de saltar en seco.
+  useEffect(() => {
+    const el = tiltRef.current;
+    if (!el || prefersReducedMotion()) return;
+
+    const handleMove = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      const rect = el.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      animate(el, {
+        rotateY: px * 8,
+        rotateX: py * -8,
+        duration: 400,
+        ease: 'outQuad',
+      });
+    };
+    const handleLeave = () => {
+      animate(el, { rotateX: 0, rotateY: 0, duration: 700, ease: 'outElastic(1, .5)' });
+    };
+
+    el.addEventListener('pointermove', handleMove);
+    el.addEventListener('pointerleave', handleLeave);
+    return () => {
+      el.removeEventListener('pointermove', handleMove);
+      el.removeEventListener('pointerleave', handleLeave);
+    };
+  }, []);
 
   // Si se llegó desde una búsqueda (lista de resultados), conserva el punto
   // buscado para poder mostrar distancia real en el mapa del perfil.
@@ -1507,65 +1545,69 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 </motion.div>
               )}
 
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
-                  {displayCity || agency.provincia}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-primary shadow-soft">
-                  <BadgeCheck size={12} /> Verificada
-                </span>
-              </div>
+              <div style={{ perspective: '1200px' }}>
+                <div ref={tiltRef} style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
+                      {displayCity || agency.provincia}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-primary shadow-soft">
+                      <BadgeCheck size={12} /> Verificada
+                    </span>
+                  </div>
 
-              <h1
-                ref={nameRef}
-                className="mt-6 text-[40px] font-black leading-[1.05] tracking-[-0.02em] text-foreground sm:text-5xl lg:text-[56px]"
-              >
-                {agency.nombre_comercial}
-              </h1>
+                  <h1
+                    ref={nameRef}
+                    className="mt-6 text-[40px] font-black leading-[1.05] tracking-[-0.02em] text-foreground sm:text-5xl lg:text-[56px]"
+                  >
+                    {agency.nombre_comercial}
+                  </h1>
 
-              <div className="mt-4 flex items-center gap-2">
-                <div ref={starsRef} className="flex items-center gap-0.5">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} size={16} className="fill-amber-400 text-amber-400" />
-                  ))}
+                  <div className="mt-4 flex items-center gap-2">
+                    <div ref={starsRef} className="flex items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star key={star} size={16} className="fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                    <span className="text-sm font-bold text-foreground">{agency.rating?.toFixed(1)}</span>
+                    {agency.num_opiniones != null && (
+                      <span className="text-sm text-ink-muted">({agency.num_opiniones} opiniones)</span>
+                    )}
+                  </div>
+
+                  <p className="mt-4 flex items-center gap-1.5 text-body-sm text-ink-muted">
+                    <MapPin size={15} className="shrink-0 text-primary" /> {[displayCity, agency.provincia].filter(Boolean).join(', ')}
+                  </p>
+
+                  <p className="mt-2 flex items-center gap-1.5 text-body-sm text-ink-muted">
+                    <BadgeCheck size={15} className="shrink-0 text-primary" /> Inmobiliaria verificada por Cosiris
+                  </p>
+
+                  <p ref={bioRef} className={`mt-6 max-w-[520px] text-body leading-relaxed text-ink-muted ${bioExpanded ? '' : 'line-clamp-3'}`}>
+                    {agency.texto_presentacion}
+                  </p>
+                  {(bioOverflowing || bioExpanded) && (
+                    <button
+                      type="button"
+                      onClick={() => setBioExpanded((v) => !v)}
+                      className="mt-1.5 text-sm font-bold text-primary hover:underline"
+                    >
+                      {bioExpanded ? 'Leer menos' : 'Leer más'}
+                    </button>
+                  )}
+
+                  <div className="mt-5 flex items-center gap-2.5">
+                    <User size={15} className="shrink-0 text-ink-muted" />
+                    <div className="leading-tight">
+                      <p className="text-sm font-semibold text-foreground">{agency.nombre_agente}</p>
+                      <p className="text-xs text-ink-muted">Agente inmobiliario</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <CtaButton agency={agency} showPhone={showPhone} onOpenTypeSelector={() => setShowTypeModal(true)} />
+                  </div>
                 </div>
-                <span className="text-sm font-bold text-foreground">{agency.rating?.toFixed(1)}</span>
-                {agency.num_opiniones != null && (
-                  <span className="text-sm text-ink-muted">({agency.num_opiniones} opiniones)</span>
-                )}
-              </div>
-
-              <p className="mt-4 flex items-center gap-1.5 text-body-sm text-ink-muted">
-                <MapPin size={15} className="shrink-0 text-primary" /> {[displayCity, agency.provincia].filter(Boolean).join(', ')}
-              </p>
-
-              <p className="mt-2 flex items-center gap-1.5 text-body-sm text-ink-muted">
-                <BadgeCheck size={15} className="shrink-0 text-primary" /> Inmobiliaria verificada por Cosiris
-              </p>
-
-              <p ref={bioRef} className={`mt-6 max-w-[520px] text-body leading-relaxed text-ink-muted ${bioExpanded ? '' : 'line-clamp-3'}`}>
-                {agency.texto_presentacion}
-              </p>
-              {(bioOverflowing || bioExpanded) && (
-                <button
-                  type="button"
-                  onClick={() => setBioExpanded((v) => !v)}
-                  className="mt-1.5 text-sm font-bold text-primary hover:underline"
-                >
-                  {bioExpanded ? 'Leer menos' : 'Leer más'}
-                </button>
-              )}
-
-              <div className="mt-5 flex items-center gap-2.5">
-                <User size={15} className="shrink-0 text-ink-muted" />
-                <div className="leading-tight">
-                  <p className="text-sm font-semibold text-foreground">{agency.nombre_agente}</p>
-                  <p className="text-xs text-ink-muted">Agente inmobiliario</p>
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <CtaButton agency={agency} showPhone={showPhone} onOpenTypeSelector={() => setShowTypeModal(true)} />
               </div>
             </motion.div>
           </div>
