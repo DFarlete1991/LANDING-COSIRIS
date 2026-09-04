@@ -1,8 +1,22 @@
 import Select from 'react-select';
-import * as Flags from 'country-flag-icons/react/3x2';
+import {
+  ES, CO, MX, AR, CL, PE, EC, VE, UY, BO,
+  PY, PA, CR, DO, US, GB, FR, DE, IT, PT,
+} from 'country-flag-icons/react/3x2';
 import { COUNTRY_CODES, type CountryCode } from '@/data/country-codes';
 
-const FLAG_COMPONENTS = Flags as unknown as Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>>;
+// Se importan las banderas una a una, y NO con `import * as Flags`: el
+// namespace + el acceso dinámico FLAG_COMPONENTS[iso] impedía a Rollup
+// descartar nada, así que las ~250 banderas del paquete (230 kB) acababan en
+// el bundle principal de TODAS las rutas por culpa de este único combobox.
+// Aquí solo entran las 20 de COUNTRY_CODES — si se añade un país a esa lista,
+// hay que añadir su ISO también aquí o se quedará sin bandera.
+// El tipo se toma de una bandera cualquiera: el paquete define su propio
+// FlagComponent (sobre HTMLSVGElement) que no encaja con React.SVGProps.
+const FLAG_COMPONENTS: Record<string, typeof ES> = {
+  ES, CO, MX, AR, CL, PE, EC, VE, UY, BO,
+  PY, PA, CR, DO, US, GB, FR, DE, IT, PT,
+};
 
 function CountryOptionLabel({ country }: { country: CountryCode }) {
   const Flag = FLAG_COMPONENTS[country.iso];

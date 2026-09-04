@@ -1,11 +1,23 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import ContactModal from './components/ContactModal';
 import { CookieConsentBanner } from './components/CookieConsentBanner';
-import { InmobiliariasProvider } from './context/InmobiliariasContext';
+import { useUI } from './context/UIContext';
 import { parseAgencyProfilePath } from '@/lib/agency-url';
 import { captureAttribution } from '@/lib/utm';
 import { applyStoredConsentOnLoad } from '@/lib/cookieConsent';
+
+// ContactModal arrastraba react-select + las banderas de país (~290 kB) al
+// bundle de TODAS las rutas para un modal que arranca cerrado. Ahora su chunk
+// se descarga en segundo plano cuando el navegador está ocioso (ver
+// ContactModalMount), no en la ruta crítica del primer render.
+const ContactModal = lazy(() => import('./components/ContactModal'));
+
+// El provider tira de Supabase (~200 kB con auth/realtime/storage) y solo lo
+// necesitan las rutas de /inmobiliarias — las páginas de campaña
+// (/vendetuvivienda, /valoratuvivienda) lo pagaban sin usarlo nunca.
+const InmobiliariasProvider = lazy(() =>
+  import('./context/InmobiliariasContext').then((m) => ({ default: m.InmobiliariasProvider })),
+);
 
 // Cada página se descarga solo cuando se visita esa ruta, en vez de que
 // TODAS (mapas de Leaflet, three.js, formularios de registro, etc.) vayan
@@ -51,6 +63,46 @@ const standaloneRoutes: Record<string, React.ComponentType> = {
   '/gracias-vender': GraciasVenderPage,
   '/gracias': GraciasPage,
 };
+
+// Monta ContactModal solo a partir del primer intento de abrirlo. Si se
+// renderizara siempre (aunque él mismo se pinte vacío cuando está cerrado),
+// React.lazy pediría su chunk igualmente en cada carga y no habría ahorro.
+// Una vez montado se queda montado: desmontarlo al cerrar cortaría la
+// animación de salida de su <AnimatePresence>.
+function ContactModalMount() {
+  const { isContactModalOpen } = useUI();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    if (isContactModalOpen) setMounted(true);
+  }, [isContactModalOpen]);
+
+  // Precarga en cuanto el navegador queda ocioso, para que el chunk ya esté
+  // en caché al pulsar el CTA y no se note la descarga. `timeout` cubre el
+  // caso de una pestaña que nunca llega a estar ociosa.
+  useEffect(() => {
+    if (mounted) return;
+    const preload = () => { void import('./components/ContactModal'); };
+    // Safari no tuvo requestIdleCallback hasta la 18: se comprueba con un
+    // booleano aparte porque `'x' in window` estrecha el tipo de window y deja
+    // la rama del setTimeout como inalcanzable para TypeScript.
+    const supportsIdleCallback = typeof window.requestIdleCallback === 'function';
+    if (supportsIdleCallback) {
+      const id = window.requestIdleCallback(preload, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(preload, 2000);
+    return () => window.clearTimeout(id);
+  }, [mounted]);
+
+  if (!mounted) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <ContactModal />
+    </Suspense>
+  );
+}
 
 export default function App() {
   const [introDone, setIntroDone] = useState(false);
@@ -116,7 +168,7 @@ export default function App() {
         <Suspense fallback={null}>
           <PlanesInmobiliariasPage />
         </Suspense>
-        <ContactModal />
+        <ContactModalMount />
         <CookieConsentBanner />
       </>
     );
@@ -133,15 +185,20 @@ export default function App() {
     );
   }
 
+  // En las rutas con provider, el <Suspense> pasa a envolverlo a él (ahora es
+  // lazy). El banner de cookies se queda fuera a propósito: el consentimiento
+  // debe aparecer aunque el chunk del provider o de la página siga cargando.
   if (currentPath === '/inmobiliarias/valorar') {
     return (
-      <InmobiliariasProvider>
+      <>
         <Suspense fallback={null}>
-          <ValorarPropiedadPage />
+          <InmobiliariasProvider>
+            <ValorarPropiedadPage />
+          </InmobiliariasProvider>
         </Suspense>
-        <ContactModal />
+        <ContactModalMount />
         <CookieConsentBanner />
-      </InmobiliariasProvider>
+      </>
     );
   }
 
@@ -151,17 +208,19 @@ export default function App() {
   const profilePath = parseAgencyProfilePath(currentPath);
   if (profilePath) {
     return (
-      <InmobiliariasProvider>
+      <>
         <Suspense fallback={null}>
-          {profilePath.slug ? (
-            <InmobiliariaPerfilPage city={profilePath.city} slug={profilePath.slug} />
-          ) : (
-            <BuscadorInmobiliariasPage />
-          )}
+          <InmobiliariasProvider>
+            {profilePath.slug ? (
+              <InmobiliariaPerfilPage city={profilePath.city} slug={profilePath.slug} />
+            ) : (
+              <BuscadorInmobiliariasPage />
+            )}
+          </InmobiliariasProvider>
         </Suspense>
-        <ContactModal />
+        <ContactModalMount />
         <CookieConsentBanner />
-      </InmobiliariasProvider>
+      </>
     );
   }
 
@@ -170,25 +229,29 @@ export default function App() {
   if (currentPath.startsWith('/inmobiliarias/')) {
     const agencyId = decodeURIComponent(currentPath.slice('/inmobiliarias/'.length));
     return (
-      <InmobiliariasProvider>
+      <>
         <Suspense fallback={null}>
-          <InmobiliariaPerfilPage id={agencyId} />
+          <InmobiliariasProvider>
+            <InmobiliariaPerfilPage id={agencyId} />
+          </InmobiliariasProvider>
         </Suspense>
-        <ContactModal />
+        <ContactModalMount />
         <CookieConsentBanner />
-      </InmobiliariasProvider>
+      </>
     );
   }
 
   if (currentPath === '/inmobiliarias') {
     return (
-      <InmobiliariasProvider>
+      <>
         <Suspense fallback={null}>
-          <BuscadorInmobiliariasPage />
+          <InmobiliariasProvider>
+            <BuscadorInmobiliariasPage />
+          </InmobiliariasProvider>
         </Suspense>
-        <ContactModal />
+        <ContactModalMount />
         <CookieConsentBanner />
-      </InmobiliariasProvider>
+      </>
     );
   }
 
@@ -198,7 +261,7 @@ export default function App() {
       <Suspense fallback={null}>
         <StandalonePage />
       </Suspense>
-      <ContactModal />
+      <ContactModalMount />
       <CookieConsentBanner />
     </>
   );
@@ -226,7 +289,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <ContactModal />
+      <ContactModalMount />
       <CookieConsentBanner />
     </main>
   );
