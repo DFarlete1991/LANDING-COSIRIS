@@ -22,6 +22,7 @@ import { FadeImage } from '../ui/FadeImage';
 import { fetchResenasManuales, type ResenaManual } from '@/data/live-resenas';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 import { useValidImageUrl } from '@/lib/use-valid-image-url';
+import { animate, splitText, stagger } from 'animejs';
 
 // three.js + fiber pesan varios cientos de KB — nada de esto debe entrar en
 // el bundle inicial de una landing de campaña de pago. Se carga solo si el
@@ -1270,6 +1271,41 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
   const heroFotoUrl = useValidImageUrl(agency?.foto_url);
 
+  // Entrada del nombre letra a letra + estrellas con rebote elástico, con
+  // anime.js en vez de framer-motion — partir el texto en caracteres y
+  // encadenar un stagger elástico es mucho más directo con `splitText` +
+  // `stagger` de anime.js que replicarlo a mano con variants.
+  const nameRef = useRef<HTMLHeadingElement>(null);
+  const starsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!agency || prefersReducedMotion()) return;
+    const nameEl = nameRef.current;
+    if (!nameEl) return;
+
+    const splitter = splitText(nameEl, { chars: true });
+    animate(splitter.chars, {
+      opacity: [0, 1],
+      y: [26, 0],
+      rotate: [6, 0],
+      duration: 700,
+      delay: stagger(22),
+      ease: 'outExpo',
+    });
+
+    const starIcons = starsRef.current?.querySelectorAll('svg');
+    if (starIcons?.length) {
+      animate(starIcons, {
+        scale: [0, 1],
+        opacity: [0, 1],
+        duration: 500,
+        delay: stagger(90, { start: 350 }),
+        ease: 'outElastic(1, .6)',
+      });
+    }
+
+    return () => splitter.revert();
+  }, [agency?.id]);
+
   // Si se llegó desde una búsqueda (lista de resultados), conserva el punto
   // buscado para poder mostrar distancia real en el mapa del perfil.
   const searchPoint = useMemo(() => {
@@ -1414,10 +1450,12 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
             />
           </div>
 
-          <div className={`relative z-10 mt-10 grid grid-cols-1 items-start gap-10 ${hasPlayableVideo ? 'md:grid-cols-[1fr_1.3fr] md:gap-10 lg:gap-16' : ''}`}>
-            {/* El vídeo va primero en el DOM (columna izquierda desde
-                tablet) — en móvil, al ser grid-cols-1, igual queda arriba
-                del bloque de perfil. El corte es en `md` (768px), no `lg`
+          <div className={`relative z-10 mt-10 grid grid-cols-1 items-start gap-10 ${hasPlayableVideo ? 'md:grid-cols-[1.3fr_1fr] md:gap-10 lg:gap-16' : ''}`}>
+            {/* El vídeo va primero en el DOM para que en móvil (grid-cols-1)
+                siga apareciendo arriba del bloque de perfil, pero desde
+                tablet (`md`) se manda a la columna derecha con `order` — el
+                nombre de la inmobiliaria va siempre a la izquierda, es lo
+                primero que se lee. El corte es en `md` (768px), no `lg`
                 (1024px): de lo contrario, entre esos dos anchos, un vídeo
                 vertical angosto quedaba centrado en una columna de ancho
                 completo con muchísimo blanco a los lados. Sin vídeo, la bio
@@ -1430,6 +1468,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: EASE, delay: 0.08 }}
+                className="md:order-2"
               >
                 <VideoCard
                   url={agency.media_presentacion_url}
@@ -1446,7 +1485,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
-              className={`relative ${heroFotoUrl ? 'md:pr-[170px] lg:pr-[220px] xl:pr-[260px]' : ''} ${!hasPlayableVideo ? 'md:mx-auto md:max-w-[760px]' : ''}`}
+              className={`relative md:order-1 ${heroFotoUrl ? 'md:pr-[170px] lg:pr-[220px] xl:pr-[260px]' : ''} ${!hasPlayableVideo ? 'md:mx-auto md:max-w-[760px]' : ''}`}
             >
               {/* Foto del agente junto al nombre — en móvil centrada encima
                   del bloque, desde tablet (`md`) flotando a la derecha del
@@ -1477,12 +1516,15 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 </span>
               </div>
 
-              <h1 className="mt-6 text-[40px] font-black leading-[1.05] tracking-[-0.02em] text-foreground sm:text-5xl lg:text-[56px]">
+              <h1
+                ref={nameRef}
+                className="mt-6 text-[40px] font-black leading-[1.05] tracking-[-0.02em] text-foreground sm:text-5xl lg:text-[56px]"
+              >
                 {agency.nombre_comercial}
               </h1>
 
               <div className="mt-4 flex items-center gap-2">
-                <div className="flex items-center gap-0.5">
+                <div ref={starsRef} className="flex items-center gap-0.5">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star key={star} size={16} className="fill-amber-400 text-amber-400" />
                   ))}
