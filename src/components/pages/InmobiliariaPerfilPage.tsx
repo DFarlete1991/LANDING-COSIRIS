@@ -315,40 +315,33 @@ function VideoCard({
         )}
       </div>
 
-      {resolvedLogoUrl && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.4, delay: 0.1, ease: [0.19, 1, 0.22, 1] }}
-          className="relative z-10 -mb-8 mt-5 flex justify-center"
-        >
-          <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-white shadow-lg shadow-slate-900/10">
+      {/* El logo de la inmobiliaria antes flotaba superpuesto entre el vídeo y esta
+          tarjeta (círculo a medio camino de los dos, con -mb-8) -- quedaba apretado
+          justo en el borde entre ambos bloques. Ahora ocupa el mismo lugar que ya
+          usa el ícono de escudo por defecto (cuando no hay logo): un círculo chico
+          al inicio de esta misma tarjeta, en flujo normal, sin superposición. */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-40px' }}
+        transition={{ duration: 0.5, delay: 0.15, ease: [0.19, 1, 0.22, 1] }}
+        className="mt-5 flex items-center gap-3 rounded-[22px] border border-[#ECE8E1] bg-white px-5 py-4 shadow-[0_10px_30px_rgba(30,35,50,.05)]"
+      >
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/8 text-primary">
+          {resolvedLogoUrl ? (
             <FadeImage
-              src={optimizedImageUrl(resolvedLogoUrl, 130)}
+              src={optimizedImageUrl(resolvedLogoUrl, 90)}
               alt={nombre}
               style={{ objectPosition: logoPos ?? '50% 50%' }}
               className="h-full w-full rounded-full object-cover"
               loading="lazy"
               decoding="async"
             />
-          </div>
-        </motion.div>
-      )}
-
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-40px' }}
-        transition={{ duration: 0.5, delay: 0.15, ease: [0.19, 1, 0.22, 1] }}
-        className={`flex items-center gap-3 rounded-[22px] border border-[#ECE8E1] bg-white px-5 py-4 shadow-[0_10px_30px_rgba(30,35,50,.05)] ${resolvedLogoUrl ? 'pt-9' : 'mt-5'}`}
-      >
-        {!resolvedLogoUrl && (
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
+          ) : (
             <ShieldCheck size={18} />
-          </div>
-        )}
-        <div className={resolvedLogoUrl ? 'w-full text-center' : ''}>
+          )}
+        </div>
+        <div>
           <p className="text-sm font-bold text-[#0F172A]">Transparencia, compromiso y resultados comprobados.</p>
           <p className="text-xs text-[#68707F]">Así trabajamos en {nombre}.</p>
         </div>
@@ -1524,7 +1517,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
-              className={`relative md:order-1 ${heroFotoUrl ? 'md:pr-[170px] lg:pr-[220px] xl:pr-[260px]' : ''} ${!hasPlayableVideo ? 'md:mx-auto md:max-w-[760px]' : ''}`}
+              className={`relative md:order-1 ${!hasPlayableVideo ? 'md:mx-auto md:max-w-[760px]' : ''}`}
             >
               {/* Sin vídeo, el bloque de texto queda centrado en 760px y deja
                   un hueco vacío a cada lado en pantallas anchas — unas
@@ -1543,35 +1536,42 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 </div>
               )}
 
-              {/* Foto del agente junto al nombre — en móvil centrada encima
-                  del bloque, desde tablet (`md`) flotando a la derecha del
-                  texto (mismo corte que la columna del vídeo, arriba). */}
-              {heroFotoUrl && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, ease: EASE, delay: 0.15 }}
-                  className="pointer-events-none relative z-10 mb-6 flex justify-center md:absolute md:right-0 md:top-0 md:mb-0 md:justify-end"
-                >
-                  <FadeImage
-                    src={optimizedImageUrl(heroFotoUrl, 400)}
-                    alt={agency.nombre_agente}
-                    style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
-                    className="h-28 w-28 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-36 sm:w-36 md:h-[140px] md:w-[140px] lg:h-[180px] lg:w-[180px]"
-                    decoding="async"
-                  />
-                </motion.div>
-              )}
-
               <div style={{ perspective: '1200px' }}>
                 <div ref={tiltRef} style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
-                      {displayCity || agency.provincia}
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-primary shadow-soft">
-                      <BadgeCheck size={12} /> Verificada
-                    </span>
+                  {/* Foto del agente junto a los badges — antes flotaba absoluta a la
+                      derecha del bloque de texto, con ese hueco reservado a punta de
+                      padding-right (hasta 260px en xl). Ese hueco angostaba tanto la
+                      columna real de texto que un nombre de dos palabras (p. ej.
+                      "Inmobiliaria Pedro Moya") quedaba partido en dos líneas dentro de
+                      apenas ~500px, mucho más apretado de lo que hacía falta. En flujo
+                      normal junto a los badges, el texto usa el ancho completo del
+                      bloque (760px, o la columna 1.3fr cuando hay vídeo). */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
+                        {displayCity || agency.provincia}
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-primary shadow-soft">
+                        <BadgeCheck size={12} /> Verificada
+                      </span>
+                    </div>
+
+                    {heroFotoUrl && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, ease: EASE, delay: 0.15 }}
+                        className="pointer-events-none shrink-0"
+                      >
+                        <FadeImage
+                          src={optimizedImageUrl(heroFotoUrl, 400)}
+                          alt={agency.nombre_agente}
+                          style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
+                          className="h-16 w-16 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-20 sm:w-20 md:h-24 md:w-24"
+                          decoding="async"
+                        />
+                      </motion.div>
+                    )}
                   </div>
 
                   <h1
