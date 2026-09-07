@@ -172,19 +172,14 @@ async function fetchEmbedOrientation(embed: { platform: 'youtube' | 'vimeo'; id:
 function VideoCard({
   url,
   nombre,
-  logoUrl,
-  logoPos,
   posterUrl,
   onError,
 }: {
   url: string;
   nombre: string;
-  logoUrl?: string | null;
-  logoPos?: string | null;
   posterUrl?: string | null;
   onError?: () => void;
 }) {
-  const resolvedLogoUrl = useValidImageUrl(logoUrl);
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
@@ -237,28 +232,13 @@ function VideoCard({
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.7, ease: [0.19, 1, 0.22, 1] }}
     >
-      {/* Cabecera estilo "publicación de red social": logo redondo a la izquierda,
-          nombre de la inmobiliaria y "Video de presentación" como caption chico al
-          lado -- antes era un eyebrow "Conócenos" + titular grande sin el logo, que
-          es justo lo que dejaba al logo sin más sitio que superponerse encima del
-          video más abajo (ver el resto del componente). */}
-      <div className="mb-5 flex items-center gap-3">
-        {resolvedLogoUrl && (
-          <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-[0_2px_8px_rgba(15,23,42,.12)]">
-            <FadeImage
-              src={optimizedImageUrl(resolvedLogoUrl, 100)}
-              alt={nombre}
-              style={{ objectPosition: logoPos ?? '50% 50%' }}
-              className="h-full w-full object-cover"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-        )}
-        <div>
-          <p className="text-sm font-bold text-[#0F172A]">{nombre}</p>
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-primary">Video de presentación</p>
-        </div>
+      {/* Cabecera estilo "publicación de red social": nombre de la inmobiliaria y
+          "Video de presentación" como caption chico debajo -- sin logo redondo (se
+          probó con el logo aquí, pero la foto del agente ya cumple ese rol de
+          identificar quién habla, más abajo en la columna de texto). */}
+      <div className="mb-5">
+        <p className="text-sm font-bold text-[#0F172A]">{nombre}</p>
+        <p className="text-xs font-bold uppercase tracking-[0.1em] text-primary">Video de presentación</p>
       </div>
 
       <div className="rounded-[24px] border border-border bg-white p-3 shadow-[0_10px_30px_rgba(15,23,42,.06)]">
@@ -1344,6 +1324,40 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
     };
   }, []);
 
+  // Foto grande cuando NO hay vídeo (única pieza visual de la columna
+  // derecha, ver más abajo): un tilt igual de sutil que el de la tarjeta de
+  // texto, pero bastante más leve (la mitad de grados) porque aquí es lo
+  // único que hay en pantalla y no debe robar más atención que la tarjeta.
+  const photoTiltRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = photoTiltRef.current;
+    if (!el || prefersReducedMotion()) return;
+
+    const handleMove = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      const rect = el.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      animate(el, {
+        rotateY: px * 4,
+        rotateX: py * -4,
+        scale: 1.03,
+        duration: 450,
+        ease: 'outQuad',
+      });
+    };
+    const handleLeave = () => {
+      animate(el, { rotateX: 0, rotateY: 0, scale: 1, duration: 700, ease: 'outElastic(1, .6)' });
+    };
+
+    el.addEventListener('pointermove', handleMove);
+    el.addEventListener('pointerleave', handleLeave);
+    return () => {
+      el.removeEventListener('pointermove', handleMove);
+      el.removeEventListener('pointerleave', handleLeave);
+    };
+  }, []);
+
   // Si se llegó desde una búsqueda (lista de resultados), conserva el punto
   // buscado para poder mostrar distancia real en el mapa del perfil.
   const searchPoint = useMemo(() => {
@@ -1518,8 +1532,6 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 <VideoCard
                   url={agency.media_presentacion_url}
                   nombre={agency.nombre_comercial}
-                  logoUrl={agency.logo_url}
-                  logoPos={agency.logo_pos}
                   posterUrl={heroFotoUrl}
                   onError={() => setVideoBroken(true)}
                 />
@@ -1537,14 +1549,17 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: EASE, delay: 0.08 }}
                 className="flex justify-center md:order-2 md:h-full md:items-center"
+                style={{ perspective: '900px' }}
               >
-                <FadeImage
-                  src={optimizedImageUrl(heroFotoUrl, 600)}
-                  alt={agency.nombre_agente}
-                  style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
-                  className="h-48 w-48 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-56 sm:w-56 md:h-[240px] md:w-[240px] lg:h-[280px] lg:w-[280px]"
-                  decoding="async"
-                />
+                <div ref={photoTiltRef} style={{ willChange: 'transform' }}>
+                  <FadeImage
+                    src={optimizedImageUrl(heroFotoUrl, 600)}
+                    alt={agency.nombre_agente}
+                    style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
+                    className="h-48 w-48 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-56 sm:w-56 md:h-[240px] md:w-[240px] lg:h-[280px] lg:w-[280px]"
+                    decoding="async"
+                  />
+                </div>
               </motion.div>
             )}
 
@@ -1640,6 +1655,26 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                   <div className="mt-8">
                     <CtaButton agency={agency} showPhone={showPhone} onOpenTypeSelector={() => setShowTypeModal(true)} />
                   </div>
+
+                  {/* Con vídeo, la columna de texto suele quedar más corta que la del
+                      vídeo -- este hueco de abajo se aprovecha con la foto del agente,
+                      ya sin sitio arriba desde que se quitó del lado de los badges. */}
+                  {hasPlayableVideo && heroFotoUrl && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.94 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5, ease: EASE, delay: 0.2 }}
+                      className="mt-10 flex justify-center"
+                    >
+                      <FadeImage
+                        src={optimizedImageUrl(heroFotoUrl, 400)}
+                        alt={agency.nombre_agente}
+                        style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
+                        className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-36 sm:w-36 md:h-[150px] md:w-[150px]"
+                        decoding="async"
+                      />
+                    </motion.div>
+                  )}
                 </div>
               </div>
             </motion.div>
