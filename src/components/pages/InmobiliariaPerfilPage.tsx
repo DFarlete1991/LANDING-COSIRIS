@@ -237,9 +237,28 @@ function VideoCard({
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.7, ease: [0.19, 1, 0.22, 1] }}
     >
-      <div className="mb-5">
-        <span className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Conócenos</span>
-        <h3 className="mt-1 text-2xl font-bold text-[#0F172A] sm:text-[26px]">Video de presentación</h3>
+      {/* Cabecera estilo "publicación de red social": logo redondo a la izquierda,
+          nombre de la inmobiliaria y "Video de presentación" como caption chico al
+          lado -- antes era un eyebrow "Conócenos" + titular grande sin el logo, que
+          es justo lo que dejaba al logo sin más sitio que superponerse encima del
+          video más abajo (ver el resto del componente). */}
+      <div className="mb-5 flex items-center gap-3">
+        {resolvedLogoUrl && (
+          <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-[0_2px_8px_rgba(15,23,42,.12)]">
+            <FadeImage
+              src={optimizedImageUrl(resolvedLogoUrl, 100)}
+              alt={nombre}
+              style={{ objectPosition: logoPos ?? '50% 50%' }}
+              className="h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        )}
+        <div>
+          <p className="text-sm font-bold text-[#0F172A]">{nombre}</p>
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-primary">Video de presentación</p>
+        </div>
       </div>
 
       <div className="rounded-[24px] border border-border bg-white p-3 shadow-[0_10px_30px_rgba(15,23,42,.06)]">
@@ -315,11 +334,9 @@ function VideoCard({
         )}
       </div>
 
-      {/* El logo de la inmobiliaria antes flotaba superpuesto entre el vídeo y esta
-          tarjeta (círculo a medio camino de los dos, con -mb-8) -- quedaba apretado
-          justo en el borde entre ambos bloques. Ahora ocupa el mismo lugar que ya
-          usa el ícono de escudo por defecto (cuando no hay logo): un círculo chico
-          al inicio de esta misma tarjeta, en flujo normal, sin superposición. */}
+      {/* El logo ya se muestra arriba en la cabecera tipo publicación de red social
+          -- aquí siempre el ícono de escudo por defecto, para no repetir el mismo
+          logo dos veces seguidas en la misma tarjeta. */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -327,19 +344,8 @@ function VideoCard({
         transition={{ duration: 0.5, delay: 0.15, ease: [0.19, 1, 0.22, 1] }}
         className="mt-5 flex items-center gap-3 rounded-[22px] border border-[#ECE8E1] bg-white px-5 py-4 shadow-[0_10px_30px_rgba(30,35,50,.05)]"
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/8 text-primary">
-          {resolvedLogoUrl ? (
-            <FadeImage
-              src={optimizedImageUrl(resolvedLogoUrl, 90)}
-              alt={nombre}
-              style={{ objectPosition: logoPos ?? '50% 50%' }}
-              className="h-full w-full rounded-full object-cover"
-              loading="lazy"
-              decoding="async"
-            />
-          ) : (
-            <ShieldCheck size={18} />
-          )}
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
+          <ShieldCheck size={18} />
         </div>
         <div>
           <p className="text-sm font-bold text-[#0F172A]">Transparencia, compromiso y resultados comprobados.</p>
@@ -1422,6 +1428,14 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
     && (!!getVideoEmbed(agency.media_presentacion_url) || isDirectVideoUrl(agency.media_presentacion_url))
     && !videoBroken;
 
+  // Con vídeo o sin él, si hay foto del agente se usan las 2 columnas
+  // (texto a la izquierda, media a la derecha) -- antes solo el vídeo activaba
+  // ese layout, y sin vídeo el texto quedaba centrado en una columna angosta
+  // aunque hubiera una foto para llenar el lado derecho. Solo cuando no hay
+  // NINGUNA media (ni vídeo ni foto) se cae al layout de una sola columna
+  // centrada con las esferas 3D de relleno.
+  const hasSideMedia = hasPlayableVideo || !!heroFotoUrl;
+
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 antialiased">
       <div className="sticky top-0 z-30 border-b border-slate-100 bg-white/90 backdrop-blur-sm">
@@ -1482,18 +1496,17 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
             />
           </div>
 
-          <div className={`relative z-10 mt-10 grid grid-cols-1 items-start gap-10 ${hasPlayableVideo ? 'md:grid-cols-[1.3fr_1fr] md:gap-10 lg:gap-16' : ''}`}>
-            {/* El vídeo va primero en el DOM para que en móvil (grid-cols-1)
-                siga apareciendo arriba del bloque de perfil, pero desde
-                tablet (`md`) se manda a la columna derecha con `order` — el
-                nombre de la inmobiliaria va siempre a la izquierda, es lo
-                primero que se lee. El corte es en `md` (768px), no `lg`
-                (1024px): de lo contrario, entre esos dos anchos, un vídeo
-                vertical angosto quedaba centrado en una columna de ancho
-                completo con muchísimo blanco a los lados. Sin vídeo, la bio
-                se limita a un ancho de lectura cómodo y se centra en la fila
-                completa — dejarla en columna angosta pegada a la izquierda
-                de un contenedor de 1400px, con toda esa franja vacía a la
+          <div className={`relative z-10 mt-10 grid grid-cols-1 items-start gap-10 ${hasSideMedia ? 'md:grid-cols-[1.3fr_1fr] md:gap-10 lg:gap-16' : ''}`}>
+            {/* El vídeo (o si no hay, la foto grande del agente) va primero en el DOM
+                para que en móvil (grid-cols-1) siga apareciendo arriba del bloque de
+                perfil, pero desde tablet (`md`) se manda a la columna derecha con
+                `order` — el nombre de la inmobiliaria va siempre a la izquierda, es lo
+                primero que se lee. El corte es en `md` (768px), no `lg` (1024px): de lo
+                contrario, entre esos dos anchos, un vídeo vertical angosto quedaba
+                centrado en una columna de ancho completo con muchísimo blanco a los
+                lados. Sin vídeo NI foto, la bio se limita a un ancho de lectura cómodo
+                y se centra en la fila completa — dejarla en columna angosta pegada a la
+                izquierda de un contenedor de 1400px, con toda esa franja vacía a la
                 derecha sin usar, se veía desangelado. */}
             {hasPlayableVideo && agency.media_presentacion_url && (
               <motion.div
@@ -1513,19 +1526,41 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
               </motion.div>
             )}
 
+            {/* Sin vídeo pero con foto: la foto pasa a ocupar la columna derecha
+                (como haría el vídeo), centrada verticalmente y bastante más grande
+                que el tamaño chico que tenía junto a los badges — antes, sin vídeo,
+                esa foto era chica y el hueco de la columna derecha se llenaba solo
+                con las esferas 3D decorativas. */}
+            {!hasPlayableVideo && heroFotoUrl && (
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: EASE, delay: 0.08 }}
+                className="flex justify-center md:order-2 md:h-full md:items-center"
+              >
+                <FadeImage
+                  src={optimizedImageUrl(heroFotoUrl, 600)}
+                  alt={agency.nombre_agente}
+                  style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
+                  className="h-48 w-48 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-56 sm:w-56 md:h-[240px] md:w-[240px] lg:h-[280px] lg:w-[280px]"
+                  decoding="async"
+                />
+              </motion.div>
+            )}
+
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
-              className={`relative md:order-1 ${!hasPlayableVideo ? 'md:mx-auto md:max-w-[760px]' : ''}`}
+              className={`relative md:order-1 ${!hasSideMedia ? 'md:mx-auto md:max-w-[760px]' : ''}`}
             >
-              {/* Sin vídeo, el bloque de texto queda centrado en 760px y deja
+              {/* Sin ninguna media, el bloque de texto queda centrado en 760px y deja
                   un hueco vacío a cada lado en pantallas anchas — unas
                   esferas 3D translúcidas (mismo componente que ya existía
                   para el hero, ver ProfileHeroOrbs) lo llenan sin competir
                   con el contenido: solo desktop grande (`xl:`, hueco de
                   sobra) y solo si hay margen para three.js (`show3D`). */}
-              {!hasPlayableVideo && show3D && (
+              {!hasSideMedia && show3D && (
                 <div
                   aria-hidden="true"
                   className="pointer-events-none absolute left-full top-1/2 hidden h-[280px] w-[280px] -translate-y-1/2 opacity-90 xl:block"
@@ -1538,14 +1573,16 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
               <div style={{ perspective: '1200px' }}>
                 <div ref={tiltRef} style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}>
-                  {/* Foto del agente junto a los badges — antes flotaba absoluta a la
-                      derecha del bloque de texto, con ese hueco reservado a punta de
-                      padding-right (hasta 260px en xl). Ese hueco angostaba tanto la
-                      columna real de texto que un nombre de dos palabras (p. ej.
-                      "Inmobiliaria Pedro Moya") quedaba partido en dos líneas dentro de
-                      apenas ~500px, mucho más apretado de lo que hacía falta. En flujo
-                      normal junto a los badges, el texto usa el ancho completo del
-                      bloque (760px, o la columna 1.3fr cuando hay vídeo). */}
+                  {/* Foto del agente junto a los badges -- solo cuando SÍ hay vídeo: ahí la
+                      columna derecha la ocupa el vídeo, así que esta versión chica sirve de
+                      referencia visual de quién habla. Sin vídeo, la foto ya se muestra
+                      grande en la columna derecha (ver arriba) y repetirla aquí chica sería
+                      redundante. Antes flotaba absoluta a la derecha del bloque de texto, con
+                      un hueco reservado a punta de padding-right (hasta 260px en xl) que
+                      angostaba tanto la columna real de texto que un nombre de dos palabras
+                      (p. ej. "Inmobiliaria Pedro Moya") quedaba partido en dos líneas dentro
+                      de apenas ~500px. En flujo normal junto a los badges, el texto usa el
+                      ancho completo de su columna. */}
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
@@ -1556,7 +1593,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                       </span>
                     </div>
 
-                    {heroFotoUrl && (
+                    {hasPlayableVideo && heroFotoUrl && (
                       <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
