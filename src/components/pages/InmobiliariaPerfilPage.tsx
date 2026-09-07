@@ -1573,42 +1573,20 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
               <div style={{ perspective: '1200px' }}>
                 <div ref={tiltRef} style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}>
-                  {/* Foto del agente junto a los badges -- solo cuando SÍ hay vídeo: ahí la
-                      columna derecha la ocupa el vídeo, así que esta versión chica sirve de
-                      referencia visual de quién habla. Sin vídeo, la foto ya se muestra
-                      grande en la columna derecha (ver arriba) y repetirla aquí chica sería
-                      redundante. Antes flotaba absoluta a la derecha del bloque de texto, con
-                      un hueco reservado a punta de padding-right (hasta 260px en xl) que
-                      angostaba tanto la columna real de texto que un nombre de dos palabras
-                      (p. ej. "Inmobiliaria Pedro Moya") quedaba partido en dos líneas dentro
-                      de apenas ~500px. En flujo normal junto a los badges, el texto usa el
-                      ancho completo de su columna. */}
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
-                        {displayCity || agency.provincia}
-                      </span>
-                      <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-primary shadow-soft">
-                        <BadgeCheck size={12} /> Verificada
-                      </span>
-                    </div>
-
-                    {hasPlayableVideo && heroFotoUrl && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.5, ease: EASE, delay: 0.15 }}
-                        className="pointer-events-none shrink-0"
-                      >
-                        <FadeImage
-                          src={optimizedImageUrl(heroFotoUrl, 400)}
-                          alt={agency.nombre_agente}
-                          style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
-                          className="h-16 w-16 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-20 sm:w-20 md:h-24 md:w-24"
-                          decoding="async"
-                        />
-                      </motion.div>
-                    )}
+                  {/* Con vídeo, la foto del agente NO se repite aquí -- ya aparece en la
+                      cabecera tipo publicación del propio VideoCard (logo + nombre +
+                      "Video de presentación"), así que ponerla otra vez junto a los badges
+                      era el mismo círculo dos veces en la misma pantalla. Sin vídeo, la
+                      foto se muestra grande en la columna derecha (ver arriba). En flujo
+                      normal junto a los badges (sin position:absolute ni padding-right
+                      reservado), el texto usa el ancho completo de su columna. */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
+                      {displayCity || agency.provincia}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-primary shadow-soft">
+                      <BadgeCheck size={12} /> Verificada
+                    </span>
                   </div>
 
                   <h1
