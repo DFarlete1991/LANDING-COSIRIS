@@ -29,6 +29,7 @@ import { animate, splitText, stagger } from 'animejs';
 // visitante entra en desktop (ver `show3D` más abajo), y ni siquiera
 // entonces hasta que React decide pintarlo.
 const LocationGlobe = lazy(() => import('../ui/LocationGlobe'));
+const ProfileHeroOrbs = lazy(() => import('../ui/ProfileHeroOrbs'));
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -1525,6 +1526,23 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
               transition={{ duration: 0.5, ease: EASE }}
               className={`relative md:order-1 ${heroFotoUrl ? 'md:pr-[170px] lg:pr-[220px] xl:pr-[260px]' : ''} ${!hasPlayableVideo ? 'md:mx-auto md:max-w-[760px]' : ''}`}
             >
+              {/* Sin vídeo, el bloque de texto queda centrado en 760px y deja
+                  un hueco vacío a cada lado en pantallas anchas — unas
+                  esferas 3D translúcidas (mismo componente que ya existía
+                  para el hero, ver ProfileHeroOrbs) lo llenan sin competir
+                  con el contenido: solo desktop grande (`xl:`, hueco de
+                  sobra) y solo si hay margen para three.js (`show3D`). */}
+              {!hasPlayableVideo && show3D && (
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-full top-1/2 hidden h-[280px] w-[280px] -translate-y-1/2 opacity-90 xl:block"
+                >
+                  <Suspense fallback={null}>
+                    <ProfileHeroOrbs colorHex={agency.color_hex} />
+                  </Suspense>
+                </div>
+              )}
+
               {/* Foto del agente junto al nombre — en móvil centrada encima
                   del bloque, desde tablet (`md`) flotando a la derecha del
                   texto (mismo corte que la columna del vídeo, arriba). */}
