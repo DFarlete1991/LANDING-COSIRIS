@@ -172,14 +172,19 @@ async function fetchEmbedOrientation(embed: { platform: 'youtube' | 'vimeo'; id:
 function VideoCard({
   url,
   nombre,
+  logoUrl,
+  logoPos,
   posterUrl,
   onError,
 }: {
   url: string;
   nombre: string;
+  logoUrl?: string | null;
+  logoPos?: string | null;
   posterUrl?: string | null;
   onError?: () => void;
 }) {
+  const resolvedLogoUrl = useValidImageUrl(logoUrl);
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
@@ -314,11 +319,12 @@ function VideoCard({
         )}
       </div>
 
-      {/* El logo ya se muestra arriba en la cabecera tipo publicación de red social
-          -- aquí siempre el ícono de escudo por defecto, para no repetir el mismo
-          logo dos veces seguidas en la misma tarjeta. En móvil el ícono va arriba
-          y el texto centrado debajo (columna); desde `sm` vuelve a la fila de
-          siempre, ícono a la izquierda y texto alineado a la izquierda. */}
+      {/* El logo de la inmobiliaria vive aquí, debajo del video, en flujo normal
+          -- ya no en la cabecera de arriba (se quitó de ahí, ver el comentario
+          en esa sección) ni superpuesto sobre nada. Si no hay logo, cae al
+          ícono de escudo de siempre. En móvil el logo/ícono va arriba y el
+          texto centrado debajo (columna); desde `sm` vuelve a la fila de
+          siempre, a la izquierda. */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -326,9 +332,22 @@ function VideoCard({
         transition={{ duration: 0.5, delay: 0.15, ease: [0.19, 1, 0.22, 1] }}
         className="mt-5 flex flex-col items-center gap-3 rounded-[22px] border border-[#ECE8E1] bg-white px-5 py-4 text-center shadow-[0_10px_30px_rgba(30,35,50,.05)] sm:flex-row sm:text-left"
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
-          <ShieldCheck size={18} />
-        </div>
+        {resolvedLogoUrl ? (
+          <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[#ECE8E1]">
+            <FadeImage
+              src={optimizedImageUrl(resolvedLogoUrl, 100)}
+              alt={nombre}
+              style={{ objectPosition: logoPos ?? '50% 50%' }}
+              className="h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        ) : (
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
+            <ShieldCheck size={18} />
+          </div>
+        )}
         <div>
           <p className="text-sm font-bold text-[#0F172A]">Transparencia, compromiso y resultados comprobados.</p>
           <p className="text-xs text-[#68707F]">Así trabajamos en {nombre}.</p>
@@ -1534,6 +1553,8 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 <VideoCard
                   url={agency.media_presentacion_url}
                   nombre={agency.nombre_comercial}
+                  logoUrl={agency.logo_url}
+                  logoPos={agency.logo_pos}
                   posterUrl={heroFotoUrl}
                   onError={() => setVideoBroken(true)}
                 />
