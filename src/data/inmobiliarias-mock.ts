@@ -43,6 +43,10 @@ export type InmobiliariaPublica = {
   /** null cuando la inmobiliaria (típicamente un cliente de prueba recién aprobado) no fijó su ubicación en el mapa — sigue siendo válida para búsqueda por nombre y estadísticas, pero se excluye de mapa/ciudad/distancia. */
   lat: number | null;
   lng: number | null;
+  /** Controla si el perfil público muestra la franja "por qué elegirnos". Se
+      trata como `true` cuando no llega (undefined) para no ocultar la franja
+      en perfiles antiguos que aún no configuraron esto en el CRM. */
+  mostrar_diferenciales?: boolean | null;
 };
 
 export const INMOBILIARIAS_MOCK: InmobiliariaPublica[] = [

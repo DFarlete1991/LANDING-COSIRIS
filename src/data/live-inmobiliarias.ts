@@ -32,6 +32,7 @@ type DirectorioRow = {
   lng: number | null;
   hero_image_url: string | null;
   google_place_id: string | null;
+  mostrar_diferenciales: boolean | null;
 };
 
 function mapRow(row: DirectorioRow): InmobiliariaPublica {
@@ -70,6 +71,9 @@ function mapRow(row: DirectorioRow): InmobiliariaPublica {
     lng: row.lng,
     hero_image_url: row.hero_image_url,
     google_place_id: row.google_place_id,
+    // `?? true`: si la columna todavía no existe en la vista del CRM (o el
+    // cliente no la ha tocado), la franja se muestra por defecto.
+    mostrar_diferenciales: row.mostrar_diferenciales ?? true,
   };
 }
 
