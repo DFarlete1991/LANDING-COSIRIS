@@ -1670,7 +1670,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                         src={optimizedImageUrl(heroFotoUrl, 400)}
                         alt={agency.nombre_agente}
                         style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
-                        className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-36 sm:w-36 md:h-[150px] md:w-[150px]"
+                        className="h-40 w-40 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-44 sm:w-44 md:h-[190px] md:w-[190px]"
                         decoding="async"
                       />
                     </motion.div>
