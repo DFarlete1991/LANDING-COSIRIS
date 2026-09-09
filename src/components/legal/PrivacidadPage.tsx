@@ -9,14 +9,7 @@ export function PrivacidadPage() {
 
       <section>
         <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">RESPONSABLE DEL TRATAMIENTO DE LOS DATOS PERSONALES</h2>
-        {/* TODO(cosiris): sustituir por los datos reales de inscripcion registral
-            (Registro Mercantil de que provincia, tomo, libro, folio, hoja e
-            inscripcion) antes de publicar. Se retiro el marcador [XXXXXX] que
-            llevaba publicado sin rellenar — un placeholder sin completar en un
-            documento legal en produccion incumple el art. 10.1.b) LSSI igual
-            que un dato inventado, asi que mientras no se confirme el dato real
-            esta frase se omite en vez de fabricar un tomo/folio falso. */}
-        <p>El responsable del tratamiento de los datos personales que el usuario facilite al acceder y utilizar el sitio web, es, en calidad de propietario, CONSULTORA NEGOCIO COSIRIS, S.L., con C.I.F. núm. B-44913903, con domicilio social a estos efectos en Carrer Mossèn Jacint Verdaguer, número 4, La Sènia, Tarragona, C.P. 43560. Dirección de correo electrónico de contacto comercial@cosiris.com.</p>
+        <p>El responsable del tratamiento de los datos personales que el usuario facilite al acceder y utilizar el sitio web, es, en calidad de propietario, CONSULTORA NEGOCIO COSIRIS, S.L., con C.I.F. núm. B-44913903, con domicilio social a estos efectos en Carrer Mossèn Jacint Verdaguer, número 4, La Sènia, Tarragona, C.P. 43560. Dirección de correo electrónico de contacto comercial@cosiris.com. Inscrita en el Registro Mercantil de Tarragona, al Tomo 3362, Folio 61, Hoja T-60152, Inscripción 1ª.</p>
         <p>CONSULTORA NEGOCIO COSIRIS, S.L.. se compromete a aplicar las medidas de seguridad informática previstas en la normativa citada previamente, con el objetivo de impedir el acceso o uso indebido de los datos, su manipulación, deterioro o pérdida.</p>
       </section>
 

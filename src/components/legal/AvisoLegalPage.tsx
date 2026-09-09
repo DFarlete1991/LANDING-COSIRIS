@@ -8,7 +8,7 @@ export function AvisoLegalPage() {
       <section>
         <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">DATOS IDENTIFICATIVOS</h2>
         <p>En cumplimiento del deber de información regulado en el art. 10 LSSICE, a continuación se facilitan los datos necesarios del titular de la página web:</p>
-        <p>La empresa que gestiona los servicios y el dominio web es CONSULTORA NEGOCIO COSIRIS, S.L., con N.I.F. B-44913903, con domicilio social a estos efectos en Carrer Mossen Jacint Verdaguer número 4 La Senia, Tarragona (CP 43560).</p>
+        <p>La empresa que gestiona los servicios y el dominio web es CONSULTORA NEGOCIO COSIRIS, S.L., con N.I.F. B-44913903, con domicilio social a estos efectos en Carrer Mossen Jacint Verdaguer número 4 La Senia, Tarragona (CP 43560), inscrita en el Registro Mercantil de Tarragona, al Tomo 3362, Folio 61, Hoja T-60152, Inscripción 1ª.</p>
         <p>Dirección de correo electrónico de contacto comercial@cosiris.com.</p>
       </section>
 
