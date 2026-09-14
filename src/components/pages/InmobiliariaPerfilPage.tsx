@@ -130,17 +130,17 @@ function DifferentiatorsStrip() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.45, ease: [0.19, 1, 0.22, 1] }}
-      className="flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4"
+      className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
     >
       {WHY_US.map(({ icon: Icon, title }) => (
         <div
           key={title}
-          className="flex shrink-0 snap-start items-center gap-3 rounded-2xl border border-[#ECE8E1] bg-white px-4 py-3.5 shadow-[0_6px_20px_rgba(30,35,50,.04)] sm:shrink"
+          className="flex items-center gap-3 rounded-2xl border border-[#ECE8E1] bg-white px-4 py-3.5 shadow-[0_6px_20px_rgba(30,35,50,.04)]"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
             <Icon size={16} />
           </div>
-          <p className="whitespace-nowrap text-sm font-semibold text-[#0F172A] sm:whitespace-normal">{title}</p>
+          <p className="text-sm font-semibold text-[#0F172A]">{title}</p>
         </div>
       ))}
     </motion.div>
@@ -1532,23 +1532,24 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
           </div>
 
           <div className={`relative z-10 mt-10 grid grid-cols-1 items-start gap-10 ${hasSideMedia ? 'md:grid-cols-[1.3fr_1fr] md:gap-10 lg:gap-16' : ''}`}>
-            {/* El vídeo (o si no hay, la foto grande del agente) va primero en el DOM
-                para que en móvil (grid-cols-1) siga apareciendo arriba del bloque de
-                perfil, pero desde tablet (`md`) se manda a la columna derecha con
-                `order` — el nombre de la inmobiliaria va siempre a la izquierda, es lo
-                primero que se lee. El corte es en `md` (768px), no `lg` (1024px): de lo
-                contrario, entre esos dos anchos, un vídeo vertical angosto quedaba
-                centrado en una columna de ancho completo con muchísimo blanco a los
-                lados. Sin vídeo NI foto, la bio se limita a un ancho de lectura cómodo
-                y se centra en la fila completa — dejarla en columna angosta pegada a la
-                izquierda de un contenedor de 1400px, con toda esa franja vacía a la
-                derecha sin usar, se veía desangelado. */}
+            {/* El vídeo (o si no hay, la foto grande del agente) va primero en el DOM,
+                pero en móvil se manda al final del stack con `order-2` — el visitante
+                lee primero la presentación (nombre, bio, agente, CTA) y el vídeo queda
+                como refuerzo debajo, no como lo primero que tapa la pantalla. Desde
+                tablet (`md`) se mantiene igual (`order-2`, columna derecha) — el corte
+                es en `md` (768px), no `lg` (1024px): de lo contrario, entre esos dos
+                anchos, un vídeo vertical angosto quedaba centrado en una columna de
+                ancho completo con muchísimo blanco a los lados. Sin vídeo NI foto, la
+                bio se limita a un ancho de lectura cómodo y se centra en la fila
+                completa — dejarla en columna angosta pegada a la izquierda de un
+                contenedor de 1400px, con toda esa franja vacía a la derecha sin usar,
+                se veía desangelado. */}
             {hasPlayableVideo && agency.media_presentacion_url && (
               <motion.div
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: EASE, delay: 0.08 }}
-                className="md:order-2"
+                className="order-2"
               >
                 <VideoCard
                   url={agency.media_presentacion_url}
@@ -1565,13 +1566,14 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                 (como haría el vídeo), centrada verticalmente y bastante más grande
                 que el tamaño chico que tenía junto a los badges — antes, sin vídeo,
                 esa foto era chica y el hueco de la columna derecha se llenaba solo
-                con las esferas 3D decorativas. */}
+                con las esferas 3D decorativas. Mismo criterio de orden que el vídeo:
+                en móvil va después de la presentación. */}
             {!hasPlayableVideo && heroFotoUrl && (
               <motion.div
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: EASE, delay: 0.08 }}
-                className="flex justify-center md:order-2 md:h-full md:items-center"
+                className="flex justify-center order-2 md:h-full md:items-center"
                 style={{ perspective: '900px' }}
               >
                 <div ref={photoTiltRef} style={{ willChange: 'transform' }}>
@@ -1590,7 +1592,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
-              className={`relative md:order-1 ${!hasSideMedia ? 'md:mx-auto md:max-w-[760px]' : ''}`}
+              className={`relative order-1 ${!hasSideMedia ? 'md:mx-auto md:max-w-[760px]' : ''}`}
             >
               {/* Sin ninguna media, el bloque de texto queda centrado en 760px y deja
                   un hueco vacío a cada lado en pantallas anchas — unas
