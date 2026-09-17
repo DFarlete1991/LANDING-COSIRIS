@@ -35,7 +35,7 @@ function Avatar({ agency, sizeClass = 'h-[88px] w-[88px]' }: { agency: Inmobilia
       style={{ backgroundColor: agency.color_hex }}
       className={`flex shrink-0 items-center justify-center rounded-full border-2 border-white text-xl font-black text-white shadow-lg ${sizeClass}`}
     >
-      {agency.nombre_agente.slice(0, 1)}
+      {agency.nombre_comercial.slice(0, 1)}
     </div>
   );
 }
@@ -224,18 +224,27 @@ export function AgencyResultRow({
               Cerca
             </span>
           )}
+          {/* Debajo del logo va la persona de contacto, ahora que el titular
+              lo ocupa la inmobiliaria. `mapRow` rellena nombre_agente con
+              nombre_comercial cuando no hay asesor puesto, así que en ese caso
+              se omite en vez de repetir el mismo texto dos veces. */}
           <div className="hidden items-center gap-1.5 sm:flex">
             {agency.foto_url && <AgencyThumbnail agency={agency} sizeClass="h-6 w-6 rounded-md" />}
-            <span className="max-w-[90px] truncate text-[10px] font-black uppercase leading-tight tracking-tight text-slate-400">
-              {agency.nombre_comercial}
-            </span>
+            {agency.nombre_agente !== agency.nombre_comercial && (
+              <span className="max-w-[90px] truncate text-[10px] font-black uppercase leading-tight tracking-tight text-slate-400">
+                {agency.nombre_agente}
+              </span>
+            )}
           </div>
         </div>
 
         {/* Zona central: nombre → verificada → ubicación → valoración → descripción → métricas */}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-            <p className="truncate text-base font-bold leading-tight text-slate-900 sm:text-[26px] sm:leading-[32px]">{agency.nombre_agente}</p>
+            {/* El titular es la inmobiliaria, no la persona de contacto: es un
+                directorio de inmobiliarias y es el nombre por el que se busca.
+                Igual que el <h1> del perfil y que la tarjeta compacta. */}
+            <p className="truncate text-base font-bold leading-tight text-slate-900 sm:text-[26px] sm:leading-[32px]">{agency.nombre_comercial}</p>
             <span className="flex shrink-0 items-center gap-1 text-xs font-bold text-[#FF8000] sm:text-[13px]">
               <BadgeCheck size={16} className="shrink-0" /> Verificada
             </span>
