@@ -20,9 +20,17 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
   const links = [
     { label: 'Servicios', href: '/servicios' },
     { label: 'Nosotros', href: '/nosotros' },
-    { label: 'Vender Tu Vivienda', href: '/vendetuvivienda' },
+    { label: 'Valora tu vivienda', href: '/inmobiliarias/valorar' },
     { label: 'Inmobiliarias en tu zona', href: '/inmobiliarias' },
   ];
+
+  const [path, setPath] = React.useState(() => window.location.pathname);
+  React.useEffect(() => {
+    const sync = () => setPath(window.location.pathname);
+    window.addEventListener('popstate', sync);
+    return () => window.removeEventListener('popstate', sync);
+  }, []);
+  const isActive = (href: string) => path === href || path.startsWith(href + '/');
 
   const navigate = (href: string) => {
     if (href.startsWith('/') && href !== '/') {
@@ -86,7 +94,12 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
           {links.map((link) => (
             <a
               key={link.label}
-              className={buttonVariants({ variant: 'ghost' })}
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'relative rounded-full px-4 text-[13px] font-medium tracking-tight text-slate-700 transition-colors hover:bg-orange-50 hover:text-orange-700 focus-visible:ring-2 focus-visible:ring-[#FF8000]/60',
+                isActive(link.href) && 'bg-orange-50 text-orange-700',
+              )}
+              aria-current={isActive(link.href) ? 'page' : undefined}
               href={link.href}
               onClick={link.href.startsWith('/') && link.href !== '/' ? (e) => { e.preventDefault(); navigate(link.href); } : undefined}
             >
@@ -96,7 +109,7 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
           {/* <a href="https://homestaging-cosiris.com/" target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: 'outline' })}>
             Home Staging
           </a> */}
-          <Button onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
+          <Button className="ml-1 rounded-full px-5 shadow-sm shadow-orange-500/20" onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
             Acceso Clientes
           </Button>
         </div>
@@ -131,8 +144,12 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
                 key={link.label}
                 className={buttonVariants({
                   variant: 'ghost',
-                  className: 'justify-start',
+                  className: cn(
+                    'h-12 justify-start rounded-xl px-4 text-base font-medium text-slate-800',
+                    isActive(link.href) && 'bg-orange-50 text-orange-700',
+                  ),
                 })}
+                aria-current={isActive(link.href) ? 'page' : undefined}
                 href={link.href}
                 onClick={link.href.startsWith('/') && link.href !== '/' ? (e) => { e.preventDefault(); navigate(link.href); setOpen(false); } : undefined}
               >
@@ -144,7 +161,7 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
             {/* <a href="https://homestaging-cosiris.com/" target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: 'outline' })}>
             Home Staging
           </a> */}
-            <Button className="w-full" onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
+            <Button className="h-12 w-full rounded-xl text-base" onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
               Acceso Clientes
             </Button>
           </div>

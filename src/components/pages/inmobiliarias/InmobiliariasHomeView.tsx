@@ -58,6 +58,30 @@ function hasShowcaseMedia(agency: InmobiliariaPublica): boolean {
 }
 
 /**
+ * Vídeo de fondo sin póster: mientras carga se ve el fondo oscuro del
+ * contenedor y el vídeo entra con un fundido al tener el primer fotograma.
+ * Antes se usaba de póster una foto de Madrid que aparecía unos segundos y
+ * desaparecía de golpe al arrancar el vídeo.
+ */
+function BgVideo({ className, ...rest }: React.VideoHTMLAttributes<HTMLVideoElement>) {
+  const [ready, setReady] = useState(false);
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    if (ref.current && ref.current.readyState >= 2) setReady(true);
+  }, []);
+  return (
+    <video
+      ref={ref}
+      {...rest}
+      src="/assets/inmobiliarias/hero-bg.mp4"
+      autoPlay muted loop playsInline
+      onLoadedData={() => setReady(true)}
+      className={`${className ?? ''} transition-opacity duration-700 ${ready ? 'opacity-100' : 'opacity-0'}`}
+    />
+  );
+}
+
+/**
  * El fondo de la sección de showcase es el mismo hero-bg.mp4 (4.2MB) que ya
  * se descarga en el hero de arriba, pero esta sección vive muy por debajo
  * del pliegue -- sin este gate, el <video> se montaba de entrada y el
@@ -84,13 +108,7 @@ function LazyBgVideo({ className }: { className: string }) {
   return (
     <div ref={ref} className={className}>
       {shouldLoad && (
-        <video
-          className="h-full w-full object-cover"
-          src="/assets/inmobiliarias/hero-bg.mp4"
-          poster="/assets/inmobiliarias/ciudades/madrid.webp"
-          preload="none"
-          autoPlay muted loop playsInline
-        />
+        <BgVideo className="h-full w-full object-cover" preload="none" />
       )}
     </div>
   );
@@ -106,6 +124,14 @@ function LazyBgVideo({ className }: { className: string }) {
  * ser el grupo entero — el ahorro de banda ancha sigue estando en que una
  * tarjeta fuera de pantalla nunca llega a montar su <video>/<iframe>.
  */
+// Misma URL en la tarjeta y en el precalentado del siguiente grupo, para que
+// el navegador reutilice la descarga en vez de pedirla dos veces.
+function cardImageUrl(agency: InmobiliariaPublica): string | null {
+  if (agency.foto_url) return optimizedImageUrl(agency.foto_url, 500, 75) ?? agency.foto_url;
+  const embed = agency.media_presentacion_url ? getVideoEmbed(agency.media_presentacion_url) : null;
+  return embed?.platform === 'youtube' ? `https://img.youtube.com/vi/${embed.id}/mqdefault.jpg` : null;
+}
+
 function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica; agencies: InmobiliariaPublica[] }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [inView, setInView] = useState(false);
@@ -115,7 +141,7 @@ function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica;
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.6 });
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.25, rootMargin: '0px 100px' });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -132,21 +158,22 @@ function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica;
   const showProfilePhoto = !embed && !directVideoSrc && !!fotoUrl;
   const staticFallback = fotoUrl
     ?? (embed?.platform === 'youtube' ? `https://img.youtube.com/vi/${embed.id}/mqdefault.jpg` : null)
-    ?? '/assets/inmobiliarias/ciudades/madrid.webp';
+    ?? null;
 
   return (
     <motion.button
       ref={ref}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.2 }}
+      layout
+      initial={{ opacity: 0, scale: 0.94 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3, ease: EASE, layout: { duration: 0.35, ease: EASE } }}
       onClick={() => { rememberDirectoryUrl(); navigateTo(agencyProfilePath(agency, agencies)); }}
-      className="group relative w-36 shrink-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-44 md:w-56 lg:w-64"
+      className="group relative w-36 shrink-0 overflow-hidden rounded-2xl bg-slate-800 shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-44 md:w-56 lg:w-64"
       style={{ aspectRatio: '9/16' }}
     >
       {!inView ? (
-        <FadeImage
-          src={optimizedImageUrl(staticFallback, 500) ?? staticFallback}
+        staticFallback && <FadeImage
+          src={optimizedImageUrl(staticFallback, 500, 75) ?? staticFallback}
           alt={agency.nombre_comercial}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
@@ -167,26 +194,21 @@ function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica;
         <video
           className="absolute inset-0 h-full w-full object-cover"
           src={directVideoSrc}
-          poster={optimizedImageUrl(staticFallback, 500) ?? staticFallback}
+          poster={staticFallback ? optimizedImageUrl(staticFallback, 500, 75) ?? staticFallback : undefined}
           preload="metadata"
           autoPlay muted loop playsInline
           onError={() => setDirectVideoBroken(true)}
         />
       ) : showProfilePhoto ? (
         <FadeImage
-          src={optimizedImageUrl(fotoUrl, 500)}
+          src={optimizedImageUrl(fotoUrl, 500, 75)}
           alt={agency.nombre_comercial}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
           decoding="async"
         />
       ) : (
-        <video
-          className="absolute inset-0 h-full w-full object-cover"
-          src="/assets/inmobiliarias/hero-bg.mp4"
-          poster="/assets/inmobiliarias/ciudades/madrid.webp"
-          autoPlay muted loop playsInline
-        />
+        <BgVideo className="absolute inset-0 h-full w-full object-cover" />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 p-3 text-left sm:p-4">
@@ -227,13 +249,32 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
     return () => clearInterval(t);
   }, [shuffledForVideo.length, videoStartIdx]);
 
+  // Precalienta las fotos del siguiente grupo mientras se ve el actual, para
+  // que al rotar (o pulsar la flecha) ya estén en caché y no aparezcan tarde.
+  useEffect(() => {
+    if (shuffledForVideo.length <= VIDEO_COUNT) return;
+    const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback
+      ?? ((cb: () => void) => window.setTimeout(cb, 400));
+    idle(() => {
+      const n = shuffledForVideo.length;
+      for (let i = -1; i < VIDEO_COUNT * 2; i++) {
+        if (i >= 0 && i < VIDEO_COUNT) continue;
+        const url = cardImageUrl(shuffledForVideo[(((videoStartIdx + i) % n) + n) % n]);
+        if (url) new Image().src = url;
+      }
+    });
+  }, [shuffledForVideo, videoStartIdx]);
+
   const goNext = () => setVideoStartIdx((prev) => (prev + 1) % shuffledForVideo.length);
   const goPrev = () => setVideoStartIdx((prev) => (prev - 1 + shuffledForVideo.length) % shuffledForVideo.length);
 
   const visibleForVideo = useMemo(() => {
     if (shuffledForVideo.length === 0) return [];
+    // Sin duplicados: la key de cada tarjeta es el id de la agencia, así al
+    // avanzar solo entra una nueva y las demás se desplazan sin recargarse.
+    const count = Math.min(VIDEO_COUNT, shuffledForVideo.length);
     const result: typeof agencies = [];
-    for (let i = 0; i < VIDEO_COUNT; i++) {
+    for (let i = 0; i < count; i++) {
       result.push(shuffledForVideo[(videoStartIdx + i) % shuffledForVideo.length]);
     }
     return result;
@@ -267,14 +308,11 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
     <div>
       {/* HERO — video de fondo real, overlay oscuro + buscador */}
       <section id="inicio-directorio" className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-4 pb-20 pt-28 text-center text-white sm:min-h-[92vh] sm:pb-28 sm:pt-32">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-slate-950">
           {/* scale-125: recorta el video ~12.5% por lado para sacar de cuadro la
               marca de agua que trae el archivo fuente en la esquina superior izquierda. */}
-          <video
+          <BgVideo
             className="h-full w-full scale-125 object-cover"
-            src="/assets/inmobiliarias/hero-bg.mp4"
-            poster="/assets/inmobiliarias/ciudades/madrid.webp"
-            autoPlay muted loop playsInline
             // Este es el elemento de LCP de la página (PageSpeed lo señala
             // explícitamente) -- fetchPriority alto le dice al navegador que
             // lo baje antes que el resto de recursos no críticos. El atributo
@@ -533,7 +571,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {visibleForVideo.map((agency, i) => (
-                <AgencyShowcaseCard key={`${agency.id}-${videoStartIdx + i}`} agency={agency} agencies={agencies} />
+                <AgencyShowcaseCard key={agency.id} agency={agency} agencies={agencies} />
               ))}
             </div>
           </div>

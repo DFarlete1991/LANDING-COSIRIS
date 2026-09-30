@@ -121,7 +121,7 @@ const SOCIAL_PACKS = [
   {
     name: 'PREMIUM',
     tagline: 'Potencia total',
-    features: ['6 publicaciones estáticas', '4 vídeos editados', 'Edición a tu estilo', 'Personalización total'],
+    features: ['4 publicaciones estáticas', '4 vídeos editados', 'Edición a tu estilo', 'Personalización total'],
     highlight: false,
     sourceContext: 'social_premium_plan',
   },
