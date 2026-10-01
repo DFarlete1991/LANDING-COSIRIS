@@ -570,7 +570,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
               className="flex items-end gap-2 overflow-x-auto overscroll-x-contain px-4 sm:gap-3 md:gap-4 md:justify-center md:overflow-visible md:px-10 [&::-webkit-scrollbar]:hidden"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {visibleForVideo.map((agency, i) => (
+              {visibleForVideo.map((agency) => (
                 <AgencyShowcaseCard key={agency.id} agency={agency} agencies={agencies} />
               ))}
             </div>
