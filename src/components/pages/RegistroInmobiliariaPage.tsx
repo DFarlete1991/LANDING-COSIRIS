@@ -711,23 +711,23 @@ export function RegistroInmobiliariaPage() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
                           <label htmlFor="ri-email" className="block text-sm font-semibold text-slate-800">Email</label>
                           <input id="ri-email" name="email" type="email" value={clientForm.email} onChange={handleClientChange} disabled={step1Phase === 'loading'} placeholder="tu@empresa.com" className={baseInputClass} />
                         </div>
-                        <div className="space-y-1.5">
+                        <div className="min-w-0 space-y-1.5">
                           <label htmlFor="ri-telefono" className="block text-sm font-semibold text-slate-800">Teléfono</label>
-                          <div className="flex gap-2">
+                          <div className="flex min-w-0 gap-2">
                             <CountryCodeSelect
                               id="ri-country-code"
                               value={clientForm.countryCode}
                               onChange={(dial) => setClientForm((prev) => ({ ...prev, countryCode: dial }))}
                               disabled={step1Phase === 'loading'}
                               ariaLabel="Indicativo de país"
-                              className="w-32 shrink-0"
+                              className="w-28 shrink-0 sm:w-32"
                             />
-                            <input id="ri-telefono" name="telefono" type="tel" value={clientForm.telefono} onChange={handleClientChange} disabled={step1Phase === 'loading'} placeholder="671 355 775" className={baseInputClass} />
+                            <input id="ri-telefono" name="telefono" type="tel" value={clientForm.telefono} onChange={handleClientChange} disabled={step1Phase === 'loading'} placeholder="671 355 775" className={`${baseInputClass} min-w-0 flex-1`} />
                           </div>
                         </div>
                       </div>
