@@ -19,6 +19,7 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
 
   const links = [
     { label: 'Servicios', href: '/servicios' },
+    { label: 'Calculadora ROI', href: '/calculadora-roi' },
     { label: 'Nosotros', href: '/nosotros' },
     { label: 'Valora tu vivienda', href: '/inmobiliarias/valorar' },
     { label: 'Inmobiliarias en tu zona', href: '/inmobiliarias' },

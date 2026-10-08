@@ -31,6 +31,7 @@ const PrivacidadPage = lazy(() => import('./components/legal/PrivacidadPage').th
 const CookiesPage = lazy(() => import('./components/legal/CookiesPage').then((m) => ({ default: m.CookiesPage })));
 const NosotrosPage = lazy(() => import('./components/pages/NosotrosPage').then((m) => ({ default: m.NosotrosPage })));
 const ServiciosPage = lazy(() => import('./components/pages/ServiciosPage').then((m) => ({ default: m.ServiciosPage })));
+const CalculadoraRoiPage = lazy(() => import('./components/pages/CalculadoraRoiPage').then((m) => ({ default: m.CalculadoraRoiPage })));
 const VenderPage = lazy(() => import('./components/pages/VenderPage').then((m) => ({ default: m.VenderPage })));
 const ValoracionPage = lazy(() => import('./components/pages/ValoracionPage').then((m) => ({ default: m.ValoracionPage })));
 const CaptacionInmobiliariasPage = lazy(() => import('./components/pages/CaptacionInmobiliariasPage').then((m) => ({ default: m.CaptacionInmobiliariasPage })));
@@ -55,6 +56,7 @@ const standaloneRoutes: Record<string, React.ComponentType> = {
   '/cookies': CookiesPage,
   '/nosotros': NosotrosPage,
   '/servicios': ServiciosPage,
+  '/calculadora-roi': CalculadoraRoiPage,
   '/valoratuvivienda': VenderPage,
   '/vendetuvivienda': ValoracionPage,
   '/vendetuvivienda/forms': ValoracionPage,

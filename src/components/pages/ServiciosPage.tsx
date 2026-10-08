@@ -9,6 +9,7 @@ import {
 import { useUI } from '@/context/UIContext';
 import { LandingNavbar } from '@/components/pages/landing-navbar';
 import { Footer } from '@/components/Footer';
+import { RoiCalculator } from '@/components/RoiCalculator';
 import { useSEO } from '@/lib/seo';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -137,7 +138,7 @@ const SOCIAL_BENEFITS = [
 function RedesSection() {
   const { openContactModal } = useUI();
   return (
-    <section className="mx-auto max-w-5xl px-6 py-28 md:py-36">
+    <section className="mx-auto max-w-5xl px-6 py-12 md:py-36">
       <FadeUp>
         <span className="mb-4 inline-block text-[10px] font-bold uppercase tracking-[0.28em] text-[#FF8000]">
           Tu nuevo escaparate
@@ -151,7 +152,7 @@ function RedesSection() {
       </FadeUp>
 
       {/* Benefit chips */}
-      <div className="mt-10 flex flex-wrap gap-3">
+      <div className="mt-6 flex flex-wrap gap-3 md:mt-10">
         {SOCIAL_BENEFITS.map((b, i) => (
           <FadeUp key={b.label} delay={i * 0.08}>
             <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm">
@@ -163,7 +164,7 @@ function RedesSection() {
       </div>
 
       {/* Pricing cards */}
-      <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-4 md:mt-14 md:gap-6 md:grid-cols-3">
         {SOCIAL_PACKS.map((pack, i) => (
           <FadeUp key={pack.name} delay={i * 0.1}>
             <div
@@ -243,7 +244,7 @@ const TESTIMONIALS = [
 function AdsSection() {
   const { openContactModal } = useUI();
   return (
-    <section className="mx-auto max-w-5xl px-6 py-28 md:py-36">
+    <section className="mx-auto max-w-5xl px-6 py-12 md:py-36">
       <FadeUp>
         <span className="mb-4 inline-block text-[10px] font-bold uppercase tracking-[0.28em] text-[#FF8000]">
           Invertir en campañas es invertir en captación
@@ -253,8 +254,22 @@ function AdsSection() {
         </h2>
       </FadeUp>
 
+      {/* Calculadora de ROI */}
+      <FadeUp>
+        <div className="mt-8 rounded-2xl md:mt-12 border border-slate-200 bg-slate-50/60 p-5 md:p-8">
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#FF8000]">Calculadora de ROI</p>
+          <h3 className="mt-2 max-w-2xl text-2xl font-black leading-tight tracking-tighter text-slate-900 md:text-3xl">
+            Calcula lo que te devuelve la campaña
+          </h3>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
+            Ajusta los meses, tu inversión publicitaria y tu comisión media para ver leads, captaciones y retorno estimado.
+          </p>
+          <RoiCalculator />
+        </div>
+      </FadeUp>
+
       {/* Timeline */}
-      <div className="mt-16 grid grid-cols-1 gap-0 md:grid-cols-6">
+      <div className="mt-10 grid grid-cols-1 gap-0 md:mt-16 md:grid-cols-6">
         {TIMELINE_STEPS.map((step, i) => (
           <FadeUp key={step.title} delay={i * 0.09} className="relative flex flex-col items-center text-center">
             {/* Connector line */}
@@ -275,7 +290,7 @@ function AdsSection() {
       </div>
 
       {/* Social proof */}
-      <div className="mt-20">
+      <div className="mt-12 md:mt-20">
         <FadeUp>
           <p className="mb-8 text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
             Clientes reales, resultados reales.
@@ -311,7 +326,7 @@ function AdsSection() {
 
       {/* Ads CTA */}
       <FadeUp>
-        <div className="mt-14 flex justify-center">
+        <div className="mt-8 flex justify-center md:mt-14">
           <button
             onClick={() => openContactModal({ initialServices: ['Captación Ads'], sourceContext: 'ads_conversion_section' })}
             className="group inline-flex items-center gap-2 rounded-md bg-[#FF8000] px-8 py-3.5 text-sm font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#E67300] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000]"
@@ -345,7 +360,7 @@ const EMAIL_PACKS = [
 function EmailSection() {
   const { openContactModal } = useUI();
   return (
-    <section className="mx-auto max-w-5xl px-6 py-28 md:py-36">
+    <section className="mx-auto max-w-5xl px-6 py-12 md:py-36">
       <FadeUp>
         <span className="mb-4 inline-block text-[10px] font-bold uppercase tracking-[0.28em] text-[#FF8000]">
           Campañas de captación de leads · Estrategia, no Spam
@@ -360,7 +375,7 @@ function EmailSection() {
       </FadeUp>
 
       {/* Feature row */}
-      <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
         {[
           { icon: <PhoneCall size={16} />, label: 'Seguimiento automático' },
           { icon: <TrendingUp size={16} />, label: 'Más conversiones' },
@@ -446,7 +461,7 @@ const FAQS = [
 function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section className="mx-auto max-w-3xl px-6 py-20 md:py-28">
+    <section className="mx-auto max-w-3xl px-6 py-12 md:py-28">
       <FadeUp>
         <h2 className="mb-12 text-3xl font-black tracking-tighter text-slate-900 md:text-4xl">
           Preguntas frecuentes
@@ -502,7 +517,7 @@ export function ServiciosPage() {
       <LandingNavbar />
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden py-24 md:py-32">
+      <section className="relative overflow-hidden py-14 md:py-32">
         <DotGrid />
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute inset-y-0 left-4 w-px bg-gradient-to-b from-transparent via-slate-200 to-slate-200 md:left-8" />
@@ -576,7 +591,7 @@ export function ServiciosPage() {
       {/* ── CTA ──────────────────────────────────────────────────────────── */}
       <section className="mx-6 mb-20 overflow-hidden rounded-2xl bg-[#FF8000] md:mx-12">
         <FadeUp>
-          <div className="relative px-10 py-16 text-center md:py-20">
+          <div className="relative px-6 py-10 text-center md:px-10 md:py-16 md:py-20">
             <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10" />
             <div aria-hidden="true" className="pointer-events-none absolute -bottom-20 -left-12 h-80 w-80 rounded-full bg-white/8" />
             <p className="relative mb-2 text-[10px] font-bold uppercase tracking-[0.28em] text-white/70">

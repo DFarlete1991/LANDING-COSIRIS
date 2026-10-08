@@ -97,6 +97,7 @@ const STATIC_PATHS = [
   { path: '/', priority: '1.0' },
   { path: '/nosotros', priority: '0.6' },
   { path: '/servicios', priority: '0.6' },
+  { path: '/calculadora-roi', priority: '0.6' },
   { path: '/valoratuvivienda', priority: '0.7' },
   { path: '/vendetuvivienda', priority: '0.7' },
   { path: '/captacion_inmobiliarias', priority: '0.7' },
