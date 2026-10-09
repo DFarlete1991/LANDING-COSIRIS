@@ -364,7 +364,7 @@ export default function ContactModal() {
             animate="visible"
             exit="exit"
             onClick={handleBackdropClick}
-            className="fixed inset-0 z-40 bg-black/65 backdrop-blur-sm"
+            className="fixed inset-0 z-[110] bg-black/65 backdrop-blur-sm"
             aria-hidden="true"
           />
 
@@ -378,7 +378,7 @@ export default function ContactModal() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
+            className="fixed inset-0 z-[120] flex items-center justify-center px-4 py-6"
           >
             <div className="relative w-full max-w-lg overflow-hidden rounded-xl border border-slate-200 bg-[#ffffff] shadow-[0_24px_64px_-12px_rgba(0,0,0,0.45)]">
               {/* Scrollable inner */}
