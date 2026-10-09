@@ -465,8 +465,9 @@ export default function ContactModal() {
                           {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
                         </motion.div>
 
-                        {/* Phone + Province side by side */}
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        {/* Phone + Province, cada uno en su línea: en paralelo el
+                            número quedaba recortado junto al selector de país */}
+                        <div className="grid grid-cols-1 gap-4">
                           <motion.div variants={fieldVariants}>
                             <label htmlFor="cm-phone" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
                               Teléfono
