@@ -9,7 +9,7 @@ import {
 import { useUI } from '@/context/UIContext';
 import { LandingNavbar } from '@/components/pages/landing-navbar';
 import { Footer } from '@/components/Footer';
-import { RoiCalculator } from '@/components/RoiCalculator';
+import { PlanCalculator } from '@/components/plan-calculator/PlanCalculator';
 import { useSEO } from '@/lib/seo';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -254,19 +254,11 @@ function AdsSection() {
         </h2>
       </FadeUp>
 
-      {/* Calculadora de ROI */}
-      <FadeUp>
-        <div className="mt-8 rounded-2xl md:mt-12 border border-slate-200 bg-slate-50/60 p-5 md:p-8">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#FF8000]">Calculadora de ROI</p>
-          <h3 className="mt-2 max-w-2xl text-2xl font-black leading-tight tracking-tighter text-slate-900 md:text-3xl">
-            Calcula lo que te devuelve la campaña
-          </h3>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
-            Ajusta los meses, tu inversión publicitaria y tu comisión media para ver leads, captaciones y retorno estimado.
-          </p>
-          <RoiCalculator />
-        </div>
-      </FadeUp>
+      {/* Calculadora del plan: a sangre en móvil para ganar ancho, en tarjeta en escritorio.
+          Fuera de FadeUp: su resumen es sticky y su modal, fixed. */}
+      <div className="-mx-6 mt-8 bg-slate-50 px-4 py-8 md:mx-0 md:mt-12 md:rounded-2xl md:border md:border-slate-200 md:px-8 md:py-10 xl:-mx-24">
+        <PlanCalculator headingTag="h3" />
+      </div>
 
       {/* Timeline */}
       <div className="mt-10 grid grid-cols-1 gap-0 md:mt-16 md:grid-cols-6">

@@ -8,6 +8,7 @@ import { X, Check, ChevronDown } from 'lucide-react';
 import { useUI } from '../context/UIContext';
 import { getAttributionFields } from '@/lib/utm';
 import { notifyWhatsAppLead } from '@/lib/whatsapp-webhook';
+import { LEAD_WEBHOOK_URL } from '@/lib/lead-webhook';
 import { DEFAULT_COUNTRY_DIAL, toInternationalPhone } from '@/data/country-codes';
 import { CountryCodeSelect } from './ui/CountryCodeSelect';
 import { ConsentCheckbox } from './ui/ConsentCheckbox';
@@ -225,8 +226,8 @@ function SentScreen() {
 
 // ─── Empty state helpers ──────────────────────────────────────────────────────
 
-const emptyForm = { name: '', email: '', countryCode: DEFAULT_COUNTRY_DIAL, phone: '', province: '', employees: '' };
-const emptyErrors = { name: '', email: '', countryCode: '', phone: '', province: '', employees: '' };
+const emptyForm = { name: '', company: '', email: '', countryCode: DEFAULT_COUNTRY_DIAL, phone: '', province: '', employees: '' };
+const emptyErrors = { name: '', company: '', email: '', countryCode: '', phone: '', province: '', employees: '' };
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -302,6 +303,7 @@ export default function ContactModal() {
     let hasErrors = false;
 
     if (!formData.name.trim()) { newErrors.name = 'Por favor, introduce tu nombre.'; hasErrors = true; }
+    if (!formData.company.trim()) { newErrors.company = 'Por favor, introduce el nombre de tu empresa.'; hasErrors = true; }
     if (!formData.email.trim() || !validateEmail(formData.email)) { newErrors.email = 'Por favor, introduce tu email.'; hasErrors = true; }
     if (!formData.phone.trim()) { newErrors.phone = 'El teléfono es requerido.'; hasErrors = true; }
     else if (!validatePhone(formData.phone)) { newErrors.phone = 'Introduce un teléfono válido (ej. 671 355 775).'; hasErrors = true; }
@@ -319,6 +321,7 @@ export default function ContactModal() {
 
     const payload = {
       name: formData.name,
+      company: formData.company.trim(),
       email: formData.email,
       phone: toInternationalPhone(formData.countryCode, formData.phone),
       province: formData.province,
@@ -331,7 +334,7 @@ export default function ContactModal() {
     notifyWhatsAppLead(payload);
 
     try {
-      const response = await fetch('https://n8n.srv1123447.hstgr.cloud/webhook/8383a34e-98f6-45b0-adda-77a6cdaf8abe', {
+      const response = await fetch(LEAD_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -448,6 +451,21 @@ export default function ContactModal() {
                             className={`${baseInputClass} ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-slate-200 focus:border-[#FF8000]'}`}
                           />
                           {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+                        </motion.div>
+
+                        {/* Company */}
+                        <motion.div variants={fieldVariants}>
+                          <label htmlFor="cm-company" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                            Nombre de empresa
+                          </label>
+                          <input
+                            id="cm-company" name="company" type="text"
+                            autoComplete="organization" placeholder="Nombre de tu inmobiliaria"
+                            value={formData.company}
+                            onChange={handleInputChange}
+                            className={`${baseInputClass} ${errors.company ? 'border-red-500 focus:border-red-500' : 'border-slate-200 focus:border-[#FF8000]'}`}
+                          />
+                          {errors.company && <p className="mt-1 text-xs text-red-500">{errors.company}</p>}
                         </motion.div>
 
                         {/* Email */}

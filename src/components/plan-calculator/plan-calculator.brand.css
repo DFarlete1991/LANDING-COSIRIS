@@ -1,0 +1,156 @@
+/*
+ * Integración de la calculadora con la marca de la web (BRAND_BOOK_COSIRIS.md).
+ * plan-calculator.css se genera desde el HTML original; los ajustes viven aquí
+ * para poder regenerarlo sin perderlos. Se carga después y gana por orden.
+ */
+
+/* ── Tokens: la paleta de la web en lugar de la del HTML suelto ─────────── */
+.plan-calc,
+#ftip {
+  --bg: #f8fafc;        /* Accent */
+  --card: #ffffff;
+  --navy: #0f172a;      /* Ink */
+  --ink: #0f172a;
+  --text: #475569;      /* slate-600: copy secundario legible */
+  --muted: #64748b;     /* Ink Muted */
+  --line: #e2e8f0;      /* Border */
+  --orange: #ff8000;    /* Primary */
+  --orange-d: #e67300;  /* Primary Hover; también texto naranja sobre blanco */
+  --orange-t: #c2410c;  /* Texto naranja pequeño con contraste suficiente */
+  --peach: #fff7ed;     /* orange-50 */
+  --font: "Montserrat", "Inter", system-ui, sans-serif;
+}
+
+/* La página pone el fondo; la calculadora no pinta un bloque gris propio. */
+.plan-calc { background: none; -webkit-font-smoothing: antialiased; }
+
+/* ── Cabecera alineada con los hero de la web ──────────────────────────── */
+.plan-calc .intro { padding-block: 0 32px; }
+.plan-calc .intro .eyebrow {
+  display: inline-block;
+  margin: 0 0 18px;
+  padding: 6px 16px;
+  border: 1px solid rgba(255, 128, 0, 0.3);
+  border-radius: 999px;
+  background: rgba(255, 128, 0, 0.06);
+  color: var(--orange);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+}
+.plan-calc .pc-h1 {
+  font-size: clamp(34px, 5.2vw, 60px);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+  color: var(--ink);
+}
+.plan-calc .pc-h1 em { color: var(--orange); }
+/* Dentro de otra página (Servicios) el título es un subapartado. */
+.plan-calc h3.pc-h1 { font-size: clamp(26px, 3.4vw, 38px); }
+
+/* ── Superficies: tarjetas de la web (borde suave + sombra ligera) ────── */
+.plan-calc .card {
+  border-color: var(--line);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -18px rgba(15, 23, 42, 0.12);
+}
+.plan-calc .opt { border-radius: 12px; background: #fff; }
+.plan-calc .opt:hover { border-color: rgba(255, 128, 0, 0.45); }
+.plan-calc .opt:has(input:checked) {
+  border-color: var(--orange);
+  background: var(--peach);
+  box-shadow: 0 0 0 3px rgba(255, 128, 0, 0.14);
+}
+.plan-calc .opt .p { color: var(--orange-d); }
+.plan-calc .est > div,
+.plan-calc .estg > div { border-radius: 12px; border: 1px solid rgba(255, 128, 0, 0.14); }
+.plan-calc .estg > .wide { border-color: rgba(31, 157, 85, 0.18); }
+/* .estg es un contenedor dentro de .est, no una tarjeta: sin borde propio. */
+.plan-calc .est > .estg { border: 0; }
+.plan-calc .hero,
+.plan-calc .recap { border-radius: 16px; }
+.plan-calc .kfield,
+.plan-calc .kstat,
+.plan-calc .wst { border-radius: 12px; border: 1px solid var(--line); background: var(--bg); }
+
+/* Las etiquetas "Más elegido" / "Recomendado" en naranja de marca, no en negro. */
+.plan-calc .tag { background: var(--orange); letter-spacing: 0.1em; }
+
+/* ── CTA con el patrón de la web: rounded-md, mayúsculas, tracking ────── */
+.plan-calc .next {
+  border-radius: 6px;
+  background: var(--orange);
+  padding: 13px 22px;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 20px -8px rgba(255, 128, 0, 0.55);
+}
+.plan-calc .next:hover { background: var(--orange-d); }
+.plan-calc .next:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+.plan-calc .dlo { border-radius: 6px; text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px; }
+.plan-calc .mx { border-radius: 8px; }
+
+/* Inputs del formulario de lead como los de "Cuéntanos sobre tu negocio". */
+.plan-calc .mbox { border-radius: 16px; border: 1px solid var(--line); }
+.plan-calc .fl span { color: var(--ink); font-size: 10px; letter-spacing: 0.18em; }
+.plan-calc .fl input { border-radius: 8px; border: 1px solid var(--line); background: #f8fafc; font-weight: 500; font-size: 14px; }
+.plan-calc .fl input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255, 128, 0, 0.15); }
+.plan-calc .modal { background: rgba(0, 0, 0, 0.65); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+
+/* ── Resumen fijo: que no quede debajo de la barra de navegación flotante ─ */
+.plan-calc .sum { top: 104px; }
+
+.plan-calc input[type="range"]::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(255, 128, 0, 0.16); }
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .plan-calc .layout { gap: 16px; }
+  /* En una columna, el resumen de costes va justo después de los 4 pasos y
+     antes del informe y la descarga (en el HTML original quedaba al final). */
+  .plan-calc .layout > div:first-child { display: contents; }
+  .plan-calc .layout #tour { order: 1; }
+  .plan-calc .layout .sum { order: 2; }
+  .plan-calc .layout #report { order: 3; margin-top: 0; }
+  .plan-calc .layout #dlbox { order: 4; margin-top: 0; }
+}
+@media (max-width: 560px) {
+  .plan-calc .card { padding: 18px 16px; border-radius: 14px; }
+  .plan-calc .tour .step { padding-left: 38px; }
+  .plan-calc .tour .st-h b { width: 26px; height: 26px; font-size: 12px; }
+  .plan-calc .tour .step:not(:last-child)::before { left: 12px; }
+  .plan-calc .st-h h2 { font-size: 16px; }
+  .plan-calc .next { width: 100%; justify-content: center; text-align: center; }
+  .plan-calc .opt .mm { font-size: 13px; }
+  .plan-calc .hero .v { font-size: 40px; }
+  .plan-calc .est .v { font-size: 22px; }
+  .plan-calc .rg b { font-size: 19px; }
+  .plan-calc .recap { padding: 16px; }
+  .plan-calc .wh { font-size: 22px; }
+  /* Botones de cierre y tooltips con área táctil de 44 px. */
+  .plan-calc .mx { width: 44px; height: 44px; }
+  .plan-calc .info { width: 22px; height: 22px; }
+}
+/* Ventas e ingresos llevan rangos largos: a todo el ancho en pantallas estrechas. */
+@media (max-width: 480px) {
+  .plan-calc .est > .estg { grid-template-columns: 1fr; }
+}
+/* Si la pantalla es baja, el resumen fijo no cabría entero: que fluya. */
+@media (max-height: 760px) {
+  .plan-calc .sum { position: static; }
+}
+
+/* Campo de empleados (desplegable) con el aspecto de los inputs del formulario. */
+.plan-calc .fl select {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #f8fafc;
+  color: var(--ink);
+  font: 500 14px var(--font);
+  padding: 10px 12px;
+  outline: none;
+}
+.plan-calc .fl select:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255, 128, 0, 0.15); }
+.plan-calc .fl select.bad { border-color: #c0392b; }

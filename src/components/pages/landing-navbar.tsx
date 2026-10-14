@@ -91,13 +91,13 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
         >
           <img src="/assets/logo_orange.png" alt="Cosiris" width="380" height="170" className="h-10 w-auto" />
         </button>
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-1 lg:flex xl:gap-2">
           {links.map((link) => (
             <a
               key={link.label}
               className={cn(
                 buttonVariants({ variant: 'ghost' }),
-                'relative rounded-full px-4 text-[13px] font-medium tracking-tight text-slate-700 transition-colors hover:bg-orange-50 hover:text-orange-700 focus-visible:ring-2 focus-visible:ring-[#FF8000]/60',
+                'relative rounded-full px-3 text-[13px] font-medium xl:px-4 tracking-tight text-slate-700 transition-colors hover:bg-orange-50 hover:text-orange-700 focus-visible:ring-2 focus-visible:ring-[#FF8000]/60',
                 isActive(link.href) && 'bg-orange-50 text-orange-700',
               )}
               aria-current={isActive(link.href) ? 'page' : undefined}
@@ -110,7 +110,7 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
           {/* <a href="https://homestaging-cosiris.com/" target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: 'outline' })}>
             Home Staging
           </a> */}
-          <Button className="ml-1 rounded-full px-5 shadow-sm shadow-orange-500/20" onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
+          <Button className="ml-1 rounded-full px-4 shadow-sm shadow-orange-500/20 xl:px-5" onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
             Acceso Clientes
           </Button>
         </div>
@@ -118,7 +118,7 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
           size="icon"
           variant="outline"
           onClick={() => setOpen(!open)}
-          className="md:hidden"
+          className="lg:hidden"
           aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
           aria-expanded={open}
         >
@@ -128,7 +128,7 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
 
       <div
         className={cn(
-          'fixed top-14 right-0 bottom-0 left-0 z-50 flex flex-col overflow-hidden border-y bg-white md:hidden',
+          'fixed top-14 right-0 bottom-0 left-0 z-50 flex flex-col overflow-hidden border-y bg-white lg:hidden',
           open ? 'block' : 'hidden',
         )}
       >
