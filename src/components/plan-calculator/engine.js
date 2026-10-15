@@ -1,3 +1,4 @@
+/* eslint-disable */
 // Calculadora "Plan de captación" (lógica original de la versión HTML entregada
 // por Cosiris), adaptada para montarse dentro de un componente React:
 // - Todo se busca dentro de `root` (o del portal del modal), no en document.
@@ -17,23 +18,24 @@ export function mountPlanCalculator(root, opts){
   const FEES={12:[190,190,290,290,290,290,390,390,390,390,390,390],6:[190,290,290,390,390,390],3:[390,390,390]}, TARIFA=390;
   const yearSave=perm=>12*TARIFA-(FEES[perm].reduce((a,b)=>a+b,0)+(12-perm)*TARIFA);
   const ADD={basico:0,avanzado:90,premium:190}, NAME={basico:"Básico",avanzado:"Avanzado",premium:"Premium"};
-  const ACT=90, MIN=300; let LAST=null;
+  const ACT=90, CTA_MES=0, MIN=300; let LAST=null;
   const $=id=>root.querySelector("#"+id)||portal.querySelector("#"+id);
   const val=n=>root.querySelector(`input[name="${n}"]:checked`).value;
   const grp=n=>{const neg=n<0;let s=Math.abs(n).toFixed(2);let [i,d]=s.split(".");i=i.replace(/\B(?=(\d{3})+(?!\d))/g,".");return (neg?"−":"")+i+(d==="00"?"":","+d);};
   const eur=n=>grp(n)+" €";
   const dec1=n=>{const s=(Math.round(n*10)/10).toFixed(1).replace(".",",");return s.endsWith(",0")?s.slice(0,-2):s;};
 
+  const dec2=n=>{let s=(Math.round(n*100)/100).toFixed(2).replace(".",",");s=s.replace(/0$/,"");return s.endsWith(",0")?s.slice(0,-2):s.replace(/,$/,"");};
   const kfmt=v=>{const a=Math.abs(v);const s=a>=1000?(Math.round(a/100)/10).toString().replace(".",",")+" k€":Math.round(a)+" €";return (v<0?"−":"")+s;};
   /* Modelo de maduración: de los leads que entran un mes, unos están calientes (se captan enseguida) y otros fríos (tardan meses). */
-  const MAT=[0.15,0.15,0.2,0.2,0.15,0.15], CPL=37.5, LPC=17.5, SELL=0.5, LAG=3;
+  const MAT=[0.15,0.15,0.2,0.2,0.15,0.15], CPL=37.5, LPC=17.5, SELL=0.5, LAG=3, HZ=12;
   function project(r){
-    const com=Math.max(0,+$("com").value||0), H=r.perm+MAT.length-1+LAG;
+    /* Horizonte fijo: siempre los primeros 12 meses, nunca más. */
+    const com=Math.max(0,+$("com").value||0), H=HZ;
     const fees=[],ads=[],rev=[],labels=[],soldC=[],capC=[],capM=[];let cf=0,ca=0,cap=0,rv=0,be=0,sc=0;
     for(let m=1;m<=H;m++){
-      const inC=m<=r.perm;
-      cf+=inC?r.paid[m-1]+(m===1?r.act:0):0; ca+=inC?r.inv:0;
-      let c=0;for(let k=1;k<=Math.min(m,r.perm);k++){const d=m-k;if(d<MAT.length)c+=r.inv/CPL/LPC*MAT[d];}
+      cf+=r.yMonths[m-1]+(m===1?r.act:0); ca+=r.inv;
+      let c=0;for(let k=1;k<=m;k++){const d=m-k;if(d<MAT.length)c+=r.inv/CPL/LPC*MAT[d];}
       capM.push(c);cap+=c;
       const sold=m>LAG?capM[m-1-LAG]*SELL:0; rv+=sold*com; sc+=sold;
       soldC.push(sc);rev.push(rv);capC.push(cap);fees.push(cf);ads.push(ca);labels.push("M"+m);
@@ -95,7 +97,7 @@ export function mountPlanCalculator(root, opts){
     mn=Math.floor(mn/step)*step; mx=Math.ceil(mx/step)*step; if(mx-(Math.max(...all))<step*0.15)mx+=step; const ticks=Math.round((mx-mn)/step);
     const X=i=>pl+(n===1?iw/2:i*iw/(n-1)), Y=v=>pt+ih-(v-mn)/(mx-mn)*ih;
     let g="";
-    if(o.band&&o.band<n){const xb=(X(o.band-1)+X(o.band))/2;const nar=(xb-pl)<130;g+=`<rect x="${pl}" y="${pt}" width="${xb-pl}" height="${ih}" fill="#FFF3E6"/><text x="${pl+6}" y="${pt+14}" font-size="11" font-weight="800" fill="#C24E08">${nar?"Permanencia":"Tu permanencia"}</text><text x="${xb+8}" y="${pt+(nar?32:14)}" font-size="11" font-weight="700" fill="#8A8FA3">Lo captado se sigue vendiendo</text>`;}
+    if(o.band&&o.band<n){const xb=(X(o.band-1)+X(o.band))/2;const nar=(xb-pl)<130;g+=`<rect x="${pl}" y="${pt}" width="${xb-pl}" height="${ih}" fill="#FFF3E6"/><text x="${pl+6}" y="${pt+14}" font-size="11" font-weight="800" fill="#C24E08">${nar?"Permanencia":"Tu permanencia"}</text><text x="${xb+8}" y="${pt+(nar?32:14)}" font-size="11" font-weight="700" fill="#8A8FA3">${W<520?"Renovación":"Renovación automática · 390 €/mes"}</text>`;}
     for(let k=0;k<=ticks;k++){const v=mn+step*k,y=Y(v);g+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="#E8E8EC" stroke-width="1"/><text x="${pl-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#8A8FA3" font-weight="600">${o.yFmt(v)}</text>`;}
     if(o.zero&&mn<0){const y=Y(0);g+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="#13204A" stroke-width="1.5"/>`;}
     o.labels.forEach((l,i)=>{if((W<520&&n>6||n>14)&&i%2===1&&i!==n-1)return;g+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="#8A8FA3" font-weight="700">${l}</text>`;});
@@ -129,122 +131,82 @@ export function mountPlanCalculator(root, opts){
   function calc(){
     const perm=+val("perm"), pack=val("pack");
     let inv=+$("inv").value; if(!(inv>=MIN)) inv=MIN;
-    const base=FEES[perm], months=base.map(f=>f+ADD[pack]), paid=months;
-    const fees=months.reduce((a,b)=>a+b,0), ads=inv*perm;
-    return {perm,pack,inv,base,months,paid,fees,cos:fees,disc:0,act:0,ads,tot:fees+ads};
+    const cta=val("cta"), ext=cta==="cliente"?CTA_MES:0, act=cta==="cliente"?ACT:0;
+    const base=FEES[perm], months=base.map(f=>f+ADD[pack]+ext), paid=months;
+    const fees=months.reduce((a,b)=>a+b,0)+act, ads=inv*perm;
+    /* Año completo: meses de permanencia a precio del pack, resto del año renovación automática a 390 € + pack. */
+    const yMonths=Array.from({length:12},(_,i)=>i<perm?months[i]:TARIFA+ADD[pack]+ext);
+    const yFees=yMonths.reduce((a,b)=>a+b,0)+act, yAds=inv*12;
+    return {perm,pack,inv,base,months,paid,fees,cos:fees,disc:0,act,cta,ext,ads,tot:fees+ads,yMonths,yFees,yAds,yTot:yFees+yAds};
   }
+  const INC={basico:"Meta Ads · minisite · CRM · WhatsApp · leads por email",avanzado:"Todo el Básico + <b>leads por WhatsApp</b> + <b>seguimiento automático</b>",premium:"Todo el Avanzado + <b>cualificación telefónica</b>"};
+  const groupsOf=arr=>{const g=[];arr.forEach((v,i)=>{const l=g[g.length-1];if(l&&l.v===v)l.to=i+1;else g.push({from:i+1,to:i+1,v});});return g;};
+  const rngTxt=g=>g.from===g.to?`Mes ${g.from}`:`Mes ${g.from}–${g.to}`;
   function render(){
-    const r=calc();
-    if($("avg"))$("avg").innerHTML=eur(Math.round(r.fees/r.perm))+"<small>/mes</small>";
-    if($("avgS"))$("avgS").textContent=`${r.perm} meses · pack ${NAME[r.pack]} · ${eur(r.fees)} en total`;
-    $("rCos").textContent=eur(r.cos);
-    const sv=yearSave(r.perm);$("rSave").textContent=sv?("−"+eur(sv)):"0 €";
-    $("rAdsL").textContent=`Inversión en Meta Ads (${grp(r.inv)} € × ${r.perm})`;
-    $("rAds").textContent=eur(r.ads);
-    $("rTot").textContent=eur(r.tot);
-    const lo=r.ads/45, hi=r.ads/30;
-    $("eLeads").textContent=`${Math.round(lo)}–${Math.round(hi)}`;
-    $("eLeadsS").textContent=`en ${r.perm} meses`;
-    const cLo=lo/20, cHi=hi/15;
-    $("eCap").textContent=`${dec1(cLo)}–${dec1(cHi)}`;
-    // gráfico 1: cuota mes a mes (líneas)
-    const g1={}; if($("feeChart")){ $("feeChart").innerHTML=lineChart({out:g1,w:$("feeChart").clientWidth,labels:r.paid.map((m,i)=>"M"+(i+1)),series:[{name:"Cuota",color:"#FF8C19",data:r.paid,labels:true}],h:220,yFmt:v=>grp(Math.round(v))+" €",zero:false});
-    hover("feeChart",g1,i=>`<b>Mes ${i+1}</b><br>Cuota base Básico (${r.perm} meses): ${eur(r.base[i])}<br>Pack ${NAME[r.pack]}: +${eur(ADD[r.pack])}<br><b>Total del mes: ${eur(r.months[i])}</b>`); }
-    // gráfico 2: proyección 12 meses (nunca en negativo: inversión acumulada frente a ingresos por ventas)
+    const r=calc(), sv=yearSave(r.perm);
+    // 1 · escalera de cuota base
+    $("ladder").innerHTML=groupsOf(r.base).map(g=>`<span class="${g.v===TARIFA?"f":""}">${rngTxt(g)}<b>${eur(g.v)}</b></span>`).join("")+(r.perm<12?`<span>Después<b>390 €</b></span>`:"");
+    // 2 · pack
+    // 3 · inversión y cuenta
+    const lm=Math.round(r.inv/30);
+    $("invLine").innerHTML=`CPL medio de nuestros clientes: <b>30 € por lead</b>. ${grp(r.inv)} € ÷ 30 € = <b>≈ ${lm} leads al mes</b>.`;
+    $("ctaLine").innerHTML=r.cta==="cliente"?`Anuncios con <b>tu logo</b> y pagas a Meta directamente. 90 € de alta, una sola vez.`:`Sin permisos ni configuraciones. <b>Una sola factura.</b>`;
+    // resultados
     const P=project(r);
-    const g2={}; $("resChart").innerHTML=lineChart({out:g2,w:$("resChart").clientWidth,labels:P.labels,band:r.perm,series:[
+    const g2={};$("resChart").innerHTML=lineChart({out:g2,w:$("resChart").clientWidth,labels:P.labels,band:r.perm,series:[
       {name:"Honorarios Cosiris",color:"#FF8C19",data:P.fees},
       {name:"Inversión en Meta Ads",color:"#2F5BEA",data:P.ads},
-      {name:"Ingresos por ventas",color:"#1F9D55",data:P.rev,width:4,end:true}],h:280,yFmt:v=>kfmt(v),zero:false});
-    hover("resChart",g2,i=>{const inv=P.fees[i]+P.ads[i],d=P.rev[i]-inv;return `<b>Mes ${i+1} · acumulado</b><br>Honorarios Cosiris: ${eur(Math.round(P.fees[i]))}<br>Inversión en Meta: ${eur(P.ads[i])}<br>Captaciones: ${dec1(P.capC[i])} · ventas: ${dec1(P.soldC[i])}<br><span class="g">Ingresos: ${dec1(P.soldC[i])} × ${eur(P.com)} = ${eur(Math.round(P.rev[i]))}</span><br>`+(d>=0?`<span class="g">Ya has recuperado tu inversión: +${eur(Math.round(d))}</span>`:`Aún madurando: faltan ${eur(Math.round(-d))} por recuperar`);});
+      {name:"Ingresos por ventas",color:"#1F9D55",data:P.rev,width:4,end:true}],h:260,yFmt:v=>kfmt(v),zero:false});
+    hover("resChart",g2,i=>{const inv=P.fees[i]+P.ads[i],d=P.rev[i]-inv;return `<b>Mes ${i+1}</b><br>Invertido: ${eur(Math.round(inv))}<br><span class="g">Ingresos: ${eur(Math.round(P.rev[i]))}</span><br>`+(d>=0?`<span class="g">Recuperado: +${eur(Math.round(d))}</span>`:`Faltan ${eur(Math.round(-d))}`);});
+    $("resT").textContent=`Lo que puedes esperar en 12 meses`;
     $("pCap").textContent=dec1(P.cap);
     $("pVen").textContent=dec1(P.ven);
     const mul=P.tot?P.rev.at(-1)/P.tot:0;$("pMul").textContent=mul.toFixed(2).replace(".",",")+" €";
-    const mulOf=pm=>{const rr={...r,perm:pm,paid:FEES[pm].map(f=>f+ADD[r.pack])};const q=project(rr);return (q.rev.at(-1)/q.tot).toFixed(2).replace(".",",");};
-    $("pBE").textContent=P.be?("mes "+P.be):"más adelante";
-    $("resT").textContent=`Tus ${r.perm} meses y lo que viene después`;
-    $("pBE").parentElement.classList.toggle("pos",!!P.be);
-    $("pRes").textContent=`Con ${grp(r.inv)} €/mes durante ${r.perm} meses y una comisión media de ${eur(P.com)}: unas ${dec1(P.cap)} captaciones y ${dec1(P.ven)} ventas, ${eur(Math.round(P.rev.at(-1)))} en ingresos frente a ${eur(Math.round(P.tot))} invertidos. Los leads de tus ${r.perm} meses siguen madurando después y lo captado se vende en los meses siguientes: por eso el gráfico llega hasta el mes ${P.H}.`+` Supuestos: unos 37,5 € por lead, 1 captación por cada 17,5 leads, se vende el 50 % de lo captado unos 3 meses después.`;
-    if(r.perm<12){const r12={...r,perm:12,paid:[...r.months,...Array(12-r.perm).fill(TARIFA+ADD[r.pack])]};const P12=project(r12);
-      $("pRes").textContent+=` Si sigues todo el año (renovación automática a ${eur(TARIFA+ADD[r.pack])}/mes), serían unas ${dec1(P12.cap)} captaciones y ${eur(Math.round(P12.rev.at(-1)))} en ingresos.`;}
-    renderWhy(r);
-    const groups=[];r.months.forEach((m,i)=>{const g=groups[groups.length-1];if(g&&g.v===m)g.to=i+1;else groups.push({from:i+1,to:i+1,v:m});});
-    const inc={basico:"campañas en Meta Ads, minisite, CRM, cualificación por WhatsApp y leads por email",avanzado:"todo el Básico más leads por WhatsApp y seguimiento automatizado por email y WhatsApp",premium:"todo el Avanzado más cualificación telefónica desde Cosiris"}[r.pack];
-    const bg=[];r.base.forEach((m,i)=>{const g=bg[bg.length-1];if(g&&g.v===m)g.to=i+1;else bg.push({from:i+1,to:i+1,v:m});});
-    $("rcT").innerHTML=`<b>${r.perm} meses</b> · pack <b>${NAME[r.pack]}</b>`;
-    $("rcBase").innerHTML=bg.map(g=>`<i>${g.from===g.to?"Mes "+g.from:"Mes "+g.from+" a "+g.to}</i><b>${eur(g.v)}</b>`).join("");
-    $("rcPackT").textContent=r.pack==="basico"?"Pack Básico":"Pack "+NAME[r.pack];
-    $("rcPack").innerHTML=r.pack==="basico"?`<div class="rpv">+0 €</div><div class="rps">Ya incluido en la cuota base.</div>`:`<div class="rpv">+${ADD[r.pack]} €</div><div class="rps">cada mes</div>`;
-    $("rcG").innerHTML=groups.map(g=>`<div><i>${g.from===g.to?"Mes "+g.from:"Meses "+g.from+" a "+g.to}</i><b class="num">${eur(g.v)}</b><small>al mes</small></div>`).join("");
-    $("rcInc").textContent=`Total gestión ${r.perm} meses`+(sv?` · ahorras ${eur(sv)}/año`:"")+":";
-    $("rcTot").textContent=eur(r.fees);
     const T=(id,h)=>{const e=$(id);if(!e)return;e.innerHTML=e.firstElementChild.outerHTML+h;};
-    const plus=ADD[r.pack]?` + ${ADD[r.pack]} € del pack ${NAME[r.pack]}`:"";
-    T("tSave",sv?`Si te quedas todo el año: a 390 €/mes pagarías ${eur(12*TARIFA)} de gestión base. Con ${r.perm} meses de permanencia pagas ${eur(12*TARIFA-sv)} (${r.perm<12?`${eur(FEES[r.perm].reduce((a,b)=>a+b,0))} de permanencia + ${12-r.perm} meses a 390 €`:"tus 12 cuotas"}). Ahorras ${eur(sv)}. El pack se suma igual en todos los casos.`:`Con 3 meses pagas la tarifa de 390 €/mes sin bonificar. Con 6 meses ahorrarías ${eur(yearSave(6))} en el año y con 12 meses ${eur(yearSave(12))}.`);
-    T("tAvg",`Total de gestión (${eur(r.fees)}) ÷ ${r.perm} meses = ${eur(Math.round(r.fees/r.perm))} de media. Al principio pagas menos y luego algo más.`);
-    T("tCos",`Suma de tus ${r.perm} cuotas mensuales: cuota base del pack Básico${plus} cada mes = ${eur(r.fees)}. No incluye la publicidad.`);
-    T("tAds",`${eur(r.inv)} al mes × ${r.perm} meses = ${eur(r.ads)}. Se paga a Meta, no a Cosiris.`);
-    T("tTot",`Lo que pagas a Cosiris (${eur(r.fees)}) + inversión en Meta Ads (${eur(r.ads)}) = ${eur(r.tot)}.`);
-    T("tLeads",`Inversión en Meta (${eur(r.ads)}) ÷ coste medio por lead de nuestros clientes (entre 30 y 45 €) = ${Math.round(lo)} a ${Math.round(hi)} leads. Es un ejemplo, no una garantía.`);
-    T("tCap",`De media, 1 de cada 15–20 leads acaba en captación. ${Math.round(lo)}–${Math.round(hi)} leads ÷ 15–20 = ${dec1(cLo)} a ${dec1(cHi)} captaciones. Es un ejemplo, no una garantía.`);
-    T("tPack",r.pack==="basico"?"Has elegido el Básico: ya está incluido en la cuota base, no suma nada.":`Has elegido el pack ${NAME[r.pack]}: suma ${ADD[r.pack]} € a la cuota base cada mes, durante los ${r.perm} meses.`);
-    T("tRcTot",`Suma de tus ${r.perm} cuotas mensuales totales: ${groups.map(g=>(g.to>g.from?(g.to-g.from+1)+" × ":"")+grp(g.v)+" €").join(" + ")} = ${eur(r.fees)}.`);
-    const leads12=r.inv*Math.min(r.perm,12)/37.5;
-    T("tPCap",`Inversión en Meta durante ${r.perm} meses (${eur(r.inv*r.perm)}) ÷ 37,5 € por lead = ${Math.round(leads12)} leads. ${Math.round(leads12)} ÷ 17,5 leads por captación = ${dec1(P.cap)} captaciones.`);
-    T("tPMul",`Ingresos por ventas (${eur(Math.round(P.rev.at(-1)))}) ÷ todo lo que inviertes (${eur(Math.round(P.tot))}). Con tu inversión y tu pack: 3 meses ${mulOf(3)} €, 6 meses ${mulOf(6)} €, 12 meses ${mulOf(12)} € por cada euro. Más permanencia, más rendimiento.`);
-    T("tPVen",`Suponemos que se vende el 50 % de lo captado y que cada venta llega unos 3 meses después de captar. Contamos todas las ventas de lo captado con tus leads, también las que llegan después de tu permanencia: ${dec1(P.ven)}.`);
-    T("tPBE",P.be?`Es el primer mes en que lo que ingresas por ventas (ventas × ${eur(P.com)}) supera todo lo que has pagado hasta ese mes (Cosiris + Meta).`:`Con estos datos, lo ingresado por ventas no supera lo pagado (Cosiris + Meta) dentro de tus ${r.perm} meses. Muchas ventas llegan después: las captaciones siguen madurando. Prueba con más inversión o tu comisión real.`);
-    const com=Math.max(0,+$("com").value||0), vLo=cLo*0.5, vHi=cHi*0.5, iLo=vLo*com, iHi=vHi*com, nLo=iLo-r.tot, nHi=iHi-r.tot;
-    const rng=(a,b)=>`${grp(Math.round(a))}–${grp(Math.round(b))} €`;
-    $("eVen").textContent=`${dec1(vLo)}–${dec1(vHi)}`;
-    $("eIng").textContent=rng(iLo,iHi);
-    $("eIngS").textContent=`ventas × tu comisión (${eur(com)})`;
-    $("eNet").textContent=`${nLo<0?"":"+"}${grp(Math.round(nLo))} a ${nHi<0?"":"+"}${grp(Math.round(nHi))} €`;
-    const roi=n=>Math.round(n/r.tot*100)+" %";
-    $("eNetS").textContent=`cuando se vendan tus captaciones · ingresos − inversión (${eur(r.tot)}) · ROI ${roi(nLo)} a ${roi(nHi)}`;
-    T("tVen",`De media, nuestros clientes venden alrededor del 50 % de lo que captan. ${dec1(cLo)}–${dec1(cHi)} captaciones × 50 % = ${dec1(vLo)} a ${dec1(vHi)} ventas. Algunas ventas pueden llegar meses después de captar. Es un ejemplo, no una garantía.`);
-    T("tIng",`Ventas × tu comisión media por venta (${eur(com)}, puedes cambiarla en el paso 4). ${dec1(vLo)}–${dec1(vHi)} ventas × ${eur(com)} = ${rng(iLo,iHi)}.`);
-    T("tRoi",`Ingresos por ventas (${rng(iLo,iHi)}) − todo lo que inviertes: Cosiris ${eur(r.fees)} + Meta ${eur(r.ads)} = ${eur(r.tot)}. ROI = retorno ÷ inversión total. Es un ejemplo con datos promedio de nuestros clientes, no una garantía.`);
-    const lm=Math.round(r.inv/30);
-    LAST={r,P,lo,hi,cLo,cHi,vLo,vHi,iLo,iHi,nLo,nHi,com};
-    if($("mTab"))$("mTab").innerHTML=`<tr><th>Mes</th>${[...Array(12)].map((_,i)=>`<th>${i+1}</th>`).join("")}<th>Total</th></tr>`+[3,6,12].map(pm=>`<tr${pm===r.perm?' class="sel"':''}><td>${pm} m</td>${[...Array(12)].map((_,i)=>i<pm?`<td class="${FEES[pm][i]===TARIFA?"f":""}">${FEES[pm][i]}</td>`:`<td class="e">·</td>`).join("")}<td class="tot">${grp(FEES[pm].reduce((a,b)=>a+b,0))}</td></tr>`).join("");
-    $("invLeads").innerHTML=`≈ ${lm} leads aproximados al mes <small>· un lead cuesta unos 30 € de promedio</small><span class="invp">≈ ${grp(lm*r.perm)} leads en tus ${r.perm} meses de permanencia <small>· ${lm} leads × ${r.perm} meses</small></span>`;
-    if($("mSub"))$("mSub").textContent=`Base + pack ${NAME[r.pack]}`;
+    const leadsN=r.inv*12/CPL, potCap=leadsN/LPC, laterCap=potCap-P.cap, capSell=P.ven/SELL, ingN=Math.round(P.rev.at(-1));
+    const capTxt=`${eur(r.inv)}/mes × 12 meses = ${eur(r.inv*12)} en Meta. ÷ 37,5 € por lead = ${Math.round(leadsN)} leads. 1 captación cada 17,5 leads = ${dec1(potCap)} captaciones.`+(laterCap>=0.05?` Cada lead tarda de 0 a 5 meses en convertirse en captación: ${dec1(P.cap)} llegan dentro de los 12 meses y ${dec1(laterCap)} después.`:` Todas llegan dentro de los 12 meses.`);
+    const venTxt=`Se vende el 50 % de lo captado, unos 3 meses después de captarlo. Solo cuenta lo captado hasta el mes 9 (${dec2(capSell)} inmuebles) → ${dec2(capSell)} × 50 % = ${dec2(P.ven)} ventas dentro de los 12 meses.`;
+    const ingTxt=`${dec2(P.ven)} ventas × ${eur(P.com)} de comisión media ≈ ${eur(ingN)}. Solo cuenta lo vendido en los primeros 12 meses.`;
+    T("tPCap",capTxt); T("tPVen",venTxt);
+    T("tPMul",`Ingresos por ventas en 12 meses (${eur(ingN)}) ÷ todo lo invertido (${eur(Math.round(P.tot))}).`);
+    T("tSCap",capTxt); T("tSVen",venTxt); T("tSIng",ingTxt);
+    $("rCap").textContent=dec1(P.cap); $("rVen").textContent=dec1(P.ven);
+    renderWhy(r);
+    {const rw=whyModel(r.perm,r.inv),fw=whyModel(12,r.inv);$("whyTxt").innerHTML=r.perm<12?`Con ${r.perm} meses: <b>${rw.at(-1).tot} captaciones</b>. Todo el año: <b>${fw.at(-1).tot}</b>.`:`En 12 meses: <b>${rw.at(-1).tot} captaciones</b>.`;}
+    // resumen final
+    const months=groupsOf(r.yMonths);
+    $("sChips").innerHTML=[["Permanencia",`${r.perm} meses`],["Pack",NAME[r.pack]],["Cuenta",r.cta==="cliente"?"Propia":"Cosiris"],["Meta",`${grp(r.inv)} €/mes`]].map(([a,b])=>`<span><i>${a}</i>${b}</span>`).join("");
+    $("sFee").style.setProperty("--n",months.length);
+    $("sFee").innerHTML=months.map(g=>`<div><i>${rngTxt(g)}</i><b>${eur(g.v)}<small>/mes</small></b></div>`).join("");
+    $("rSave").textContent=sv?("−"+eur(sv)):"0 €";
+    $("rCosS").textContent=r.act?`(incl. ${r.act} € de alta)`:"";
+    $("rCos").textContent=eur(r.yFees);
+    $("rCosD").textContent=r.perm<12?`${r.perm} meses de permanencia (${eur(r.fees-r.act)}) + ${12-r.perm} de renovación a ${eur(TARIFA+ADD[r.pack]+r.ext)}`:`12 meses de permanencia`;
+    $("rAdsL").textContent=`Meta Ads (${grp(r.inv)} € × 12 meses)`;
+    $("rAds").textContent=eur(r.yAds);
+    $("rTot").textContent=eur(r.yTot);
+    {const ing=Math.round(P.rev.at(-1)),ret=ing-Math.round(P.tot);$("rIng").textContent=eur(ing);$("rRet").textContent=(ret>=0?"+":"")+eur(ret);$("retBox").classList.toggle("neg",ret<0);}
+    $("sRen").textContent=r.perm<12?`Cálculo anual: al terminar tus ${r.perm} meses de permanencia, el contrato se renueva automáticamente a ${eur(TARIFA+ADD[r.pack]+r.ext)}/mes.`:`Al terminar el año, renovación automática a ${eur(TARIFA+ADD[r.pack]+r.ext)}/mes con las condiciones contratadas.`;
+    $("bTxt").innerHTML=`Empiezas en <b>${eur(r.months[0])}</b>/mes<span class="bt"> · 1.er año <b>${eur(r.yTot)}</b></span>`;
+    // datos para el PDF (mismo formato que la calculadora completa)
+    const com=Math.max(0,+$("com").value||0), lo=r.ads/45, hi=r.ads/30, cLo=lo/20, cHi=hi/15, vLo=cLo*0.5, vHi=cHi*0.5, iLo=vLo*com, iHi=vHi*com;
+    LAST={r,P,lo,hi,cLo,cHi,vLo,vHi,iLo,iHi,nLo:iLo-r.tot,nHi:iHi-r.tot,com};
   }
   root.querySelectorAll('input[type="radio"]').forEach(x=>x.addEventListener("change",render));
   const inv=$("inv"), invR=$("invR");
-  invR.addEventListener("input",()=>{inv.value=invR.value;$("invHint").className="hint";$("invHint").textContent="Mínimo 300 €/mes.";render();});
+  invR.addEventListener("input",()=>{inv.value=invR.value;render();});
   inv.addEventListener("input",()=>{const v=+inv.value;if(v>=MIN)invR.value=Math.min(2000,v);render();});
-  inv.addEventListener("change",()=>{if(!(+inv.value>=MIN)){inv.value=MIN;invR.value=MIN;$("invHint").className="warn";$("invHint").textContent="La inversión mínima es de 300 €/mes. Hemos ajustado el valor.";}render();});
+  inv.addEventListener("change",()=>{if(!(+inv.value>=MIN)){inv.value=MIN;invR.value=MIN;$("invLine").insertAdjacentHTML("beforeend"," · <b style=\"color:#C0392B\">mínimo 300 €/mes</b>");}render();});
   const com=$("com"), comR=$("comR");
   com.addEventListener("input",()=>{const v=+com.value;if(v>0)comR.value=Math.min(30000,Math.max(1000,v));render();});
   comR.addEventListener("input",()=>{com.value=comR.value;render();});
-  // recorrido guiado (no obligatorio: se ilumina el paso que tienes delante al hacer scroll)
-  const steps=[...root.querySelectorAll("#tour .step")]; const done=new Set(); let scur=0;
-  const paint=()=>steps.forEach((s,j)=>{s.classList.toggle("active",j===scur);s.classList.toggle("done",done.has(j));});
-  const setActive=i=>{scur=i;paint();};
-  const markDone=i=>{done.add(i);paint();};
-  const go=el=>el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
-  let lock=0;
-  steps.forEach((s,i)=>{
-    s.addEventListener("change",e=>{if(!e.target.closest(".info"))markDone(i);});
-    s.addEventListener("input",e=>{if(e.target.type==="range"||e.target.type==="number")markDone(i);});
-    s.addEventListener("focusin",e=>{if(!e.target.closest(".next")&&!e.target.closest(".info"))setActive(i);});
-    const b=s.querySelector(".next");
-    b.addEventListener("click",()=>{markDone(i);lock=Date.now();
-      if(b.classList.contains("go")){[4,6,10,11,12,13,14,15].forEach(n=>loadImg(`/calculadora/pages/p${String(n).padStart(2,"0")}.jpg`));render();go($("report"));}
-      else{setActive(i+1);go(steps[i+1]);}});
-  });
-  if("IntersectionObserver" in window){
-    const vis=new Map();
-    io=new IntersectionObserver(es=>{es.forEach(e=>vis.set(e.target,e.isIntersecting));
-      if(Date.now()-lock<900)return;
-      const k=steps.findIndex(s=>vis.get(s));if(k>=0&&k!==scur)setActive(k);},{rootMargin:"-38% 0px -50% 0px"});
-    steps.forEach(s=>io.observe(s));
-  }
-  setActive(0);
+  // barra inferior: se oculta cuando el resumen está a la vista
+  $("bGo").addEventListener("click",()=>$("sum").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}));
+  if("IntersectionObserver" in window){let inRoot=false,inSum=false;const upd=()=>$("mBar").classList.toggle("off",!inRoot||inSum);io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.target===root)inRoot=e.isIntersecting;else inSum=e.isIntersecting;});upd();},{threshold:0.05});io.observe(root);io.observe($("sum"));}
+  [4,6,10,11,12,13,14,15].forEach(n=>setTimeout(()=>loadImg(`/calculadora/pages/p${String(n).padStart(2,"0")}.jpg`),1500));
   let rt;on(window,"resize",()=>{clearTimeout(rt);rt=setTimeout(render,150);});
   render();
+
   ft=document.createElement("div");ft.id="ftip";ft.setAttribute("role","tooltip");document.body.appendChild(ft);
   let cur=null;
   const showT=el=>{const tb=el.querySelector(".tipbox");if(!tb)return;cur=el;ft.innerHTML=tb.innerHTML;ft.style.display="block";
@@ -310,25 +272,25 @@ export function mountPlanCalculator(root, opts){
     const budget={bg:K.cream,note:"Precios de gestión sin IVA · La inversión en Meta Ads va aparte",draw(x,k){
       head(k,"01 · Tu presupuesto para ti","Esto es lo que","has elegido");
       // tarjetas de elección
-      const ch=[["1 · Permanencia",`${r.perm} meses`,r.perm<12?`Después, renovación automática a 390 €/mes${yearSave(r.perm)?" · ahorras "+eur(yearSave(r.perm))+" en el año":""}`:`Ahorras ${eur(yearSave(r.perm))} en el año`],["2 · Nivel de seguimiento",`Pack ${pk}`,ADD[r.pack]?`+${ADD[r.pack]} € al mes sobre la cuota base`:"Incluido en la cuota base"],["3 · Inversión en Meta Ads",`${grp(r.inv)} €/mes`,`≈ ${Math.round(r.inv/30)} leads al mes · aparte, se paga a Meta`]];
+      const ch=[["1 · Permanencia",`${r.perm} meses`,r.perm<12?`Después, renovación automática a 390 €/mes${yearSave(r.perm)?" · ahorras "+eur(yearSave(r.perm))+" en el año":""}`:`Ahorras ${eur(yearSave(r.perm))} en el año`],["2 · Nivel de seguimiento",`Pack ${pk}`,ADD[r.pack]?`+${ADD[r.pack]} € al mes sobre la cuota base`:"Incluido en la cuota base"],["3 · Inversión en Meta Ads",`${grp(r.inv)} €/mes`,`≈ ${Math.round(r.inv/30)} leads/mes · ${r.cta==="cliente"?"tu cuenta: 90 € de alta, pago único":"en cuenta Cosiris"}`]];
       ch.forEach((c,i)=>{const X=128+i*400,Y=270;k.rr(X,Y,376,190,22,K.white,K.line,2);k.rr(X+28,Y,80,6,3,K.or);
         k.t(c[0].toUpperCase(),X+28,Y+56,{w:800,s:17,c:K.muted,ls:2});k.t(c[1],X+28,Y+116,{w:800,s:c[1].length>12?36:44,c:K.navy});k.wrap(c[2],X+28,Y+158,320,{s:19,w:500,lh:24});});
       // tabla cuota
       const TX=128,TY=500,TW=1176;k.rr(TX,TY,TW,420,22,K.white,K.line,2);
       k.t("TU CUOTA MENSUAL DE GESTIÓN, MES A MES",TX+36,TY+56,{w:800,s:20,c:K.ord,ls:3});
       const cols=[TX+36,TX+380,TX+640,TX+900];
-      ["Mes","Cuota base Básico","Pack "+pk,"Total al mes"].forEach((h,i)=>k.t(h,cols[i],TY+110,{w:700,s:20,c:K.muted}));
+      ["Mes","Cuota base Básico",r.ext?"Pack + cuenta":"Pack "+pk,"Total al mes"].forEach((h,i)=>k.t(h,cols[i],TY+110,{w:700,s:20,c:K.muted}));
       x.fillStyle=K.line;x.fillRect(TX+36,TY+128,TW-72,2);
       const gr=[];r.months.forEach((m,i)=>{const g=gr[gr.length-1];if(g&&g.v===m&&g.b===r.base[i])g.to=i+1;else gr.push({from:i+1,to:i+1,v:m,b:r.base[i]});});
       const rh=Math.min(58,250/gr.length);
       gr.forEach((g,i)=>{const y=TY+180+i*rh;k.t(g.from===g.to?"Mes "+g.from:`Meses ${g.from} a ${g.to}`,cols[0],y,{w:600,s:26,c:K.navy});
-        k.t(eur(g.b),cols[1],y,{w:600,s:26,c:K.text});k.t("+"+eur(ADD[r.pack]),cols[2],y,{w:600,s:26,c:K.text});k.t(eur(g.v),cols[3],y,{w:800,s:30,c:K.ord});});
+        k.t(eur(g.b),cols[1],y,{w:600,s:26,c:K.text});k.t("+"+eur(ADD[r.pack]+r.ext),cols[2],y,{w:600,s:26,c:K.text});k.t(eur(g.v),cols[3],y,{w:800,s:30,c:K.ord});});
       k.wrap(`Base + pack = tu cuota de cada mes. Al terminar los ${r.perm} meses, el contrato se renueva automáticamente mes a mes con las condiciones contratadas: 390 € + pack.`,TX+36,TY+390,TW-72,{s:19,w:500,c:K.muted});
       // totales
       const BX=1344,BY=270,BW=448;k.rr(BX,BY,BW,650,26,K.navy);
       k.t("MEDIA DE GESTIÓN AL MES",BX+40,BY+70,{w:800,s:19,c:K.or,ls:3});
       k.rich([[eur(Math.round(r.fees/r.perm)),K.white,800],["/mes",K.light,600,30]],BX+40,BY+160,72);
-      const rows=[["Pagas a Cosiris",eur(r.fees),`${r.perm} cuotas de gestión`],["Inversión en Meta Ads",eur(r.ads),`${grp(r.inv)} € × ${r.perm} meses · aparte`],["Inversión total del plan",eur(r.tot),"Cosiris + Meta Ads"]];
+      const rows=[["Pagas a Cosiris",eur(r.fees),r.act?`${r.perm} cuotas + alta`:`${r.perm} cuotas de gestión`],["Inversión en Meta Ads",eur(r.ads),`${grp(r.inv)} € × ${r.perm} meses · aparte`],["Inversión total del plan",eur(r.tot),"Cosiris + Meta Ads"]];
       rows.forEach((w,i)=>{const y=BY+250+i*120;x.fillStyle="rgba(255,255,255,.15)";x.fillRect(BX+40,y-44,BW-80,2);
         k.t(w[0],BX+40,y,{w:700,s:22,c:i===2?K.or:K.light});k.f(500,17);const subW=x.measureText(w[2]).width;let fs=i===2?44:38;k.f(800,fs);while(fs>24&&x.measureText(w[1]).width>BW-80-subW-20){fs-=2;k.f(800,fs);}k.t(w[1],BX+BW-40,y+44,{w:800,s:fs,c:K.white,a:"right"});k.t(w[2],BX+40,y+44,{w:500,s:17,c:K.light});});
       k.rr(BX+40,BY+585,BW-80,40,10,"rgba(255,140,25,.18)");k.t("La inversión en Meta NO está en la cuota",BX+BW/2,BY+612,{w:700,s:17,c:K.or,a:"center"});
@@ -373,11 +335,11 @@ export function mountPlanCalculator(root, opts){
         k.t(pm+" meses",TX+24,y+(sel?44:54),{w:800,s:28,c:K.navy});if(sel)k.t("TU PERMANENCIA",TX+24,y+70,{w:800,s:14,c:K.ord,ls:2});
         for(let i=0;i<12;i++){const cx=TX+c0+cw*i+cw/2;if(i<pm){const v=FEES[pm][i];k.t(String(v),cx,y+54,{w:v===TARIFA?800:600,s:28,c:v===TARIFA?K.navy:K.text,a:"center"});}else k.t("·",cx,y+54,{w:600,s:28,c:K.light,a:"center"});}
         k.t(grp(FEES[pm].reduce((a,b)=>a+b,0))+" €",TX+TW-85,y+54,{w:800,s:26,c:K.navy,a:"center"});});
-      {const y=TY+92+3*rh+14;k.rr(TX,y,TW,rh-6,16,K.navy);k.t("Tu cuota",TX+24,y+42,{w:800,s:26,c:K.white});k.t(ADD[r.pack]?`con pack ${pk}`:"pack Básico",TX+24,y+70,{w:700,s:17,c:K.or});
+      {const y=TY+92+3*rh+14;k.rr(TX,y,TW,rh-6,16,K.navy);k.t("Tu cuota",TX+24,y+42,{w:800,s:26,c:K.white});k.t(r.ext?`${pk} + cuenta`:(ADD[r.pack]?`con pack ${pk}`:"pack Básico"),TX+24,y+70,{w:700,s:17,c:K.or});
         for(let i=0;i<12;i++){const cx=TX+c0+cw*i+cw/2;k.t(i<r.perm?String(r.months[i]):"·",cx,y+56,{w:800,s:28,c:i<r.perm?K.white:"#55607F",a:"center"});}
         k.t(grp(r.fees)+" €",TX+TW-85,y+56,{w:800,s:26,c:K.or,a:"center"});}
       const yy=TY+92+4*rh+40;
-      k.wrap(`Tarifa de referencia: 390 €/mes (pack Básico). Tu pack ${pk} suma ${ADD[r.pack]?"+"+ADD[r.pack]+" € cada mes":"0 €"}. Después de la permanencia, renovación automática a 390 €/mes${ADD[r.pack]?" + pack":""}. Si sigues todo el año, ahorras ${eur(yearSave(r.perm))} con tu plan.`,TX,yy,TW,{s:24,w:600,c:K.navy,lh:34});
+      k.wrap(`Tarifa de referencia: 390 €/mes (pack Básico). Tu pack ${pk} suma ${ADD[r.pack]?"+"+ADD[r.pack]+" € cada mes":"0 €"}. Después de la permanencia, renovación automática a 390 €/mes${ADD[r.pack]?" + pack":""}. Si sigues todo el año, ahorras ${eur(yearSave(r.perm))} con tu plan.`+(r.act?` Tu propia cuenta de Meta: ${r.act} € de alta, pago único.`:""),TX,yy,TW,{s:24,w:600,c:K.navy,lh:34});
     }};
     const packs={bg:K.cream,note:"Precios de gestión sin IVA · La inversión en Meta Ads va aparte",draw(x,k){
       head(k,"04 · Qué incluye cada pack","Tu pack","y las demás opciones");
@@ -460,7 +422,7 @@ export function mountPlanCalculator(root, opts){
   const KIND={presupuesto:"PDF completo"};
   function leadSummary(kind){const S=LAST,r=S.r;
     return `${LEAD.nombre} (${LEAD.inmobiliaria}, ${LEAD.zona}) se ha descargado un presupuesto (${KIND[kind]}). `+
-      `Plan: ${r.perm} meses · pack ${NAME[r.pack]} · ${grp(r.inv)} €/mes en Meta Ads · comisión media ${eur(S.com)}. `+
+      `Plan: ${r.perm} meses · pack ${NAME[r.pack]} · ${r.cta==="cliente"?"cuenta del cliente":"cuenta Cosiris"} · ${grp(r.inv)} €/mes en Meta Ads · comisión media ${eur(S.com)}. `+
       `Cuota de gestión: ${r.months.map(m=>grp(m)).join(" / ")} € · total Cosiris ${eur(r.fees)} · Meta ${eur(r.ads)} · total ${eur(r.tot)}. `+
       `Estimación: ${Math.round(S.lo)}–${Math.round(S.hi)} leads, ${dec1(S.cLo)}–${dec1(S.cHi)} captaciones.`;}
   async function sendLead(kind){try{return !!(await opts.onLead({...LEAD,summary:leadSummary(kind)}));}catch(e){return false;}}
