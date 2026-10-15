@@ -81,7 +81,7 @@ export function PlanCalculator({ headingTag = 'h1', className = '' }: { headingT
     ? PLAN_MARKUP
     : PLAN_MARKUP.replace('<h1 class="pc-h1">', `<${headingTag} class="pc-h1">`).replace('</h1>', `</${headingTag}>`);
 
-  // El HTML se pinta aquí y no con dangerouslySetInnerHTML: la lógica cuelga
+  // El HTML se pinta aquí, sin inyectarlo como HTML crudo de React: la lógica cuelga
   // listeners de los propios elementos, y un DOM nuevo en cada montaje evita
   // que un remontaje (StrictMode, navegación) los duplique y envíe el lead dos veces.
   useEffect(() => {
