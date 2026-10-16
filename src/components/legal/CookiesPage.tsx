@@ -81,6 +81,26 @@ export function CookiesPage() {
             </a>
             .
           </li>
+          <li>
+            <strong>Publicidad — Píxel de medición de OpenAI (anuncios en ChatGPT):</strong>{' '}
+            permite medir las conversiones atribuibles a nuestros anuncios en ChatGPT.
+            Guarda en su navegador dos cookies propias de este sitio: <em>__oppref</em>{' '}
+            (identificador de atribución de la URL de llegada, 30 días) y <em>__obref</em>{' '}
+            (referencia aleatoria del navegador, 365 días), y envía a OpenAI los eventos de
+            conversión junto con la URL de la página. Si se activa la coincidencia
+            automática avanzada, también puede enviar datos del cliente cifrados con SHA-256
+            (nunca en claro). Esto implica una transferencia internacional de datos a
+            Estados Unidos. Más información en la{' '}
+            <a
+              href="https://openai.com/policies/privacy-policy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-[#FF8000]"
+            >
+              Política de Privacidad de OpenAI
+            </a>
+            .
+          </li>
         </ul>
       </section>
 

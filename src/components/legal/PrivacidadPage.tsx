@@ -44,7 +44,7 @@ export function PrivacidadPage() {
           <li><strong>n8n (alojado en infraestructura de Hostinger):</strong> automatiza el envío de su solicitud a nuestro equipo comercial y, si procede, a WhatsApp Business.</li>
           <li><strong>Meta Platforms Ireland Ltd. (WhatsApp Business):</strong> utilizado para contactarle por WhatsApp cuando usted lo solicita a través de un formulario.</li>
           <li><strong>Supabase Inc.:</strong> aloja la base de datos con la que gestionamos el directorio de inmobiliarias y las solicitudes recibidas.</li>
-          <li><strong>Google Ireland Limited y Meta Platforms Ireland Ltd.:</strong> únicamente si usted ha dado su consentimiento a las cookies de analítica o publicidad — ver la <a href="/cookies" className="underline hover:text-[#FF8000]">Política de Cookies</a>.</li>
+          <li><strong>Google Ireland Limited, Meta Platforms Ireland Ltd. y OpenAI:</strong> únicamente si usted ha dado su consentimiento a las cookies de analítica o publicidad — ver la <a href="/cookies" className="underline hover:text-[#FF8000]">Política de Cookies</a>.</li>
         </ul>
       </section>
 

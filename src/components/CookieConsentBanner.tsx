@@ -9,16 +9,16 @@ export const COOKIE_PREFERENCES_EVENT = 'cosiris:open-cookie-preferences';
 export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [analytics, setAnalytics] = useState(true);
-  const [marketing, setMarketing] = useState(true);
+  const [analytics, setAnalytics] = useState(false);
+  const [marketing, setMarketing] = useState(false);
 
   useEffect(() => {
     if (!getStoredConsent()) setVisible(true);
 
     const openPreferences = () => {
       const stored = getStoredConsent();
-      setAnalytics(stored?.analytics ?? true);
-      setMarketing(stored?.marketing ?? true);
+      setAnalytics(stored?.analytics ?? false);
+      setMarketing(stored?.marketing ?? false);
       setExpanded(true);
       setVisible(true);
     };
@@ -84,7 +84,7 @@ export function CookieConsentBanner() {
                 <label className="flex items-center justify-between gap-3 text-sm text-slate-700">
                   <span>
                     <strong className="font-semibold text-slate-900">Publicidad</strong> — Meta Pixel
-                    (Facebook / Instagram)
+                    (Facebook / Instagram) y píxel de OpenAI (anuncios en ChatGPT)
                   </span>
                   <input
                     type="checkbox"

@@ -24,7 +24,7 @@ export const SECURITY_HEADERS = {
     // con contenido distinto en cada carga (conversion linking) — un hash no
     // sirve ahí. El allowlist de hosts sigue bloqueando <script src> a
     // dominios no autorizados, que es el vector más común de XSS con impacto real.
-    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net https://*.google-analytics.com https://*.analytics.google.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://maps.googleapis.com https://www.youtube.com",
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net https://bzrcdn.openai.com https://*.google-analytics.com https://*.analytics.google.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://maps.googleapis.com https://www.youtube.com",
     // 'unsafe-inline' en style-src: Framer Motion/GSAP escriben el atributo
     // style vía cssText en algunas animaciones, lo que CSP trata igual que un
     // style="" inline aunque no venga de HTML de origen dudoso.
@@ -51,6 +51,8 @@ export const SECURITY_HEADERS = {
       'https://www.googletagmanager.com',
       'https://www.facebook.com',
       'https://connect.facebook.net',
+      'https://bzr.openai.com',
+      'https://bzrcdn.openai.com',
     ].join(' '),
     "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://www.google.com https://www.googletagmanager.com",
     "worker-src 'self' blob:",

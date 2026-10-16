@@ -11,10 +11,11 @@
 const STORAGE_KEY = 'cosiris_cookie_consent_v1';
 const GTM_ID = 'GTM-MWTG2SB';
 const META_PIXEL_ID = '1241986738137530';
+const OPENAI_PIXEL_ID = 'VtNEai4EiqbyZWZk9vEGRu';
 
 export interface ConsentChoice {
   analytics: boolean; // Google Tag Manager -> Google Analytics + Google Ads
-  marketing: boolean; // Meta Pixel
+  marketing: boolean; // Meta Pixel + píxel de OpenAI (ChatGPT Ads)
   decidedAt: string;
 }
 
@@ -37,7 +38,10 @@ export function getStoredConsent(): ConsentChoice | null {
 
 function applyConsent(choice: ConsentChoice) {
   if (choice.analytics) loadGoogleTagManager();
-  if (choice.marketing) loadMetaPixel();
+  if (choice.marketing) {
+    loadMetaPixel();
+    loadOpenAIPixel();
+  }
   listeners.forEach((listener) => listener(choice));
 }
 
@@ -132,8 +136,34 @@ function loadMetaPixel(): void {
   document.body.appendChild(noscript);
 }
 
+let openAIPixelLoaded = false;
+function loadOpenAIPixel(): void {
+  if (openAIPixelLoaded || !OPENAI_PIXEL_ID || typeof document === 'undefined') return;
+  openAIPixelLoaded = true;
+
+  /* eslint-disable */
+  (function (w: any, d: Document, s: string, u: string) {
+    if (w.oaiq) return;
+    const q: any = function (...args: unknown[]) {
+      q.q.push(args);
+    };
+    q.q = [];
+    w.oaiq = q;
+    const js = d.createElement(s) as HTMLScriptElement;
+    js.async = true;
+    js.src = u;
+    const f = d.getElementsByTagName(s)[0];
+    f.parentNode!.insertBefore(js, f);
+  })(window, document, 'script', 'https://bzrcdn.openai.com/sdk/oaiq.min.js');
+  /* eslint-enable */
+
+  // Solo se llama aquí si el usuario aceptó marketing, así que el consentimiento es true.
+  window.oaiq?.('init', { pixelId: OPENAI_PIXEL_ID });
+}
+
 declare global {
   interface Window {
+    oaiq?: (...args: unknown[]) => void;
     fbq?: (...args: unknown[]) => void;
   }
 }
