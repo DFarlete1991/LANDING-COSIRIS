@@ -154,3 +154,15 @@
 }
 .plan-calc .fl select:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255, 128, 0, 0.15); }
 .plan-calc .fl select.bad { border-color: #c0392b; }
+
+/* ── Título superior de la calculadora (encima de "Calcula tu plan") ───── */
+.plan-calc .m-hero .pc-kicker {
+  margin: 0 0 14px;
+  max-width: 34ch;
+  font-size: clamp(13px, 1.6vw, 15px);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--orange-t);
+}
