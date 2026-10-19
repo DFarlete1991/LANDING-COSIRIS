@@ -15,7 +15,7 @@ export function mountPlanCalculator(root, opts){
   let io=null, ft=null;
 
 
-  const FEES={12:[190,190,290,290,290,290,390,390,390,390,390,390],6:[190,290,290,390,390,390],3:[390,390,390]}, TARIFA=390;
+  const FEES={12:[190,190,290,290,290,290,490,490,490,490,490,490],6:[190,290,290,490,490,490],3:[490,490,490]}, TARIFA=490;
   const yearSave=perm=>12*TARIFA-(FEES[perm].reduce((a,b)=>a+b,0)+(12-perm)*TARIFA);
   const ADD={basico:0,avanzado:90,premium:190}, NAME={basico:"Básico",avanzado:"Avanzado",premium:"Premium"};
   const ACT=90, CTA_MES=0, MIN=300; let LAST=null;
@@ -97,7 +97,7 @@ export function mountPlanCalculator(root, opts){
     mn=Math.floor(mn/step)*step; mx=Math.ceil(mx/step)*step; if(mx-(Math.max(...all))<step*0.15)mx+=step; const ticks=Math.round((mx-mn)/step);
     const X=i=>pl+(n===1?iw/2:i*iw/(n-1)), Y=v=>pt+ih-(v-mn)/(mx-mn)*ih;
     let g="";
-    if(o.band&&o.band<n){const xb=(X(o.band-1)+X(o.band))/2;const nar=(xb-pl)<130;g+=`<rect x="${pl}" y="${pt}" width="${xb-pl}" height="${ih}" fill="#FFF3E6"/><text x="${pl+6}" y="${pt+14}" font-size="11" font-weight="800" fill="#C24E08">${nar?"Permanencia":"Tu permanencia"}</text><text x="${xb+8}" y="${pt+(nar?32:14)}" font-size="11" font-weight="700" fill="#8A8FA3">${W<520?"Renovación":"Renovación automática · 390 €/mes"}</text>`;}
+    if(o.band&&o.band<n){const xb=(X(o.band-1)+X(o.band))/2;const nar=(xb-pl)<130;g+=`<rect x="${pl}" y="${pt}" width="${xb-pl}" height="${ih}" fill="#FFF3E6"/><text x="${pl+6}" y="${pt+14}" font-size="11" font-weight="800" fill="#C24E08">${nar?"Permanencia":"Tu permanencia"}</text><text x="${xb+8}" y="${pt+(nar?32:14)}" font-size="11" font-weight="700" fill="#8A8FA3">${W<520?"Renovación":"Renovación automática · 490 €/mes"}</text>`;}
     for(let k=0;k<=ticks;k++){const v=mn+step*k,y=Y(v);g+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="#E8E8EC" stroke-width="1"/><text x="${pl-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#8A8FA3" font-weight="600">${o.yFmt(v)}</text>`;}
     if(o.zero&&mn<0){const y=Y(0);g+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="#13204A" stroke-width="1.5"/>`;}
     o.labels.forEach((l,i)=>{if((W<520&&n>6||n>14)&&i%2===1&&i!==n-1)return;g+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="#8A8FA3" font-weight="700">${l}</text>`;});
@@ -134,7 +134,7 @@ export function mountPlanCalculator(root, opts){
     const cta=val("cta"), ext=cta==="cliente"?CTA_MES:0, act=cta==="cliente"?ACT:0;
     const base=FEES[perm], months=base.map(f=>f+ADD[pack]+ext), paid=months;
     const fees=months.reduce((a,b)=>a+b,0)+act, ads=inv*perm;
-    /* Año completo: meses de permanencia a precio del pack, resto del año renovación automática a 390 € + pack. */
+    /* Año completo: meses de permanencia a precio del pack, resto del año renovación automática a 490 € + pack. */
     const yMonths=Array.from({length:12},(_,i)=>i<perm?months[i]:TARIFA+ADD[pack]+ext);
     const yFees=yMonths.reduce((a,b)=>a+b,0)+act, yAds=inv*12;
     return {perm,pack,inv,base,months,paid,fees,cos:fees,disc:0,act,cta,ext,ads,tot:fees+ads,yMonths,yFees,yAds,yTot:yFees+yAds};
@@ -145,7 +145,7 @@ export function mountPlanCalculator(root, opts){
   function render(){
     const r=calc(), sv=yearSave(r.perm);
     // 1 · escalera de cuota base
-    $("ladder").innerHTML=groupsOf(r.base).map(g=>`<span class="${g.v===TARIFA?"f":""}">${rngTxt(g)}<b>${eur(g.v)}</b></span>`).join("")+(r.perm<12?`<span>Después<b>390 €</b></span>`:"");
+    $("ladder").innerHTML=groupsOf(r.base).map(g=>`<span class="${g.v===TARIFA?"f":""}">${rngTxt(g)}<b>${eur(g.v)}</b></span>`).join("")+(r.perm<12?`<span>Después<b>490 €</b></span>`:"");
     // 2 · pack
     // 3 · inversión y cuenta
     const lm=Math.round(r.inv/30);
@@ -272,7 +272,7 @@ export function mountPlanCalculator(root, opts){
     const budget={bg:K.cream,note:"Precios de gestión sin IVA · La inversión en Meta Ads va aparte",draw(x,k){
       head(k,"01 · Tu presupuesto para ti","Esto es lo que","has elegido");
       // tarjetas de elección
-      const ch=[["1 · Permanencia",`${r.perm} meses`,r.perm<12?`Después, renovación automática a 390 €/mes${yearSave(r.perm)?" · ahorras "+eur(yearSave(r.perm))+" en el año":""}`:`Ahorras ${eur(yearSave(r.perm))} en el año`],["2 · Nivel de seguimiento",`Pack ${pk}`,ADD[r.pack]?`+${ADD[r.pack]} € al mes sobre la cuota base`:"Incluido en la cuota base"],["3 · Inversión en Meta Ads",`${grp(r.inv)} €/mes`,`≈ ${Math.round(r.inv/30)} leads/mes · ${r.cta==="cliente"?"tu cuenta: 90 € de alta, pago único":"en cuenta Cosiris"}`]];
+      const ch=[["1 · Permanencia",`${r.perm} meses`,r.perm<12?`Después, renovación automática a 490 €/mes${yearSave(r.perm)?" · ahorras "+eur(yearSave(r.perm))+" en el año":""}`:`Ahorras ${eur(yearSave(r.perm))} en el año`],["2 · Nivel de seguimiento",`Pack ${pk}`,ADD[r.pack]?`+${ADD[r.pack]} € al mes sobre la cuota base`:"Incluido en la cuota base"],["3 · Inversión en Meta Ads",`${grp(r.inv)} €/mes`,`≈ ${Math.round(r.inv/30)} leads/mes · ${r.cta==="cliente"?"tu cuenta: 90 € de alta, pago único":"en cuenta Cosiris"}`]];
       ch.forEach((c,i)=>{const X=128+i*400,Y=270;k.rr(X,Y,376,190,22,K.white,K.line,2);k.rr(X+28,Y,80,6,3,K.or);
         k.t(c[0].toUpperCase(),X+28,Y+56,{w:800,s:17,c:K.muted,ls:2});k.t(c[1],X+28,Y+116,{w:800,s:c[1].length>12?36:44,c:K.navy});k.wrap(c[2],X+28,Y+158,320,{s:19,w:500,lh:24});});
       // tabla cuota
@@ -285,7 +285,7 @@ export function mountPlanCalculator(root, opts){
       const rh=Math.min(58,250/gr.length);
       gr.forEach((g,i)=>{const y=TY+180+i*rh;k.t(g.from===g.to?"Mes "+g.from:`Meses ${g.from} a ${g.to}`,cols[0],y,{w:600,s:26,c:K.navy});
         k.t(eur(g.b),cols[1],y,{w:600,s:26,c:K.text});k.t("+"+eur(ADD[r.pack]+r.ext),cols[2],y,{w:600,s:26,c:K.text});k.t(eur(g.v),cols[3],y,{w:800,s:30,c:K.ord});});
-      k.wrap(`Base + pack = tu cuota de cada mes. Al terminar los ${r.perm} meses, el contrato se renueva automáticamente mes a mes con las condiciones contratadas: 390 € + pack.`,TX+36,TY+390,TW-72,{s:19,w:500,c:K.muted});
+      k.wrap(`Base + pack = tu cuota de cada mes. Al terminar los ${r.perm} meses, el contrato se renueva automáticamente mes a mes con las condiciones contratadas: 490 € + pack.`,TX+36,TY+390,TW-72,{s:19,w:500,c:K.muted});
       // totales
       const BX=1344,BY=270,BW=448;k.rr(BX,BY,BW,650,26,K.navy);
       k.t("MEDIA DE GESTIÓN AL MES",BX+40,BY+70,{w:800,s:19,c:K.or,ls:3});
@@ -339,7 +339,7 @@ export function mountPlanCalculator(root, opts){
         for(let i=0;i<12;i++){const cx=TX+c0+cw*i+cw/2;k.t(i<r.perm?String(r.months[i]):"·",cx,y+56,{w:800,s:28,c:i<r.perm?K.white:"#55607F",a:"center"});}
         k.t(grp(r.fees)+" €",TX+TW-85,y+56,{w:800,s:26,c:K.or,a:"center"});}
       const yy=TY+92+4*rh+40;
-      k.wrap(`Tarifa de referencia: 390 €/mes (pack Básico). Tu pack ${pk} suma ${ADD[r.pack]?"+"+ADD[r.pack]+" € cada mes":"0 €"}. Después de la permanencia, renovación automática a 390 €/mes${ADD[r.pack]?" + pack":""}. Si sigues todo el año, ahorras ${eur(yearSave(r.perm))} con tu plan.`+(r.act?` Tu propia cuenta de Meta: ${r.act} € de alta, pago único.`:""),TX,yy,TW,{s:24,w:600,c:K.navy,lh:34});
+      k.wrap(`Tarifa de referencia: 490 €/mes (pack Básico). Tu pack ${pk} suma ${ADD[r.pack]?"+"+ADD[r.pack]+" € cada mes":"0 €"}. Después de la permanencia, renovación automática a 490 €/mes${ADD[r.pack]?" + pack":""}. Si sigues todo el año, ahorras ${eur(yearSave(r.perm))} con tu plan.`+(r.act?` Tu propia cuenta de Meta: ${r.act} € de alta, pago único.`:""),TX,yy,TW,{s:24,w:600,c:K.navy,lh:34});
     }};
     const packs={bg:K.cream,note:"Precios de gestión sin IVA · La inversión en Meta Ads va aparte",draw(x,k){
       head(k,"04 · Qué incluye cada pack","Tu pack","y las demás opciones");
@@ -358,7 +358,7 @@ export function mountPlanCalculator(root, opts){
     const benefits={bg:K.white,note:"Ejemplo con datos promedio de nuestros clientes · No es una garantía",draw(x,k){
       head(k,"03 · Los beneficios de tu plan","Lo que ganas con","tu plan "+pk);
       const m1=r.months[0], mL=r.months[r.months.length-1];
-      const sv=yearSave(r.perm);const B=[r.perm>3?["Empiezas pagando poco",`Mes 1: ${eur(m1)}. No pagas la tarifa de 390 € hasta el mes ${r.base.indexOf(TARIFA)+1}. Si sigues todo el año, ahorras ${eur(sv)}.`]:["Sin compromisos largos",`Tarifa de ${eur(m1)} al mes durante 3 meses. Con 12 meses de permanencia ahorrarías ${eur(yearSave(12))} en el año.`],
+      const sv=yearSave(r.perm);const B=[r.perm>3?["Empiezas pagando poco",`Mes 1: ${eur(m1)}. No pagas la tarifa de 490 € hasta el mes ${r.base.indexOf(TARIFA)+1}. Si sigues todo el año, ahorras ${eur(sv)}.`]:["Sin compromisos largos",`Tarifa de ${eur(m1)} al mes durante 3 meses. Con 12 meses de permanencia ahorrarías ${eur(yearSave(12))} en el año.`],
         ["Propietarios que quieren vender",`Campañas en Meta Ads creadas y optimizadas por nosotros. Con ${grp(r.inv)} €/mes, unos ${Math.round(r.inv/30)} leads al mes.`],
         r.pack==="basico"?["Cada lead, cualificado","Respuesta y cualificación automática por WhatsApp, y el lead en tu correo al momento."]:["Ningún lead se enfría","Seguimiento automatizado por email y WhatsApp mientras el propietario madura su decisión."],
         r.pack==="premium"?["Te llegan cualificados por teléfono","Desde Cosiris llamamos y cualificamos a cada lead antes de pasártelo."]:["Todo en un solo sitio","Minisite en nuestro directorio de inmobiliarias y CRM para seguir cada lead."]];
@@ -398,7 +398,7 @@ export function mountPlanCalculator(root, opts){
       head(k,"Siguientes pasos","Empecemos a captar","vendedores",140,true);
       [["Revisa tu presupuesto","Comprueba la permanencia, el pack y la inversión que has elegido."],["Habla con tu asesor","Te ayuda con la cuenta publicitaria, la forma de pago y cualquier duda."],["Activamos tus campañas","Firmamos y empezamos a llenar tu bolsa de leads."]].forEach((s,i)=>{const X=128+i*568,Y=330;k.rr(X,Y,536,330,24,K.navy2);k.rr(X+24,Y,488,6,3,K.or);
         k.t(String(i+1).padStart(2,"0"),X+40,Y+110,{w:800,s:72,c:K.or});k.t(s[0],X+40,Y+180,{w:800,s:34,c:K.white});k.wrap(s[1],X+40,Y+228,456,{s:22,w:500,c:K.light,lh:30});});
-      let y=750;["Todas las cifras de leads, captaciones, ventas y beneficio son un ejemplo calculado con datos promedio de nuestros clientes. No constituyen una garantía ni un compromiso de resultados.","Precios de gestión sin IVA. La inversión en Meta Ads se paga aparte. Al terminar la permanencia, el contrato se renueva automáticamente mes a mes con las condiciones contratadas (390 € + pack)."].forEach(s=>{y=k.wrap(s,128,y,1664,{s:20,w:500,c:K.light,lh:28})+10;});
+      let y=750;["Todas las cifras de leads, captaciones, ventas y beneficio son un ejemplo calculado con datos promedio de nuestros clientes. No constituyen una garantía ni un compromiso de resultados.","Precios de gestión sin IVA. La inversión en Meta Ads se paga aparte. Al terminar la permanencia, el contrato se renueva automáticamente mes a mes con las condiciones contratadas (490 € + pack)."].forEach(s=>{y=k.wrap(s,128,y,1664,{s:20,w:500,c:K.light,lh:28})+10;});
       k.t("Sujeto a términos y condiciones contractuales. Habla con tu asesor de Cosiris.",128,y+20,{w:800,s:24,c:K.white});
     }};
     const pg=n=>pages.find(q=>q.n===n);
