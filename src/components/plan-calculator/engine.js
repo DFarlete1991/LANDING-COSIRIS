@@ -27,35 +27,42 @@ export function mountPlanCalculator(root, opts){
 
   const dec2=n=>{let s=(Math.round(n*100)/100).toFixed(2).replace(".",",");s=s.replace(/0$/,"");return s.endsWith(",0")?s.slice(0,-2):s.replace(/,$/,"");};
   const kfmt=v=>{const a=Math.abs(v);const s=a>=1000?(Math.round(a/100)/10).toString().replace(".",",")+" k€":Math.round(a)+" €";return (v<0?"−":"")+s;};
-  /* Modelo de maduración: de los leads que entran un mes, unos están calientes (se captan enseguida) y otros fríos (tardan meses). */
-  const MAT=[0.15,0.15,0.2,0.2,0.15,0.15], CPL=37.5, LPC=17.5, SELL=0.5, LAG=3, HZ=12;
+  /* Modelo único de captaciones (web, gráfico y PDF):
+     · Cada lead cuesta 30 € → leads al mes = inversión ÷ 30.
+     · 1 captación por cada 17,5 leads, el mismo mes en que entran.
+     · Captación adicional: desde el mes 5 maduran los leads antiguos. El mes 5 trae 1 captación extra de los leads del mes 1,
+       el mes 6 de los del mes 2… hasta el mes 12 (leads de los meses 1 a 8). */
+  const CPL=30, LPC=17.5, MLAG=4, SELL=0.5, LAG=3, HZ=12;
+  const capMes=(m,inv,invMeses)=>{const n=m<=invMeses?inv/CPL/LPC:0, c=m-MLAG, o=(c>=1&&c<=invMeses)?inv/CPL/LPC:0;return {n,o};};
   function project(r){
     /* Horizonte fijo: siempre los primeros 12 meses, nunca más. */
     const com=Math.max(0,+$("com").value||0), H=HZ;
     const fees=[],ads=[],rev=[],labels=[],soldC=[],capC=[],capM=[];let cf=0,ca=0,cap=0,rv=0,be=0,sc=0;
     for(let m=1;m<=H;m++){
       cf+=r.yMonths[m-1]+(m===1?r.act:0); ca+=r.inv;
-      let c=0;for(let k=1;k<=m;k++){const d=m-k;if(d<MAT.length)c+=r.inv/CPL/LPC*MAT[d];}
+      const cm=capMes(m,r.inv,H), c=cm.n+cm.o;
       capM.push(c);cap+=c;
       const sold=m>LAG?capM[m-1-LAG]*SELL:0; rv+=sold*com; sc+=sold;
       soldC.push(sc);rev.push(rv);capC.push(cap);fees.push(cf);ads.push(ca);labels.push("M"+m);
       if(!be&&rv>=cf+ca&&rv>0)be=m;
     }
     const tot=cf+ca, net=rv-tot;
-    return {fees,ads,rev,labels,cap,ven:sc,be,com,soldC,revC:rev,capC,capM,tot,net,H};
+    /* Ventas totales = 50 % de todo lo captado en el año. El gráfico (rev) muestra el ritmo real: cada venta llega ~3 meses después de captar,
+       así que lo captado en los meses 10–12 se cobra en los 3 meses siguientes. */
+    const ven=cap*SELL;
+    return {fees,ads,rev,labels,cap,ven,ven12:sc,rev12:rv,revT:ven*com,be,com,soldC,revC:rev,capC,capM,tot,net,H};
   }
-  /* Escalera ilustrativa: cada mes entran leads (inversión ÷ 30 €), la bolsa engorda y 1 de cada 15 leads acaba en captación.
-     Un 30 % están calientes (se captan el mismo mes); el resto madura en los 5 meses siguientes. */
-  const WMAT=[0.3,0.15,0.15,0.15,0.15,0.1], WCPL=30, WLPC=15;
+  /* Escalera ilustrativa: mismo modelo que arriba. Casa naranja = captación de leads del mes; casa azul = captación adicional
+     de leads de hace 4 meses que han madurado (desde el mes 5). Solo hay leads nuevos en los meses de permanencia. */
+  const WCPL=CPL;
   function whyModel(perm,inv){
     const L=inv/WCPL, rows=[];let bag=0,cN=0,cT=0,rN=0,rT=0;
     for(let m=1;m<=12;m++){
       const nw=m<=perm?L:0; bag+=nw;
-      let eN=nw/WLPC*WMAT[0], eT=0;
-      for(let c=1;c<=Math.min(m,perm);c++){const d=m-c;if(d<WMAT.length)eT+=L/WLPC*WMAT[d];}
-      cN+=eN;cT+=eT;const nN=Math.round(cN)-rN,nT=Math.round(cT)-rT;rN+=nN;rT+=nT;
-      const hN=Math.max(0,Math.min(nN,nT));
-      rows.push({m,inv:m<=perm?inv:0,nw,bag,hN,hO:Math.max(0,nT-hN),tot:rT});
+      const cm=capMes(m,inv,perm), eN=cm.n, eT=cm.n+cm.o;
+      /* Una casa solo aparece cuando se completan 17,5 leads (redondeo hacia abajo). Leads nuevos y antiguos se cuentan por separado. */
+      cN+=eN;cT+=eT-eN;const fl=v=>Math.floor(v+1e-9),hN=fl(cN)-rN,hO=fl(cT)-rT;rN+=hN;rT+=hO;
+      rows.push({m,inv:m<=perm?inv:0,nw,bag,hN,hO,tot:rN+rT});
     }
     return rows;
   }
@@ -161,12 +168,13 @@ export function mountPlanCalculator(root, opts){
     $("resT").textContent=`Lo que puedes esperar en 12 meses`;
     $("pCap").textContent=dec1(P.cap);
     $("pVen").textContent=dec1(P.ven);
-    const mul=P.tot?P.rev.at(-1)/P.tot:0;$("pMul").textContent=mul.toFixed(2).replace(".",",")+" €";
+    $("resNote").innerHTML=`<b>¿Por qué la línea verde se acelera al final?</b> Cada inmueble se vende unos 3 meses después de captarlo. En total vendes el 50 % de lo captado: <b>${dec1(P.ven)} ventas</b>. ${dec1(P.ven12)} se cobran dentro del año (${eur(Math.round(P.rev12))}) y las ${dec1(P.ven-P.ven12)} restantes, de lo captado en los meses 10 a 12, en los 3 meses siguientes.`;
+    const mul=P.tot?P.revT/P.tot:0;$("pMul").textContent=mul.toFixed(2).replace(".",",")+" €";
     const T=(id,h)=>{const e=$(id);if(!e)return;e.innerHTML=e.firstElementChild.outerHTML+h;};
-    const leadsN=r.inv*12/CPL, potCap=leadsN/LPC, laterCap=potCap-P.cap, capSell=P.ven/SELL, ingN=Math.round(P.rev.at(-1));
-    const capTxt=`${eur(r.inv)}/mes × 12 meses = ${eur(r.inv*12)} en Meta. ÷ 37,5 € por lead = ${Math.round(leadsN)} leads. 1 captación cada 17,5 leads = ${dec1(potCap)} captaciones.`+(laterCap>=0.05?` Cada lead tarda de 0 a 5 meses en convertirse en captación: ${dec1(P.cap)} llegan dentro de los 12 meses y ${dec1(laterCap)} después.`:` Todas llegan dentro de los 12 meses.`);
-    const venTxt=`Se vende el 50 % de lo captado, unos 3 meses después de captarlo. Solo cuenta lo captado hasta el mes 9 (${dec2(capSell)} inmuebles) → ${dec2(capSell)} × 50 % = ${dec2(P.ven)} ventas dentro de los 12 meses.`;
-    const ingTxt=`${dec2(P.ven)} ventas × ${eur(P.com)} de comisión media ≈ ${eur(ingN)}. Solo cuenta lo vendido en los primeros 12 meses.`;
+    const leadsM=r.inv/CPL, capB=leadsM/LPC, ingN=Math.round(P.revT);
+    const capTxt=`${eur(r.inv)}/mes ÷ 30 € por lead = ${dec1(leadsM)} leads al mes. 1 captación cada 17,5 leads = ${dec2(capB)} ${capB===1?"captación":"captaciones"} al mes (12 meses). Además, desde el mes 5 maduran los leads antiguos: el mes 5 captas también de los leads del mes 1, el mes 6 de los del mes 2… hasta el mes 12 (+${dec2(capB)} al mes, 8 meses). Total: ${dec2(capB)} × 12 + ${dec2(capB)} × 8 = ${dec1(P.cap)} captaciones.`;
+    const venTxt=`Vendes el 50 % de lo que captas: ${dec1(P.cap)} captaciones × 50 % = ${dec1(P.ven)} ventas. Cada inmueble se vende unos 3 meses después de captarlo, por eso las ventas se aceleran al final del año: ${dec1(P.ven12)} se cierran dentro de los 12 meses y ${dec1(P.ven-P.ven12)} (lo captado en los meses 10 a 12) en los 3 meses siguientes.`;
+    const ingTxt=`${dec1(P.ven)} ventas × ${eur(P.com)} de comisión media ≈ ${eur(ingN)}. Dentro de los 12 meses cobras ${eur(Math.round(P.rev12))} (línea verde); el resto llega en los 3 meses siguientes.`;
     T("tPCap",capTxt); T("tPVen",venTxt);
     T("tPMul",`Ingresos por ventas en 12 meses (${eur(ingN)}) ÷ todo lo invertido (${eur(Math.round(P.tot))}).`);
     T("tSCap",capTxt); T("tSVen",venTxt); T("tSIng",ingTxt);
@@ -185,12 +193,12 @@ export function mountPlanCalculator(root, opts){
     $("rAdsL").textContent=`Meta Ads (${grp(r.inv)} € × 12 meses)`;
     $("rAds").textContent=eur(r.yAds);
     $("rTot").textContent=eur(r.yTot);
-    {const ing=Math.round(P.rev.at(-1)),ret=ing-Math.round(P.tot);$("rIng").textContent=eur(ing);$("rRet").textContent=(ret>=0?"+":"")+eur(ret);$("retBox").classList.toggle("neg",ret<0);}
+    {const ing=Math.round(P.revT),ret=ing-Math.round(P.tot);$("rIng").textContent=eur(ing);$("rRet").textContent=(ret>=0?"+":"")+eur(ret);$("retBox").classList.toggle("neg",ret<0);}
     $("sRen").textContent=r.perm<12?`Cálculo anual: al terminar tus ${r.perm} meses de permanencia, el contrato se renueva automáticamente a ${eur(TARIFA+ADD[r.pack]+r.ext)}/mes.`:`Al terminar el año, renovación automática a ${eur(TARIFA+ADD[r.pack]+r.ext)}/mes con las condiciones contratadas.`;
     $("bTxt").innerHTML=`Empiezas en <b>${eur(r.months[0])}</b>/mes<span class="bt"> · 1.er año <b>${eur(r.yTot)}</b></span>`;
     // datos para el PDF (mismo formato que la calculadora completa)
-    const com=Math.max(0,+$("com").value||0), lo=r.ads/45, hi=r.ads/30, cLo=lo/20, cHi=hi/15, vLo=cLo*0.5, vHi=cHi*0.5, iLo=vLo*com, iHi=vHi*com;
-    LAST={r,P,lo,hi,cLo,cHi,vLo,vHi,iLo,iHi,nLo:iLo-r.tot,nHi:iHi-r.tot,com};
+    const com=P.com, lo=r.inv*12/CPL, hi=lo, cLo=P.cap, cHi=cLo, vLo=P.ven, vHi=vLo, iLo=P.revT, iHi=iLo;
+    LAST={r,P,lo,hi,cLo,cHi,vLo,vHi,iLo,iHi,nLo:iLo-P.tot,nHi:iHi-P.tot,com};
   }
   root.querySelectorAll('input[type="radio"]').forEach(x=>x.addEventListener("change",render));
   const inv=$("inv"), invR=$("invR");
@@ -252,7 +260,7 @@ export function mountPlanCalculator(root, opts){
   }
   const head=(k,eyebrow,title,hl,y,dark)=>{y=y||120;k.t(eyebrow.toUpperCase(),128,y,{w:800,s:24,c:dark?K.or:K.ord,ls:4});
     k.rich([[title+(hl?" ":""),dark?K.white:K.navy,800],[hl||"",dark?K.or:K.ord,800]],128,y+78,64);};
-  const fmtRange=(a,b,d)=>d?`${dec1(a)}–${dec1(b)}`:`${grp(Math.round(a))}–${grp(Math.round(b))}`;
+  const fmtRange=(a,b,d)=>Math.abs(a-b)<1e-9?(d?dec1(a):grp(Math.round(a))):d?`${dec1(a)}–${dec1(b)}`:`${grp(Math.round(a))}–${grp(Math.round(b))}`;
   const FEATS=[["Campañas en Meta Ads","Creación y optimización continua",[1,1,1]],["Minisite","En nuestro directorio de inmobiliarias",[1,1,1]],["CRM","Gestión de leads y seguimiento",[1,1,1]],["Cualificación por WhatsApp","Respuesta y cualificación automática",[1,1,1]],["Leads por email","Recibes cada lead en tu correo",[1,1,1]],["Leads por WhatsApp","Recibes cada lead en tu WhatsApp",[0,1,1]],["Seguimiento automatizado","Por email y por WhatsApp",[0,1,1]],["Cualificación telefónica","Desde Cosiris",[0,0,1]]];
 
   function slidesFor(kind,S){
@@ -297,16 +305,16 @@ export function mountPlanCalculator(root, opts){
     }};
     const report={bg:K.white,note:"Ejemplo con datos promedio de nuestros clientes · No es una garantía",draw(x,k){
       head(k,"05 · Tu informe de resultados esperados","Lo que puedes","esperar");
-      const box=[["Leads",fmtRange(S.lo,S.hi),`en ${r.perm} meses`,K.peach,K.ort,K.navy],["Captaciones",fmtRange(S.cLo,S.cHi,1),"1 por cada 15–20 leads",K.peach,K.ort,K.navy],["Ventas (≈ 50 %)",fmtRange(S.vLo,S.vHi,1),"la mitad de lo captado",K.peach,K.ort,K.navy],["Ingresos por ventas",fmtRange(S.iLo,S.iHi)+" €",`ventas × ${eur(S.com)} de comisión`,K.peach,K.ort,K.navy]];
+      const box=[["Leads",fmtRange(S.lo,S.hi),`en 12 meses`,K.peach,K.ort,K.navy],["Captaciones",fmtRange(S.cLo,S.cHi,1),"1 por cada 17,5 leads + extra desde el mes 5",K.peach,K.ort,K.navy],["Ventas (≈ 50 %)",fmtRange(S.vLo,S.vHi,1),"la mitad de lo captado",K.peach,K.ort,K.navy],["Ingresos por ventas",fmtRange(S.iLo,S.iHi)+" €",`ventas × ${eur(S.com)} de comisión`,K.peach,K.ort,K.navy]];
       box.forEach((b,i)=>{const X=128+i*420,Y=250;k.rr(X,Y,396,180,22,b[3]);k.t(b[0].toUpperCase(),X+28,Y+52,{w:800,s:18,c:b[4],ls:2});k.t(b[1],X+28,Y+118,{w:800,s:b[1].length>14?36:48,c:b[5]});k.t(b[2],X+28,Y+156,{w:500,s:19});
         if(i<3)k.t("→",X+408,Y+100,{w:800,s:28,c:K.ord,a:"center"});});
       // retorno
       k.rr(128,460,1664,120,22,K.greenBg);
       k.t("TU RETORNO ESTIMADO",168,512,{w:800,s:20,c:"#157A42",ls:3});
-      k.t(`cuando se vendan tus captaciones · ingresos − inversión (${eur(r.tot)})`,168,552,{w:500,s:20});
+      k.t(`ventas de lo captado en 12 meses · ingresos − inversión (${eur(Math.round(P.tot))})`,168,552,{w:500,s:20});
       const sg=v=>(v<0?"":"+")+grp(Math.round(v));
-      k.t(`${sg(S.nLo)} a ${sg(S.nHi)} €`,1340,548,{w:800,s:56,c:K.green,a:"right"});
-      k.t(`ROI ${Math.round(S.nLo/r.tot*100)} % a ${Math.round(S.nHi/r.tot*100)} %`,1752,548,{w:800,s:30,c:"#157A42",a:"right"});
+      k.t(`${S.nLo===S.nHi?sg(S.nLo):sg(S.nLo)+" a "+sg(S.nHi)} €`,1340,548,{w:800,s:56,c:K.green,a:"right"});
+      k.t(`ROI ${Math.round(S.nLo/P.tot*100)} %`,1752,548,{w:800,s:30,c:"#157A42",a:"right"});
       // gráfico
       const GX=200,GY=640,GW=1000,GH=250;
       const all=[...P.fees,...P.ads,...P.rev];let mn=Math.min(0,...all),mx=Math.max(...all);
@@ -323,7 +331,7 @@ export function mountPlanCalculator(root, opts){
       // supuestos
       const SX=1290,SY=620;k.rr(SX,SY,502,310,22,K.cream);
       k.t("CÓMO LO CALCULAMOS",SX+30,SY+50,{w:800,s:18,c:K.ord,ls:2});
-      let yy=SY+92;[`Un lead cuesta entre 30 y 45 € en Meta Ads.`,`1 captación por cada 15–20 leads.`,`Se vende ≈ 50 % de lo captado, unos 3 meses después.`,`Ingresos = ventas × tu comisión (${eur(S.com)}).`,`Recuperas tu inversión: ${P.be?"mes "+P.be:"más adelante"} (gráfico).`].forEach(s=>{k.rr(SX+30,yy-14,10,10,5,K.or);yy=k.wrap(s,SX+52,yy,420,{s:19,w:500,lh:25})+8;});
+      let yy=SY+92;[`Un lead cuesta unos 30 € en Meta Ads.`,`1 captación por cada 17,5 leads.`,`Desde el mes 5, captación extra de leads antiguos.`,`Se vende ≈ 50 % de lo captado, unos 3 meses después.`,`Ingresos = ventas × tu comisión (${eur(S.com)}).`,`Recuperas tu inversión: ${P.be?"mes "+P.be:"más adelante"} (gráfico).`].forEach(s=>{k.rr(SX+30,yy-14,10,10,5,K.or);yy=k.wrap(s,SX+52,yy,420,{s:19,w:500,lh:25})+8;});
     }};
     const mesames={bg:K.white,note:"Precios de gestión sin IVA · La inversión en Meta Ads va aparte",draw(x,k){
       head(k,"02 · Tu cuota, mes a mes","Así pagas","cada mes");
@@ -369,7 +377,7 @@ export function mountPlanCalculator(root, opts){
       k.t("TU RETORNO ESTIMADO",176,790,{w:800,s:22,c:K.or,ls:3});
       k.wrap(`Con una comisión media de ${eur(S.com)}, ${fmtRange(S.cLo,S.cHi,1)} captaciones pueden traducirse en ${fmtRange(S.vLo,S.vHi,1)} ventas.`,176,836,900,{s:22,w:500,c:K.light,lh:30});
       const sg=v=>(v<0?"":"+")+grp(Math.round(v));
-      k.t(`${sg(S.nLo)} a ${sg(S.nHi)} €`,1744,836,{w:800,s:60,c:K.white,a:"right"});
+      k.t(`${S.nLo===S.nHi?sg(S.nLo):sg(S.nLo)+" a "+sg(S.nHi)} €`,1744,836,{w:800,s:60,c:K.white,a:"right"});
     }};
     const why={bg:K.cream,draw(x,k){
       head(k,"06 · Por qué elegir Cosiris","Confía en quien conoce","tu sector");
@@ -424,7 +432,7 @@ export function mountPlanCalculator(root, opts){
     return `${LEAD.nombre} (${LEAD.inmobiliaria}, ${LEAD.zona}) se ha descargado un presupuesto (${KIND[kind]}). `+
       `Plan: ${r.perm} meses · pack ${NAME[r.pack]} · ${r.cta==="cliente"?"cuenta del cliente":"cuenta Cosiris"} · ${grp(r.inv)} €/mes en Meta Ads · comisión media ${eur(S.com)}. `+
       `Cuota de gestión: ${r.months.map(m=>grp(m)).join(" / ")} € · total Cosiris ${eur(r.fees)} · Meta ${eur(r.ads)} · total ${eur(r.tot)}. `+
-      `Estimación: ${Math.round(S.lo)}–${Math.round(S.hi)} leads, ${dec1(S.cLo)}–${dec1(S.cHi)} captaciones.`;}
+      `Estimación 12 meses: ${Math.round(S.lo)} leads, ${dec1(S.cLo)} captaciones.`;}
   async function sendLead(kind){try{return !!(await opts.onLead({...LEAD,summary:leadSummary(kind)}));}catch(e){return false;}}
   const M=$("leadM"),F=$("leadF");
   const openM=kind=>{pending=kind;$("leadE").textContent="";F.hidden=false;$("leadP").hidden=true;M.hidden=false;setTimeout(()=>F.elements.nombre.focus(),30);};
