@@ -94,12 +94,12 @@ function ProofStrip({ agency }: { agency: InmobiliariaPublica }) {
   return (
     <div className="flex flex-wrap gap-4">
       {stats.map(({ icon: Icon, value, label }) => (
-        <div key={label} className="min-w-[150px] flex-1 rounded-card border border-border bg-white px-6 py-4 shadow-soft">
-          <div className="flex items-center gap-4">
+        <div key={label} className="min-w-[130px] flex-1 rounded-card border border-border bg-white px-3 py-4 shadow-soft sm:min-w-[150px] sm:px-6">
+          <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:gap-4 sm:text-left">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/8 text-primary">
               <Icon size={18} />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xl font-black leading-none text-foreground sm:text-2xl">{value}</p>
               <p className="mt-1 text-caption font-medium leading-tight text-ink-muted">{label}</p>
             </div>
