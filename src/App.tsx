@@ -4,7 +4,7 @@ import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { useUI } from './context/UIContext';
 import { parseAgencyProfilePath } from '@/lib/agency-url';
 import { captureAttribution } from '@/lib/utm';
-import { applyStoredConsentOnLoad } from '@/lib/cookieConsent';
+import { applyStoredConsentOnLoad, syncOpenAIRoute } from '@/lib/cookieConsent';
 
 // ContactModal arrastraba react-select + las banderas de país (~290 kB) al
 // bundle de TODAS las rutas para un modal que arranca cerrado. Ahora su chunk
@@ -160,6 +160,7 @@ export default function App() {
       page_title: document.title,
       page_location: window.location.href,
     });
+    syncOpenAIRoute(window.location.pathname);
   }, [currentLocationKey]);
 
   // Estas dos van ANTES del prefijo genérico /inmobiliarias/:id — si no,

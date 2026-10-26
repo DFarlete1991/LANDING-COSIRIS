@@ -12,6 +12,10 @@ const STORAGE_KEY = 'cosiris_cookie_consent_v1';
 const GTM_ID = 'GTM-MWTG2SB';
 const META_PIXEL_ID = '1241986738137530';
 const OPENAI_PIXEL_ID = 'VtNEai4EiqbyZWZk9vEGRu';
+// Campaña propia de un cliente (Boinder Real Estate): su píxel solo se
+// inicializa en su ficha pública, además del píxel general de Cosiris.
+const OPENAI_BOINDER_PIXEL_ID = 'GH8N8hnLoEBXrnBvrrbhd6';
+const OPENAI_BOINDER_PATH = '/inmobiliarias-en-madrid/boinder-real-estate';
 
 export interface ConsentChoice {
   analytics: boolean; // Google Tag Manager -> Google Analytics + Google Ads
@@ -159,6 +163,49 @@ function loadOpenAIPixel(): void {
 
   // Solo se llama aquí si el usuario aceptó marketing, así que el consentimiento es true.
   window.oaiq?.('init', { pixelId: OPENAI_PIXEL_ID });
+  bridgeDataLayerToOpenAI();
+  syncOpenAIRoute(window.location.pathname);
+}
+
+// Los formularios ya avisan de sus conversiones a GTM con dataLayer.push; en
+// vez de tocar cada uno, se replica aquí lo que sea una conversión.
+const DATALAYER_TO_OPENAI: Record<string, [string, string]> = {
+  generate_lead: ['lead_created', 'customer_action'],
+  lead_inmobiliaria_enviado: ['lead_created', 'customer_action'],
+  registro_inmobiliaria_completado: ['registration_completed', 'customer_action'],
+};
+let bridged = false;
+function bridgeDataLayerToOpenAI(): void {
+  if (bridged) return;
+  bridged = true;
+  window.dataLayer = window.dataLayer || [];
+  const dl = window.dataLayer;
+  const original = dl.push.bind(dl);
+  dl.push = (...items: unknown[]) => {
+    for (const item of items) {
+      const hit = DATALAYER_TO_OPENAI[(item as { event?: string })?.event ?? ''];
+      if (hit) window.oaiq?.('measure', hit[0], { type: hit[1] });
+    }
+    return original(...items);
+  };
+}
+
+// Las páginas "gracias" son una carga completa tras enviar el formulario
+// (ContactModal, Vender, Valoración): ahí se cuenta el lead.
+const THANKS_PATHS = new Set(['/gracias', '/gracias-vender']);
+let boinderInit = false;
+let lastPathTracked = '';
+
+/** Llamar en cada cambio de ruta (SPA). No hace nada si no hay consentimiento. */
+export function syncOpenAIRoute(pathname: string): void {
+  if (!openAIPixelLoaded || !window.oaiq || pathname === lastPathTracked) return;
+  lastPathTracked = pathname;
+  if (!boinderInit && pathname.replace(/\/$/, '') === OPENAI_BOINDER_PATH) {
+    boinderInit = true;
+    window.oaiq('init', { pixelId: OPENAI_BOINDER_PIXEL_ID });
+  }
+  window.oaiq('measure', 'page_viewed', { type: 'contents' });
+  if (THANKS_PATHS.has(pathname)) window.oaiq('measure', 'lead_created', { type: 'customer_action' });
 }
 
 declare global {
