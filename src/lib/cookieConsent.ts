@@ -181,7 +181,7 @@ function bridgeDataLayerToOpenAI(): void {
   window.dataLayer = window.dataLayer || [];
   const dl = window.dataLayer;
   const original = dl.push.bind(dl);
-  dl.push = (...items: unknown[]) => {
+  dl.push = (...items: Record<string, unknown>[]) => {
     for (const item of items) {
       const hit = DATALAYER_TO_OPENAI[(item as { event?: string })?.event ?? ''];
       if (hit) window.oaiq?.('measure', hit[0], { type: hit[1] });
