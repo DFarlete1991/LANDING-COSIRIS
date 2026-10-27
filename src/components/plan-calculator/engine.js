@@ -15,7 +15,7 @@ export function mountPlanCalculator(root, opts){
   let io=null, ft=null;
 
 
-  const FEES={12:[190,190,290,290,290,290,490,490,490,490,490,490],6:[190,290,290,490,490,490],3:[490,490,490]}, TARIFA=490;
+  const FEES={12:[190,190,290,290,390,390,490,490,490,490,490,490],6:[190,290,290,490,490,490],3:[490,490,490]}, TARIFA=490;
   const yearSave=perm=>12*TARIFA-(FEES[perm].reduce((a,b)=>a+b,0)+(12-perm)*TARIFA);
   const ADD={basico:0,avanzado:90,premium:190}, NAME={basico:"Básico",avanzado:"Avanzado",premium:"Premium"};
   const ACT=90, CTA_MES=0, MIN=300; let LAST=null;
