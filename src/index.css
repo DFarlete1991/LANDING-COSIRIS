@@ -57,17 +57,131 @@
   animation: marquee-scroll-reverse linear infinite;
 }
 
+/* Un carrusel que se mueve solo tiene que poder pararse (WCAG 2.2.2): al
+   tocarlo o al tabular dentro se pausa, además del hover del .group. */
 .group:hover .animate-marquee,
-.group:hover .animate-marquee-reverse {
+.group:hover .animate-marquee-reverse,
+.animate-marquee:focus-within,
+.animate-marquee:active,
+.animate-marquee-reverse:focus-within,
+.animate-marquee-reverse:active {
   animation-play-state: paused;
+}
+
+/* Burbujas que salen de detrás del vídeo del equipo. */
+@keyframes bubble-out {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  18% { opacity: 0.95; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 0; }
+}
+
+.video-bubble {
+  animation: bubble-out 5s ease-out infinite;
+}
+
+/* Fondo de estrellas del hero y flotación de la casa de "Hay otra forma". */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+.animate-twinkle {
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+@keyframes soft-float {
+  0%, 100% { transform: translateY(-4px); }
+  50% { transform: translateY(4px); }
+}
+
+.animate-soft-float {
+  animation: soft-float 4s ease-in-out infinite;
+}
+
+/* Inmobiliarias que saltan hasta la caja: varios saltos cortos y uno alto, que
+   pasa por encima de la solapa y cae dentro. Una sola animación para que el
+   avance y la altura no se desincronicen. La pista es un contenedor y cqw mide
+   su ancho. */
+.hop-track {
+  container-type: inline-size;
+}
+
+@keyframes hop {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  4% { transform: translate(calc((100cqw - 21rem) * 0.0000), 0) scale(1); opacity: 1; animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  7.62% { transform: translate(calc((100cqw - 21rem) * 0.0417), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  11.25% { transform: translate(calc((100cqw - 21rem) * 0.0833), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  14.88% { transform: translate(calc((100cqw - 21rem) * 0.1250), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  18.50% { transform: translate(calc((100cqw - 21rem) * 0.1667), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  22.12% { transform: translate(calc((100cqw - 21rem) * 0.2083), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  25.75% { transform: translate(calc((100cqw - 21rem) * 0.2500), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  29.38% { transform: translate(calc((100cqw - 21rem) * 0.2917), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  33.00% { transform: translate(calc((100cqw - 21rem) * 0.3333), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  36.62% { transform: translate(calc((100cqw - 21rem) * 0.3750), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  40.25% { transform: translate(calc((100cqw - 21rem) * 0.4167), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  43.88% { transform: translate(calc((100cqw - 21rem) * 0.4583), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  47.50% { transform: translate(calc((100cqw - 21rem) * 0.5000), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  51.12% { transform: translate(calc((100cqw - 21rem) * 0.5417), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  54.75% { transform: translate(calc((100cqw - 21rem) * 0.5833), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  58.38% { transform: translate(calc((100cqw - 21rem) * 0.6250), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  62.00% { transform: translate(calc((100cqw - 21rem) * 0.6667), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  65.62% { transform: translate(calc((100cqw - 21rem) * 0.7083), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  69.25% { transform: translate(calc((100cqw - 21rem) * 0.7500), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  72.88% { transform: translate(calc((100cqw - 21rem) * 0.7917), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  76.50% { transform: translate(calc((100cqw - 21rem) * 0.8333), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  80.12% { transform: translate(calc((100cqw - 21rem) * 0.8750), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  83.75% { transform: translate(calc((100cqw - 21rem) * 0.9167), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  87.38% { transform: translate(calc((100cqw - 21rem) * 0.9583), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  91.00% { transform: translate(calc((100cqw - 21rem) * 1.0000), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  95.5% { transform: translate(calc(100cqw - 14.5rem), -12.5rem); animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5); }
+  99.9% { transform: translate(calc(100cqw - 10.25rem), -0.5rem) scale(0.9); opacity: 1; }
+  100% { transform: translate(calc(100cqw - 10.25rem), -0.5rem) scale(0.9); opacity: 0; }
+}
+
+.hop {
+  animation: hop linear infinite;
+}
+
+.hop-track:hover .hop,
+.hop-track:hover .hop-box,
+.hop-track:focus-within .hop,
+.hop-track:focus-within .hop-box {
+  animation-play-state: paused;
+}
+
+/* La caja acusa cada burbuja que cae: su ciclo dura lo mismo que el intervalo. */
+@keyframes hop-box {
+  0% { transform: scale(1.04, 0.95); }
+  16%, 100% { transform: scale(1, 1); }
+}
+
+.hop-box {
+  animation: hop-box infinite;
+}
+
+/* Mientras se ve la home, todo su tamaño va en rem y escala con la pantalla.
+   Por debajo de 1600 px no cambia nada. */
+html.home-fluid {
+  font-size: max(100%, 1vw);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee,
-  .animate-marquee-reverse {
+  .animate-marquee-reverse,
+  .video-bubble,
+  .animate-soft-float,
+  .hop,
+  .hop-box {
     animation: none;
   }
+
+  .animate-twinkle {
+    animation: none;
+    opacity: 0.6;
+  }
 }
+
+
 
 
 

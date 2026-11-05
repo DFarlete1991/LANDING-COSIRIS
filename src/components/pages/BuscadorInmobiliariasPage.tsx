@@ -6,8 +6,11 @@ import { InmobiliariasHomeView } from './inmobiliarias/InmobiliariasHomeView';
 import { InmobiliariasResultsView } from './inmobiliarias/InmobiliariasResultsView';
 import { navigateTo } from '@/lib/utils';
 import { useSEO } from '@/lib/seo';
+import { useFluidPage } from '@/lib/use-fluid-page';
 
 export function BuscadorInmobiliariasPage() {
+  useFluidPage();
+
   useSEO({
     path: '/inmobiliarias',
     title: 'Escoge la mejor inmobiliaria para venta de tu casa | Cosiris',
@@ -48,7 +51,7 @@ export function BuscadorInmobiliariasPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased">
-      <LandingNavbar invertOnScroll />
+      <LandingNavbar invertOnScroll homeHref="/inmobiliarias" />
 
       {searchPoint ? (
         <InmobiliariasResultsView initialQuery={query} searchPoint={searchPoint} onSearch={handleSearch} onBack={handleBack} />

@@ -4,6 +4,7 @@ import { FormNavbar } from '../ui/form-navbar';
 import { SharedLandingSections } from '../ui/shared-landing-sections';
 import { navigateTo } from '@/lib/utils';
 import { useSEO } from '@/lib/seo';
+import { useFluidPage } from '@/lib/use-fluid-page';
 
 const EXPO: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -38,6 +39,8 @@ const TRIAL_BULLETS = [
 ];
 
 export function PlanesInmobiliariasPage() {
+  useFluidPage();
+
   useSEO({
     path: '/inmobiliarias/planes',
     title: 'Planes para inmobiliarias | Cosiris',
@@ -50,7 +53,7 @@ export function PlanesInmobiliariasPage() {
 
       <FormNavbar />
 
-      <main className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-16 text-center">
+      <main className="relative z-10 mx-auto w-full max-w-[87.5rem] px-4 pb-20 pt-16 text-center md:px-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

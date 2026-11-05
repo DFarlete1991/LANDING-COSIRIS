@@ -1485,8 +1485,8 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
             <span className="hidden sm:inline">Volver al directorio</span>
           </button>
           <a
-            href="/"
-            onClick={(e) => { e.preventDefault(); navigateTo('/'); }}
+            href="/inmobiliarias"
+            onClick={(e) => { e.preventDefault(); navigateTo('/inmobiliarias'); }}
             className="shrink-0 transition-transform duration-200 hover:scale-105 active:scale-90"
           >
             <img src="/assets/logo_orange.png" alt="Cosiris" width="380" height="170" className="h-10 w-auto" />

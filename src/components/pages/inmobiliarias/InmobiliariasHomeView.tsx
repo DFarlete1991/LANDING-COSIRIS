@@ -3,7 +3,6 @@ import { motion, useMotionValueEvent, useScroll, useTransform } from 'framer-mot
 import {
   ArrowRight,
   Bot,
-  Check,
   ChevronLeft,
   ChevronRight,
   Home,
@@ -36,13 +35,14 @@ import { FadeImage } from '../../ui/FadeImage';
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
-function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function Reveal({ children, delay = 0, className }: { children: React.ReactNode; delay?: number; className?: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.6, ease: EASE, delay }}
+      className={className}
     >
       {children}
     </motion.div>
@@ -329,10 +329,6 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           transition={{ duration: 0.7, ease: EASE }}
           className="relative z-10 mx-auto w-full max-w-3xl"
         >
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 backdrop-blur-md">
-            <MapPin size={13} className="text-[#FF8000]" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/90">Directorio Cosiris</span>
-          </div>
           <h1 className="text-4xl font-black leading-[0.98] tracking-[-0.03em] sm:text-6xl md:text-7xl">
             Encuentra tu
             <br />
@@ -360,7 +356,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             <span className="text-white/70">en tu zona</span>
           </h1>
           <p className="mx-auto mt-5 max-w-lg text-sm text-white/85 sm:mt-6 sm:text-base md:text-lg">
-            Conectamos personas con inmobiliarias profesionales, verificadas y de confianza en toda España.
+            Inmobiliarias verificadas en toda España.
           </p>
 
           <div className="mt-9">
@@ -397,8 +393,6 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             </span>
           </button>
 
-          <p className="mt-[14px] text-center text-[11px] font-medium text-white/50">Gratis y sin compromiso · lo reciben las inmobiliarias de tu zona</p>
-
           {allCities.length > 0 && (
             <div className="mt-[22px] flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
               <span className="hidden text-xs text-white/50 sm:inline">Ciudades:</span>
@@ -418,44 +412,43 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
       </section>
 
       {/* 1. RED DE INMOBILIARIAS + POR QUÉ BUSCAR CON COSIRIS — en columnas, para no repetir el mismo formato centrado dos veces */}
-      <section className="bg-white py-14 sm:py-28">
-        <div className="mx-auto max-w-6xl px-4">
+      <section className="bg-white py-10 sm:py-28">
+        <div className="mx-auto max-w-[87.5rem] px-5 md:px-10">
           <Reveal>
-            <div className="mb-10 text-center md:mb-12">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
-                El directorio
-              </p>
-              <h2 className="mt-3 text-3xl font-black leading-[1.1] tracking-[-0.02em] text-[#0F172A] sm:text-4xl md:text-5xl">
+            <div className="mb-4 text-center sm:mb-10 md:mb-12">
+              <h2 className="text-3xl font-black leading-[1.1] tracking-[-0.02em] text-[#0F172A] sm:text-4xl md:text-5xl">
                 Cómo funciona
               </h2>
             </div>
           </Reveal>
 
-          <div className="mb-14 grid grid-cols-1 gap-4 sm:grid-cols-3 md:mb-20">
+          <div className="mb-8 grid grid-cols-1 gap-3 sm:mb-14 sm:grid-cols-3 sm:gap-4 md:mb-20">
             {[
               {
                 icon: MapPin,
                 title: '1. Define la ubicación',
-                desc: 'Introduce tu ciudad o código postal para ver las inmobiliarias verificadas de tu zona.',
+                desc: 'Tu ciudad o código postal.',
               },
               {
                 icon: Star,
                 title: '2. Elige tu inmobiliaria',
-                desc: 'Compara experiencia, propiedades y valoraciones para decidir con confianza.',
+                desc: 'Compara y decide con confianza.',
               },
               {
                 icon: MessageCircle,
                 title: '3. Ponte en contacto',
-                desc: 'Contacta directo con la inmobiliaria que elijas, sin coste ni compromiso.',
+                desc: 'Directo, sin coste ni compromiso.',
               },
             ].map(({ icon: Icon, title, desc }, i) => (
               <Reveal key={title} delay={i * 0.08}>
-                <div className="h-full rounded-2xl border border-slate-100 bg-slate-50 p-6 text-center">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#FF8000]/10 text-[#FF8000]">
-                    <Icon size={22} />
+                <div className="flex h-full items-start gap-3 sm:block sm:rounded-2xl sm:border sm:border-slate-100 sm:bg-slate-50 sm:p-6 sm:text-center">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FF8000]/10 text-[#FF8000] sm:mx-auto sm:h-12 sm:w-12">
+                    <Icon size={20} />
                   </div>
-                  <p className="mt-4 text-base font-black tracking-[-0.01em] text-[#0F172A]">{title}</p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{desc}</p>
+                  <div>
+                    <p className="text-[15px] font-black tracking-[-0.01em] text-[#0F172A] sm:mt-4 sm:text-base">{title}</p>
+                    <p className="mt-0.5 text-sm leading-snug text-slate-500 sm:mt-1.5 sm:leading-relaxed">{desc}</p>
+                  </div>
                 </div>
               </Reveal>
             ))}
@@ -465,11 +458,8 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             {/* IZQUIERDA: carrusel de logos */}
             <Reveal>
               <div className="text-center sm:text-left">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
-                  Red de inmobiliarias
-                </p>
-                <h2 className="mt-3 text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
-                  Propietarios de toda España ya confían en nosotros para encontrar su inmobiliaria ideal
+                <h2 className="text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
+                  Propietarios de toda España ya confían en nosotros
                 </h2>
               </div>
               <div className="mt-6">
@@ -478,48 +468,25 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             </Reveal>
 
             {/* DERECHA: por qué buscar con Cosiris — panel gris para diferenciarla del carrusel */}
-            <Reveal delay={0.1}>
-              <div className="h-full rounded-2xl border border-slate-100 bg-slate-50 p-6 text-center sm:text-left sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
-                  Para quien quiere vender
-                </p>
-                <h2 className="mt-3 text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
+            <Reveal delay={0.1} className="h-full">
+              <div className="flex h-full flex-col justify-center rounded-2xl border border-slate-100 bg-slate-50 p-5 text-center sm:text-left sm:p-8">
+                <h2 className="text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
                   La forma más segura de encontrar tu inmobiliaria
                 </h2>
-                <p className="mt-2 text-sm leading-relaxed text-slate-500 md:text-base">
-                  No eliges a ciegas. Estas son las razones por las que buscar con Cosiris es mejor que buscar por tu cuenta.
-                </p>
 
-                <div className="mt-6 grid grid-cols-1 gap-3 text-left sm:grid-cols-2">
+                <div className="mt-4 grid grid-cols-2 gap-2 text-left sm:mt-6 sm:gap-3">
                   {[
-                    {
-                      icon: ShieldCheck,
-                      title: 'Solo verificadas',
-                      desc: 'Cada agencia pasa un proceso de verificación antes de entrar al directorio.',
-                    },
-                    {
-                      icon: Wallet,
-                      title: '100% gratis',
-                      desc: 'Buscar y contactar con tu inmobiliaria ideal no tiene ningún coste.',
-                    },
-                    {
-                      icon: MapPin,
-                      title: 'Cercanía real',
-                      desc: 'Profesionales que conocen tu zona — no un call center genérico.',
-                    },
-                    {
-                      icon: Zap,
-                      title: 'Respuesta rápida',
-                      desc: 'Tu solicitud llega directo a la inmobiliaria que elijas.',
-                    },
-                  ].map(({ icon: Icon, title, desc }, i) => (
+                    { icon: ShieldCheck, title: 'Solo verificadas' },
+                    { icon: Wallet, title: '100% gratis' },
+                    { icon: MapPin, title: 'Cercanía real' },
+                    { icon: Zap, title: 'Respuesta rápida' },
+                  ].map(({ icon: Icon, title }, i) => (
                     <Reveal key={title} delay={0.1 + i * 0.06}>
-                      <div className="group h-full rounded-xl border border-slate-100 bg-white p-4 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF8000]/20 hover:shadow-md hover:shadow-[#FF8000]/5">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FF8000]/10 text-[#FF8000] transition-all duration-200 group-hover:bg-[#FF8000] group-hover:text-white">
+                      <div className="group flex h-full items-center gap-2 rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF8000]/20 hover:shadow-md hover:shadow-[#FF8000]/5 sm:gap-3 sm:p-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FF8000]/10 text-[#FF8000] transition-all duration-200 group-hover:bg-[#FF8000] group-hover:text-white sm:h-9 sm:w-9">
                           <Icon size={17} />
                         </div>
-                        <p className="mt-3 text-sm font-bold text-slate-900">{title}</p>
-                        <p className="mt-1 text-xs leading-relaxed text-slate-500">{desc}</p>
+                        <p className="text-[13px] font-bold leading-tight text-slate-900 sm:text-sm">{title}</p>
                       </div>
                     </Reveal>
                   ))}
@@ -533,14 +500,14 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
       {/* 2. VIDEO SHOWCASE — cards verticales que rotan cada 5s. Solo si hay
           alguna inmobiliaria con foto o video real que mostrar. */}
       {agenciesWithMedia.length > 0 && (
-      <section className="relative overflow-hidden bg-black py-14 sm:py-28">
+      <section className="relative overflow-hidden bg-black py-10 sm:py-28">
         <div className="absolute inset-0">
           <LazyBgVideo className="absolute inset-0 opacity-15" />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         </div>
 
-        <div className="relative z-10 mx-auto max-w-6xl px-4">
+        <div className="relative z-10 mx-auto max-w-[87.5rem] px-4 md:px-10">
           <Reveal>
             <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
               Conoce a nuestras inmobiliarias
@@ -576,7 +543,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             </div>
           </div>
 
-          <div className="relative z-10 mx-auto mt-10 max-w-6xl px-4 text-center">
+          <div className="relative z-10 mx-auto mt-6 max-w-[87.5rem] px-4 text-center md:px-10 sm:mt-10">
             <button
               type="button"
               onClick={() => { document.getElementById('inicio-directorio')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
@@ -590,8 +557,8 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
       )}
 
       {/* 3. PARA INMOBILIARIAS — header + confianza */}
-      <section id="para-inmobiliarias" className="bg-white py-14 sm:py-28">
-        <div className="mx-auto max-w-6xl px-4">
+      <section id="para-inmobiliarias" className="bg-white py-10 sm:py-28">
+        <div className="mx-auto max-w-[87.5rem] px-5 md:px-10">
           {/* HEADER */}
           <Reveal>
             <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
@@ -600,9 +567,6 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             <h2 className="mx-auto mt-3 max-w-2xl text-center text-2xl font-black leading-[1.1] tracking-[-0.02em] text-[#0F172A] sm:text-3xl md:text-4xl lg:text-5xl">
               Todo lo que tu inmobiliaria necesita para crecer
             </h2>
-            <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-relaxed text-slate-500 sm:text-base">
-              Desde aparecer en nuestro directorio hasta automatizar el seguimiento de cada cliente. Todo desde una única plataforma.
-            </p>
             <div className="mt-6 text-center">
               <button
                 type="button"
@@ -617,25 +581,22 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
 
           {/* ¿POR QUÉ CONFIAR? */}
           <Reveal delay={0.05}>
-            <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-slate-100 bg-slate-50 p-5 sm:mt-20 sm:p-8">
+            <div className="mx-auto mt-6 max-w-3xl sm:mt-20 sm:rounded-2xl sm:border sm:border-slate-100 sm:bg-slate-50 sm:p-8">
               <p className="text-sm leading-relaxed text-slate-600">
                 <span className="font-bold text-[#0F172A]">No somos una inmobiliaria.</span>{' '}
-                Somos una plataforma que conecta propietarios con inmobiliarias verificadas y proporciona herramientas para captar, organizar y convertir más clientes.
+                Conectamos propietarios con inmobiliarias verificadas.
               </p>
-              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-5 sm:grid-cols-3">
                 {[
-                  { icon: ShieldCheck, label: 'Directorio verificado', desc: 'Solo inmobiliarias verificadas.' },
-                  { icon: MapPin, label: 'Captación local', desc: 'Propietarios reales de tu zona.' },
-                  { icon: Zap, label: 'Tecnología', desc: 'CRM, IA y automatizaciones en una única plataforma.' },
-                ].map(({ icon: Icon, label, desc }) => (
-                  <div key={label} className="flex items-start gap-3 rounded-xl bg-white p-4 shadow-sm">
+                  { icon: ShieldCheck, label: 'Directorio verificado' },
+                  { icon: MapPin, label: 'Captación local' },
+                  { icon: Zap, label: 'CRM, IA y automatizaciones' },
+                ].map(({ icon: Icon, label }) => (
+                  <div key={label} className="flex items-center gap-3 sm:rounded-xl sm:bg-white sm:p-4 sm:shadow-sm">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FF8000]/10 text-[#FF8000]">
                       <Icon size={18} />
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-[#0F172A]">{label}</p>
-                      <p className="mt-0.5 text-xs text-slate-500">{desc}</p>
-                    </div>
+                    <p className="text-sm font-bold text-[#0F172A]">{label}</p>
                   </div>
                 ))}
               </div>
@@ -645,22 +606,19 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
       </section>
 
       {/* 3b. STORYTELLING + MOCKUP — banda naranja pálido, pasos como tarjetas independientes con reveal al hacer scroll */}
-      <section id="recorrido" className="bg-orange-50 py-14 sm:py-28">
-        <div className="mx-auto max-w-6xl px-4">
+      <section id="recorrido" className="bg-orange-50 py-10 sm:py-28">
+        <div className="mx-auto max-w-[87.5rem] px-4 md:px-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
             <div>
               <Reveal>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
-                  Cómo funciona
-                </p>
-                <h3 className="mt-2 text-lg font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-xl md:text-2xl">
+                <h3 className="text-lg font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-xl md:text-2xl">
                   El recorrido del propietario hasta tu inmobiliaria
                 </h3>
               </Reveal>
               <Reveal delay={0.1}>
-                <div ref={stepsRef} className="relative mt-8">
+                <div ref={stepsRef} className="relative mt-4 sm:mt-8">
                   {/* riel del recorrido + marcador que viaja con el scroll real */}
-                  <div className="absolute left-9 top-9 bottom-9 -translate-x-1/2">
+                  <div className="absolute left-[2.0625rem] top-9 bottom-9 -translate-x-1/2 sm:left-9">
                     <div className="h-full w-px bg-orange-200" aria-hidden="true" />
                     <motion.div
                       style={{ top: markerTop }}
@@ -674,7 +632,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                     </motion.div>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-1.5 sm:space-y-3">
                     {STEPS.map((step, i) => {
                       const Icon = step.icon;
                       const active = i <= activeStep;
@@ -682,7 +640,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                       return (
                         <div
                           key={i}
-                          className={`relative flex items-center gap-4 rounded-xl border p-4 transition-all duration-300 ${
+                          className={`relative flex items-center gap-3 rounded-xl border p-3 transition-all duration-300 sm:gap-4 sm:p-4 ${
                             active
                               ? 'border-orange-100 bg-white shadow-sm shadow-orange-900/5'
                               : 'border-orange-100/40 bg-white/40'
@@ -712,8 +670,8 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
               </Reveal>
             </div>
 
-            {/* MOCKUP */}
-            <Reveal delay={0.1}>
+            {/* MOCKUP — solo escritorio: en móvil duplicaba lo que ya cuentan los pasos */}
+            <Reveal delay={0.1} className="hidden lg:block">
               <div className="sticky top-24 flex items-start justify-center lg:justify-end">
                 <div className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_64px_-12px_rgba(0,0,0,0.15)]">
                   <div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3">
@@ -804,49 +762,26 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
       </section>
 
       {/* 3c. BENEFICIOS + FUNCIONALIDADES */}
-      <section className="bg-white py-14 sm:py-28">
-        <div className="mx-auto max-w-6xl px-4">
-
-          {/* BENEFICIOS */}
-          <Reveal delay={0.1}>
-            <div className="mx-auto mt-16 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-slate-100 pt-10 text-sm text-slate-500 sm:mt-20 sm:pt-12">
-              {[
-                'Directorio Público',
-                'CRM',
-                'IA',
-                'Captación de Leads',
-                'Automatizaciones',
-                'Sin permanencia',
-              ].map((b) => (
-                <span key={b} className="inline-flex items-center gap-1.5 whitespace-nowrap">
-                  <Check size={14} className="text-[#FF8000]" />
-                  {b}
-                </span>
-              ))}
-            </div>
-          </Reveal>
+      <section className="bg-white py-10 sm:py-28">
+        <div className="mx-auto max-w-[87.5rem] px-5 md:px-10">
 
           {/* FUNCIONALIDADES */}
           <Reveal delay={0.15}>
-            <p className="mt-16 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000] sm:mt-20">
-              Funcionalidades
-            </p>
-            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-4">
               {[
-                { icon: UserPlus, title: 'Consigue más propietarios', desc: 'Recibe solicitudes directamente desde tu perfil.' },
-                { icon: LayoutDashboard, title: 'Gestiona todos tus clientes', desc: 'Organiza cada oportunidad desde un único lugar.' },
-                { icon: Zap, title: 'Automatiza el seguimiento', desc: 'WhatsApp, Email e IA trabajando por ti.' },
-                { icon: Megaphone, title: 'Haz crecer tu marca', desc: 'Contenido, campañas y herramientas listas para usar.' },
-              ].map(({ icon: Icon, title, desc }) => (
+                { icon: UserPlus, title: 'Consigue más propietarios' },
+                { icon: LayoutDashboard, title: 'Gestiona todos tus clientes' },
+                { icon: Zap, title: 'Automatiza el seguimiento' },
+                { icon: Megaphone, title: 'Haz crecer tu marca' },
+              ].map(({ icon: Icon, title }) => (
                 <div
                   key={title}
-                  className="group rounded-xl border border-slate-100 bg-white p-5 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF8000]/20 hover:shadow-md hover:shadow-[#FF8000]/5"
+                  className="group rounded-xl border border-slate-100 bg-white p-3 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF8000]/20 hover:shadow-md hover:shadow-[#FF8000]/5 sm:p-5"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF8000]/10 text-[#FF8000] transition-all duration-200 group-hover:bg-[#FF8000] group-hover:text-white">
-                    <Icon size={20} />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FF8000]/10 text-[#FF8000] transition-all duration-200 group-hover:bg-[#FF8000] group-hover:text-white sm:h-10 sm:w-10">
+                    <Icon size={18} />
                   </div>
-                  <p className="mt-4 text-sm font-bold text-slate-900">{title}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-500">{desc}</p>
+                  <p className="mt-2 text-[13px] font-bold leading-tight text-slate-900 sm:mt-4 sm:text-sm">{title}</p>
                 </div>
               ))}
             </div>

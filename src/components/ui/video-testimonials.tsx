@@ -1,0 +1,79 @@
+import { useCallback, useState } from 'react';
+import { Play } from 'lucide-react';
+import { useUI } from '@/context/UIContext';
+import { VideoModal } from '@/components/ui/shared-landing-sections';
+import { SwipeRow } from '@/components/ui/swipe-row';
+import { HOME_TESTIMONIALS } from '@/data/video-testimonials';
+
+const SNAPPY = 'ease-[cubic-bezier(0.23,1,0.32,1)]';
+
+// Testimonios de la home: fila deslizable en móvil y cuadrícula desde tablet. El
+// reproductor de YouTube no se carga hasta el clic: aquí solo hay miniaturas.
+export function VideoTestimonials() {
+  const { openContactModal } = useUI();
+  const [activeVideo, setActiveVideo] = useState<string | null>(null);
+  const closeVideo = useCallback(() => setActiveVideo(null), []);
+
+  return (
+    <>
+      <SwipeRow
+        label="Testimonios de inmobiliarias"
+        arrowsClassName="md:hidden"
+        className="-mx-5 scroll-pl-5 px-5 md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:px-0 xl:grid-cols-4 md:[&>li]:w-auto md:[&>li]:max-w-none"
+      >
+        {HOME_TESTIMONIALS.map((t) => (
+          <li key={t.id}>
+            <article className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0_6px_20px_rgba(0,0,0,0.08)]">
+              <button
+                type="button"
+                onClick={() => setActiveVideo(t.id)}
+                aria-label={`Haz clic para escuchar el testimonio de ${t.company}`}
+                className="group relative block aspect-video w-full shrink-0 cursor-pointer overflow-hidden bg-neutral-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E67300]"
+              >
+                {/* hqdefault es 4:3 con franjas negras: el recorte 16:9 ya las elimina. */}
+                <img
+                  src={`https://img.youtube.com/vi/${t.id}/hqdefault.jpg`}
+                  alt={`Testimonio de ${t.company}`}
+                  loading="lazy"
+                  decoding="async"
+                  width={480}
+                  height={360}
+                  className={`h-full w-full object-cover transition-transform duration-300 ${SNAPPY} [@media(hover:hover)]:group-hover:scale-[1.03]`}
+                />
+                <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/80 px-3 py-1.5 text-xs font-bold text-white">
+                  <Play size={12} fill="currentColor" strokeWidth={0} aria-hidden="true" />
+                  Haz clic para escuchar
+                </span>
+              </button>
+
+              <div className="flex flex-1 flex-col p-4 md:p-5">
+                <p className="text-xs font-bold text-[#C2410C]">
+                  {t.kind} · {t.zone}
+                </p>
+                <p className="mt-1.5 text-lg font-extrabold leading-tight tracking-tight">{t.person}</p>
+                <p className="mt-0.5 text-sm text-neutral-600">{t.company}</p>
+                <ul className="mt-3 flex flex-wrap gap-1.5">
+                  {t.results.map((r) => (
+                    <li key={r} className="rounded-full bg-[#FFF0E5] px-2.5 py-1 text-xs font-bold text-[#C2410C]">
+                      {r}
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-3 mb-4 border-t border-neutral-200 pt-3 text-[15px] font-semibold italic leading-snug">“{t.quote}”</p>
+                <button
+                  type="button"
+                  onClick={() => openContactModal({ sourceContext: 'home_testimonios' })}
+                  className={`mt-auto min-h-12 w-full cursor-pointer rounded-lg bg-[#FF8000] px-4 text-sm font-bold text-white transition-[background-color,transform] duration-150 ${SNAPPY} hover:bg-[#E67300] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2`}
+                >
+                  Solicita más información
+                </button>
+              </div>
+            </article>
+          </li>
+        ))}
+      </SwipeRow>
+
+      {activeVideo && <VideoModal videoId={activeVideo} onClose={closeVideo} />}
+    </>
+  );
+}

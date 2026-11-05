@@ -1,5 +1,4 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { useUI } from './context/UIContext';
 import { parseAgencyProfilePath } from '@/lib/agency-url';
@@ -24,7 +23,6 @@ const InmobiliariasProvider = lazy(() =>
 // en el bundle inicial de cualquier página, incluidas las de campaña como
 // /valoratuvivienda y /vendetuvivienda.
 const LandingPages = lazy(() => import('@/components/pages/landing-pages'));
-const IntroScreen = lazy(() => import('@/components/IntroScreen'));
 const AvisoLegalPage = lazy(() => import('./components/legal/AvisoLegalPage').then((m) => ({ default: m.AvisoLegalPage })));
 const TerminosCondicionesPage = lazy(() => import('./components/legal/TerminosCondicionesPage').then((m) => ({ default: m.TerminosCondicionesPage })));
 const PrivacidadPage = lazy(() => import('./components/legal/PrivacidadPage').then((m) => ({ default: m.PrivacidadPage })));
@@ -107,7 +105,6 @@ function ContactModalMount() {
 }
 
 export default function App() {
-  const [introDone, setIntroDone] = useState(false);
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [currentLocationKey, setCurrentLocationKey] = useState(`${window.location.pathname}${window.location.search}`);
 
@@ -271,26 +268,9 @@ export default function App() {
 
   return (
     <main className="font-sans bg-white text-ink antialiased">
-      {!introDone && (
-        <Suspense fallback={null}>
-          <IntroScreen onComplete={() => setIntroDone(true)} />
-        </Suspense>
-      )}
-
-      <AnimatePresence mode="wait">
-        {introDone && (
-          <motion.div
-            key="landing"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <Suspense fallback={null}>
-              <LandingPages />
-            </Suspense>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <Suspense fallback={null}>
+        <LandingPages />
+      </Suspense>
 
       <ContactModalMount />
       <CookieConsentBanner />

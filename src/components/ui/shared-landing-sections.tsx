@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { Youtube, Play, X, Users, MapPin, Calendar, Check } from 'lucide-react';
+import { TESTIMONIALS } from '@/data/testimonials';
 
 const EXPO: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -225,26 +226,6 @@ export function VideoCard({
   );
 }
 
-const TESTIMONIALS = [
-  {
-    quote: 'La calidad del lead ha sido el mayor cambio que he notado respecto a otras agencias. Los clientes contestan las llamadas, recuerdan haber enviado el lead y con algunos agendamos visitas. Captar o no ya es trabajo nuestro.',
-    author: 'Diego',
-    role: 'Inmobiliaria Capital',
-    logo: 'https://madrizcapital.com/wp-content/uploads/2025/03/Logo-Capital-verde-final-redondo.png',
-  },
-  {
-    quote: 'El acompañamiento durante el proceso es una de las cosas que más valoramos.',
-    author: 'Nerea',
-    role: 'DSS servicios inmobiliarios',
-    logo: 'https://www.dssinmo.com/img/header/logo.png',
-  },
-  {
-    quote: 'Hacía 11 años había sido mi comercial y volvimos a contratar con él y ya hemos captado alguna propiedad. Los resultados son buenos.',
-    author: 'Pep',
-    role: 'Habitat nou',
-    logo: 'https://media.egorealestate.com/ORIGINAL/abed00ed-61f1-454c-8e93-2cce127bf5c5.png',
-  },
-];
 
 export function SharedLandingSections({ disableYouTube = false }: { disableYouTube?: boolean } = {}) {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);

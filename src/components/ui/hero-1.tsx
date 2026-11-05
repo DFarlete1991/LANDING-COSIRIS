@@ -7,6 +7,7 @@ import { HeroBadge } from '@/components/ui/hero-badge';
 import { HeroTitle } from '@/components/ui/hero-title';
 import { HeroSubtitle } from '@/components/ui/hero-subtitle';
 import { useUI } from '@/context/UIContext';
+import { CLIENT_LOGOS } from '@/data/client-logos';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -56,47 +57,9 @@ export function LogosSection() {
         animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
         transition={{ duration: 0.75, ease: EASE, delay: 0.12 }}
       >
-        <LogoCloud logos={logos} />
+        <LogoCloud logos={CLIENT_LOGOS} />
       </motion.div>
     </motion.section>
   );
 }
 
-const logos = [
-  {
-    src: 'https://media.egorealestate.com/ORIGINAL/abed00ed-61f1-454c-8e93-2cce127bf5c5.png',
-    alt: 'Habitat Nou Logo',
-  },
-  {
-    src: 'https://weworkwell.com/wp-content/uploads/2025/01/WE-WORK-WELL-1-e1738655996266.png',
-    alt: 'WE WORK WELL Logo',
-  },
-  {
-    src: 'https://i.pinimg.com/736x/98/1b/48/981b48d1e50189951a88c674276addc6.jpg',
-    alt: 'REMAX Grupo Urbe Logo',
-  },
-  {
-    src: 'https://sociocasa.com/images/logos/SocioCasa_N_Logo.webp',
-    alt: 'Socio Casa Logo',
-  },
-  {
-    src: 'https://www.grupotorresol.com/Portals//inmogrupotorresol/Images/logo.png',
-    alt: 'Grupo TorreSol Logo',
-  },
-  {
-    src: 'https://cibcn.es/wp-content/uploads/2022/07/logo-cideb-300x88-1.png',
-    alt: 'Cideb Logo',
-  },
-  {
-    src: 'https://inmoacierta.com/wp-content/uploads/2022/01/logoActInmo.svg',
-    alt: 'Inmoacierta Logo',
-  },
-  {
-    src: 'https://madrizcapital.com/wp-content/uploads/2025/03/Logo-Capital-verde-final-redondo.png',
-    alt: 'Madriz Capital Logo',
-  },
-  {
-    src: 'https://www.dssinmo.com/img/header/logo.png',
-    alt: 'DSS Logo',
-  },
-];

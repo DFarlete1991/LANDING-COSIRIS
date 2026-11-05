@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, BadgeCheck, Briefcase, Check, Clock, Home, MapPin, Phone, Star, Users, X } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Briefcase, Check, ChevronRight, Clock, Home, MapPin, Phone, Star, Users, X } from 'lucide-react';
 import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 import { formatDistanceKm } from '@/lib/geo';
 import { navigateTo, rememberDirectoryUrl } from '@/lib/utils';
@@ -208,17 +208,17 @@ export function AgencyResultRow({
           handleActivate();
         }
       }}
-      className={`flex cursor-pointer flex-col gap-4 rounded-[24px] border p-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-[transform,border-color,box-shadow] duration-[250ms] ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(15,23,42,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000] sm:flex-row sm:gap-6 sm:p-6 ${
+      className={`flex cursor-pointer items-center gap-2 border-b py-3 transition-[transform,border-color,box-shadow] duration-[250ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000] active:bg-orange-50/60 sm:items-stretch sm:gap-6 sm:rounded-[24px] sm:border sm:p-6 sm:shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:hover:-translate-y-1 sm:hover:shadow-[0_16px_36px_rgba(15,23,42,0.1)] ${
         selected ? 'border-[#FF8000] bg-orange-50/40 ring-2 ring-[#FF8000]/20' : 'border-slate-100 bg-white'
       }`}
     >
-      {/* En móvil: avatar + nombre lado a lado. En sm+: display:contents hace que
-          este wrapper "desaparezca" y avatar/central vuelvan a ser columnas
-          independientes del flex-row original. */}
-      <div className="flex gap-3 sm:contents">
+      {/* En móvil es una línea de lista: avatar, nombre y datos clave, y toda la
+          fila lleva al perfil. En sm+: display:contents hace que este wrapper
+          "desaparezca" y avatar/central vuelvan a ser columnas independientes. */}
+      <div className="flex min-w-0 flex-1 items-center gap-3 sm:contents">
         {/* Zona izquierda: foto del asesor + logo pequeño de la inmobiliaria debajo */}
         <div className="relative flex shrink-0 flex-col items-start gap-2.5 self-start sm:items-center">
-          <Avatar agency={agency} sizeClass="h-16 w-16 sm:h-[92px] sm:w-[92px]" />
+          <Avatar agency={agency} sizeClass="h-14 w-14 sm:h-[92px] sm:w-[92px]" />
           {isNearest && (
             <span className="absolute -top-2 -left-2 rounded-full bg-[#0F172A]/90 px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.08em] text-white shadow-sm backdrop-blur-sm sm:px-2.5 sm:py-1 sm:text-[9px]">
               Cerca
@@ -240,23 +240,25 @@ export function AgencyResultRow({
 
         {/* Zona central: nombre → verificada → ubicación → valoración → descripción → métricas */}
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <div className="flex items-center gap-1.5 sm:flex-wrap sm:gap-x-2.5 sm:gap-y-1">
             {/* El titular es la inmobiliaria, no la persona de contacto: es un
                 directorio de inmobiliarias y es el nombre por el que se busca.
                 Igual que el <h1> del perfil y que la tarjeta compacta. */}
-            <p className="truncate text-base font-bold leading-tight text-slate-900 sm:text-[26px] sm:leading-[32px]">{agency.nombre_comercial}</p>
+            <p className="truncate text-[15px] font-bold leading-tight text-slate-900 sm:text-[26px] sm:leading-[32px]">{agency.nombre_comercial}</p>
             <span className="flex shrink-0 items-center gap-1 text-xs font-bold text-[#FF8000] sm:text-[13px]">
-              <BadgeCheck size={16} className="shrink-0" /> Verificada
+              <BadgeCheck size={16} className="shrink-0" aria-label="Verificada" />
+              <span className="hidden sm:inline">Verificada</span>
             </span>
           </div>
-          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-500 sm:text-sm">
+          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500 sm:mt-1.5 sm:text-sm">
             <MapPin size={13} className="shrink-0 text-slate-400" />
-            {agency.poblacion}, {agency.provincia}
+            <span className="truncate">{agency.poblacion}, {agency.provincia}</span>
           </p>
 
           {agency.rating != null && (
-            <div className="mt-1.5 flex items-center gap-1.5">
-              <div className="flex items-center gap-0.5">
+            <div className="mt-1 flex items-center gap-1.5 sm:mt-1.5">
+              <Star size={13} className="fill-amber-400 text-amber-400 sm:hidden" aria-hidden="true" />
+              <div className="hidden items-center gap-0.5 sm:flex">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
@@ -272,12 +274,18 @@ export function AgencyResultRow({
             </div>
           )}
 
-          <p className="mt-2.5 line-clamp-2 text-xs leading-relaxed text-slate-600 sm:text-sm">{agency.texto_presentacion}</p>
+          <p className="mt-2.5 hidden text-sm leading-relaxed text-slate-600 line-clamp-2 sm:[display:-webkit-box]">{agency.texto_presentacion}</p>
           {agency.texto_presentacion.length > 110 && (
-            <span className="mt-0.5 inline-block text-xs font-bold text-[#FF8000] sm:text-sm">Leer más</span>
+            <span className="mt-0.5 hidden text-sm font-bold text-[#FF8000] sm:inline-block">Leer más</span>
           )}
 
-          <div className="mt-3.5 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-slate-100 pt-3.5 sm:mt-4 sm:pt-4">
+          {metrics.length > 0 && (
+            <p className="mt-1 truncate text-xs font-medium text-slate-600 sm:hidden">
+              {metrics.map((m) => (m.label === 'Experiencia' ? m.value : `${m.value} ${m.label.toLowerCase()}`)).join(' · ')}
+            </p>
+          )}
+
+          <div className="mt-4 hidden flex-wrap items-center gap-x-6 gap-y-3 border-t border-slate-100 pt-4 sm:flex">
             {metrics.map(({ icon: Icon, value, label }) => (
               <div key={label} className="flex items-center gap-2">
                 <Icon size={16} className="shrink-0 text-[#FF8000]" />
@@ -335,24 +343,20 @@ export function AgencyResultRow({
           </>
         )}
       </div>
-      {/* En móvil: botón compacto */}
-      <button
-        type="button"
-        onClick={(e) => { e.stopPropagation(); handleActivate(); }}
-        className={`flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full px-5 text-sm font-bold shadow-sm transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out active:scale-95 sm:hidden ${
-          selectable
-            ? selected
-              ? 'bg-[#FF8000] text-white'
-              : 'border border-slate-200 bg-white text-slate-600'
-            : 'bg-[#FF8000] text-white shadow-[#FF8000]/20 hover:bg-[#E67300] hover:shadow-md hover:shadow-[#FF8000]/30'
-        }`}
-      >
-        {selectable ? (
-          selected ? (<><Check size={16} /> Elegida</>) : 'Elegir'
-        ) : (
-          <>Ver perfil <ArrowRight size={15} /></>
-        )}
-      </button>
+      {/* En móvil: la fila entera es el enlace; la flecha lo indica. */}
+      {selectable ? (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); handleActivate(); }}
+          className={`flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-sm font-bold transition-[background-color,border-color,transform] duration-200 ease-out active:scale-95 sm:hidden ${
+            selected ? 'bg-[#FF8000] text-white' : 'border border-slate-200 bg-white text-slate-600'
+          }`}
+        >
+          {selected ? (<><Check size={16} /> Elegida</>) : 'Elegir'}
+        </button>
+      ) : (
+        <ChevronRight size={20} aria-hidden="true" className="shrink-0 text-[#E67300] sm:hidden" />
+      )}
 
       {createPortal(
         <AnimatePresence>

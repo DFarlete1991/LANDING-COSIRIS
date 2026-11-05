@@ -5,7 +5,9 @@ import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { useScroll } from '@/components/ui/use-scroll';
 import { useUI } from '@/context/UIContext';
 
-export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boolean } = {}) {
+// homeHref: a dónde lleva el logo. En el portal de inmobiliarias vuelve al
+// inicio del portal; en el resto de la web, a la home.
+export function LandingNavbar({ invertOnScroll = false, homeHref = '/' }: { invertOnScroll?: boolean; homeHref?: string } = {}) {
   const [open, setOpen] = React.useState(false);
   const scrolled = useScroll(10);
   const { isContactModalOpen } = useUI();
@@ -18,11 +20,10 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
   const isSolidAtTop = invertOnScroll && !scrolled && !open;
 
   const links = [
+    { label: 'Home', href: '/' },
     { label: 'Servicios', href: '/servicios' },
-    { label: 'Calculadora ROI', href: '/calculadora-roi' },
     { label: 'Nosotros', href: '/nosotros' },
-    { label: 'Valora tu vivienda', href: '/inmobiliarias/valorar' },
-    { label: 'Inmobiliarias en tu zona', href: '/inmobiliarias' },
+    { label: 'Buscador de inmobiliarias', href: '/inmobiliarias' },
   ];
 
   const [path, setPath] = React.useState(() => window.location.pathname);
@@ -31,10 +32,10 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
     window.addEventListener('popstate', sync);
     return () => window.removeEventListener('popstate', sync);
   }, []);
-  const isActive = (href: string) => path === href || path.startsWith(href + '/');
+  const isActive = (href: string) => path === href || (href !== '/' && path.startsWith(href + '/'));
 
   const navigate = (href: string) => {
-    if (href.startsWith('/') && href !== '/') {
+    if (href.startsWith('/')) {
       window.history.pushState({}, '', href);
       window.dispatchEvent(new PopStateEvent('popstate'));
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -64,7 +65,7 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
       className={cn(
         'sticky top-0 z-30 mx-auto w-full md:max-w-fit transition-[filter,background-color,box-shadow] duration-300 md:top-8 md:rounded-md md:ease-out',
         {
-          'border-white/25 bg-white/50 shadow-sm backdrop-blur-xl md:top-4 md:border md:shadow-md':
+          'border-white/25 bg-white/95 shadow-sm backdrop-blur-xl md:top-4 md:border md:shadow-md':
             scrolled && !open,
           'border-slate-100 bg-white shadow-sm md:top-4 md:border md:shadow-md': isSolidAtTop,
           'pointer-events-none': isContactModalOpen,
@@ -79,10 +80,10 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
       >
         <button 
           onClick={() => {
-            if (window.location.pathname === '/') {
+            if (window.location.pathname === homeHref) {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
-              window.history.pushState({}, '', '/');
+              window.history.pushState({}, '', homeHref);
               window.dispatchEvent(new PopStateEvent('popstate'));
               window.scrollTo({ top: 0, behavior: 'instant' });
             }
@@ -97,12 +98,12 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
               key={link.label}
               className={cn(
                 buttonVariants({ variant: 'ghost' }),
-                'relative rounded-full px-3 text-[13px] font-medium xl:px-4 tracking-tight text-slate-700 transition-colors hover:bg-orange-50 hover:text-orange-700 focus-visible:ring-2 focus-visible:ring-[#FF8000]/60',
+                'relative rounded-full px-3 text-[13px] font-medium xl:px-4 tracking-tight text-black transition-colors hover:bg-orange-50 hover:text-orange-700 focus-visible:ring-2 focus-visible:ring-[#FF8000]/60',
                 isActive(link.href) && 'bg-orange-50 text-orange-700',
               )}
               aria-current={isActive(link.href) ? 'page' : undefined}
               href={link.href}
-              onClick={link.href.startsWith('/') && link.href !== '/' ? (e) => { e.preventDefault(); navigate(link.href); } : undefined}
+              onClick={(e) => { e.preventDefault(); navigate(link.href); }}
             >
               {link.label}
             </a>
@@ -111,19 +112,23 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
             Home Staging
           </a> */}
           <Button className="ml-1 rounded-full px-4 shadow-sm shadow-orange-500/20 xl:px-5" onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
-            Acceso Clientes
+            Acceso clientes
           </Button>
         </div>
-        <Button
-          size="icon"
-          variant="outline"
-          onClick={() => setOpen(!open)}
-          className="lg:hidden"
-          aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
-          aria-expanded={open}
-        >
-          <MenuToggleIcon open={open} className="size-5" duration={300} />
-        </Button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <Button className="h-10 rounded-lg px-3 text-[13px]" onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
+            Acceso clientes
+          </Button>
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => setOpen(!open)}
+            aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={open}
+          >
+            <MenuToggleIcon open={open} className="size-5" duration={300} />
+          </Button>
+        </div>
       </nav>
 
       <div
@@ -152,19 +157,11 @@ export function LandingNavbar({ invertOnScroll = false }: { invertOnScroll?: boo
                 })}
                 aria-current={isActive(link.href) ? 'page' : undefined}
                 href={link.href}
-                onClick={link.href.startsWith('/') && link.href !== '/' ? (e) => { e.preventDefault(); navigate(link.href); setOpen(false); } : undefined}
+                onClick={(e) => { e.preventDefault(); navigate(link.href); setOpen(false); }}
               >
                 {link.label}
               </a>
             ))}
-          </div>
-          <div className="flex flex-col gap-2">
-            {/* <a href="https://homestaging-cosiris.com/" target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: 'outline' })}>
-            Home Staging
-          </a> */}
-            <Button className="h-12 w-full rounded-xl text-base" onClick={() => window.open('https://crm.cosiris.com/', '_blank', 'noopener noreferrer')}>
-              Acceso Clientes
-            </Button>
           </div>
         </div>
       </div>
