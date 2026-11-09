@@ -15,8 +15,8 @@ const MAX_AGE_DAYS = 90;
 const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id'] as const;
 
 // gclid/gbraid/wbraid = Google Ads, fbclid = Meta, msclkid = Microsoft Ads,
-// ttclid = TikTok Ads, li_fat_id = LinkedIn Ads.
-const CLICK_ID_KEYS = ['gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid', 'ttclid', 'li_fat_id'] as const;
+// ttclid = TikTok Ads, li_fat_id = LinkedIn Ads, oppref = ChatGPT Ads (OpenAI).
+const CLICK_ID_KEYS = ['gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid', 'ttclid', 'li_fat_id', 'oppref'] as const;
 
 type UtmKey = (typeof UTM_KEYS)[number];
 type ClickIdKey = (typeof CLICK_ID_KEYS)[number];
@@ -130,6 +130,7 @@ export function getAttributionSummaryLine(): string | null {
     a.utm_campaign && `campaña: ${a.utm_campaign}`,
     a.fbclid && 'vía Meta Ads',
     a.gclid && 'vía Google Ads',
+    a.oppref && `vía ChatGPT Ads (oppref: ${a.oppref})`,
   ].filter(Boolean);
   if (parts.length === 0) return null;
   return `Origen: ${parts.join(' · ')}`;
