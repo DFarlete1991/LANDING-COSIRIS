@@ -4,6 +4,8 @@ import {
   ArrowRight, BarChart3, Bell, Database, Eye, FileText, Clock, Brain, ChevronDown,
   Megaphone, Mail, MessageCircle, CheckCircle2, Target, Users, Video,
   TrendingUp, PhoneCall, CalendarCheck, Filter, Repeat2, Trophy,
+  LayoutGrid, MessageSquareHeart, ThumbsUp, Settings, Calculator,
+  type LucideIcon,
 } from 'lucide-react';
 import { useUI } from '@/context/UIContext';
 import { LandingNavbar } from '@/components/pages/landing-navbar';
@@ -43,19 +45,44 @@ function FadeUp({ children, delay = 0, className = '' }: { children: React.React
 
 // ─── Índice de servicios ─────────────────────────────────────────────────────
 
-const SERVICES = [
-  { id: 'ads', icon: <Megaphone size={20} />, title: 'Captación Ads + IA', desc: 'Campañas que traen propietarios, filtrados por nuestro agente de IA.' },
-  { id: 'redes', icon: <Video size={20} />, title: 'Redes Sociales', desc: 'Diseño, textos, planificación y vídeos para hacer zona.' },
-  { id: 'email', icon: <Mail size={20} />, title: 'Email Marketing', desc: 'Seguimiento automático para no perder ningún lead.' },
-  { id: 'crm', icon: <Database size={20} />, title: 'Automatizaciones IA y CRM', desc: 'Todos tus contactos ordenados, con avisos y tareas.' },
+// Fotos de Unsplash (licencia libre, uso comercial sin atribución), servidas
+// desde la web: captacion photo-1748063578185, redes photo-1759215524472,
+// email photo-1603791440384, crm photo-1712904311048.
+// tilt/lift: giro y desplazamiento de cada tarjeta en escritorio, para que la
+// composición no sea una rejilla rígida. radius/photo: radios distintos en cada una.
+type ServiceCard = {
+  id: string; icon: LucideIcon; title: string; desc: string; img: string; alt: string;
+  tilt: string; lift: string; radius: string; photo: string;
+};
+const SERVICES: ServiceCard[] = [
+  {
+    id: 'ads', icon: Megaphone, title: 'Captación Ads + IA', desc: 'Campañas que traen propietarios, filtrados por nuestro agente de IA.',
+    img: '/assets/servicios/captacion.webp', alt: 'Casa moderna iluminada al atardecer',
+    tilt: 'xl:-rotate-[1.6deg]', lift: '', radius: 'rounded-[2rem_1.5rem_2rem_1.25rem]', photo: 'rounded-[1.6rem_0.9rem_1.6rem_2.4rem]',
+  },
+  {
+    id: 'redes', icon: ThumbsUp, title: 'Redes Sociales', desc: 'Diseño, textos, planificación y vídeos para hacer zona.',
+    img: '/assets/servicios/redes.webp', alt: 'Manos sujetando un móvil con un perfil de redes sociales',
+    tilt: 'xl:rotate-[1.4deg]', lift: 'xl:translate-y-10', radius: 'rounded-[1.5rem_2.25rem_1.5rem_2.25rem]', photo: 'rounded-[2.4rem_1rem_2.4rem_1rem]',
+  },
+  {
+    id: 'email', icon: Mail, title: 'Email Marketing', desc: 'Seguimiento automático para no perder ningún lead.',
+    img: '/assets/servicios/email.webp', alt: 'Portátil con el correo electrónico abierto',
+    tilt: 'xl:rotate-[1deg]', lift: 'xl:-translate-x-3', radius: 'rounded-[2.25rem_1.25rem_2.25rem_1.5rem]', photo: 'rounded-[1rem_2.2rem_1.4rem_2.2rem]',
+  },
+  {
+    id: 'crm', icon: Settings, title: 'Automatizaciones IA y CRM', desc: 'Todos tus contactos ordenados, con avisos y tareas.',
+    img: '/assets/servicios/crm.webp', alt: 'Portátil con un panel de contactos y métricas',
+    tilt: 'xl:-rotate-[1.2deg]', lift: 'xl:translate-y-10', radius: 'rounded-[1.25rem_2rem_1.75rem_2.25rem]', photo: 'rounded-[2.2rem_1.2rem_1rem_2.2rem]',
+  },
 ];
 
-const SECTIONS = [
-  { id: 'ads', label: 'Captación' },
-  { id: 'redes', label: 'Redes' },
-  { id: 'email', label: 'Email' },
-  { id: 'crm', label: 'CRM' },
-  { id: 'testimonios', label: 'Testimonios' },
+const SECTIONS: { id: string; label: string; icon: LucideIcon }[] = [
+  { id: 'ads', label: 'Captación', icon: LayoutGrid },
+  { id: 'redes', label: 'Redes', icon: MessageSquareHeart },
+  { id: 'email', label: 'Email', icon: Mail },
+  { id: 'crm', label: 'CRM', icon: Database },
+  { id: 'testimonios', label: 'Testimonios', icon: TrendingUp },
 ];
 
 // Barra que acompaña el scroll: dice en qué servicio estás y salta a otro sin
@@ -81,21 +108,27 @@ function SectionNav() {
   }, []);
 
   return (
-    <nav aria-label="Secciones de servicios" className="sticky top-14 z-20 border-b border-neutral-200 bg-white/95 backdrop-blur md:top-[5.75rem] md:mx-auto md:w-fit md:rounded-full md:border md:p-1 md:shadow-[0_6px_20px_rgba(0,0,0,0.08)]">
-      <ul className="flex justify-between gap-0 overflow-x-auto px-1 py-1.5 [scrollbar-width:none] sm:gap-1 sm:px-2 md:p-0 [&::-webkit-scrollbar]:hidden">
-        {SECTIONS.map((s) => (
-          <li key={s.id}>
-            <a
-              href={`#${s.id}`}
-              aria-current={active === s.id ? 'true' : undefined}
-              className={`inline-flex min-h-10 items-center rounded-full px-1.5 text-xs font-semibold min-[390px]:px-2.5 min-[390px]:text-[13px] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] md:px-5 md:text-sm ${
-                active === s.id ? 'bg-[#FF8000] text-white' : 'text-neutral-700 hover:text-black'
-              }`}
-            >
-              {s.label}
-            </a>
-          </li>
-        ))}
+    <nav aria-label="Secciones de servicios" className="sticky top-14 z-20 border-b border-neutral-200 bg-white/95 backdrop-blur md:top-[5.75rem] md:mx-auto md:w-fit md:rounded-full md:border md:border-[#FFE3C7] md:p-1.5 md:shadow-[0_10px_30px_-8px_rgba(194,65,12,0.22)]">
+      <ul className="flex items-center justify-between gap-0 overflow-x-auto px-1 py-1.5 [scrollbar-width:none] sm:gap-1 sm:px-2 md:p-0 [&::-webkit-scrollbar]:hidden">
+        {SECTIONS.map((s, i) => {
+          const Icon = s.icon;
+          const on = active === s.id;
+          return (
+            <li key={s.id} className="flex items-center">
+              {i > 0 && <span aria-hidden="true" className={`mx-1 hidden h-5 w-px md:block ${on || active === SECTIONS[i - 1].id ? 'bg-transparent' : 'bg-neutral-200'}`} />}
+              <a
+                href={`#${s.id}`}
+                aria-current={on ? 'true' : undefined}
+                className={`inline-flex min-h-10 items-center gap-2 rounded-full px-1.5 text-xs font-semibold min-[390px]:px-2.5 min-[390px]:text-[13px] transition-[background-color,color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] md:min-h-11 md:px-5 md:text-sm ${
+                  on ? 'bg-[#FF8000] text-white shadow-[0_6px_16px_-4px_rgba(255,128,0,0.55)]' : 'text-neutral-700 hover:text-black'
+                }`}
+              >
+                <Icon size={17} aria-hidden="true" className={`hidden md:block ${on ? 'text-white' : 'text-neutral-500'}`} />
+                {s.label}
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
@@ -118,46 +151,114 @@ function CalculatorLink({ children, className }: { children: React.ReactNode; cl
 
 // ─── Hero ────────────────────────────────────────────────────────────────────
 
+// Puntos naranja claro para la decoración de fondo.
+const DOTS = { backgroundImage: 'radial-gradient(#FFB877 1.4px, transparent 1.6px)', backgroundSize: '18px 18px' };
+
+// Decoración ambiental: círculos grandes, curvas, puntos y una casa a muy baja
+// opacidad. Nunca recibe clics ni compite con el contenido.
+function HeroBackdrop() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute -top-48 -right-40 size-[34rem] rounded-full bg-[#FFF0E5] md:size-[46rem]" />
+      <div className="absolute -bottom-72 -left-56 size-[36rem] rounded-full border border-[#FFD3A1]" />
+      <div className="absolute -bottom-60 -left-40 size-[28rem] rounded-full border border-[#FFE3C7]" />
+      <svg viewBox="0 0 600 400" className="absolute top-[8%] right-[6%] hidden w-[46rem] text-[#E67300] opacity-[0.06] xl:block" fill="currentColor">
+        <path d="M60 380V200L300 40l240 160v180H400V270H200v110Z" />
+        <path d="M430 120V60h50v100Z" />
+      </svg>
+      <svg viewBox="0 0 800 300" className="absolute bottom-6 left-0 hidden w-[56rem] text-[#FFB877] xl:block" fill="none">
+        <path d="M-20 280C180 140 360 300 560 170S820 60 860 40" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
+      </svg>
+      <div className="absolute top-24 right-[38%] hidden h-28 w-36 opacity-60 xl:block" style={DOTS} />
+      <div className="absolute bottom-16 left-[44%] hidden h-24 w-28 opacity-50 xl:block" style={DOTS} />
+      <span className="animate-soft-float absolute top-[22%] left-[47%] hidden size-3 rotate-45 rounded-[3px] border-2 border-[#FFB877] xl:block" />
+      <span className="animate-soft-float absolute right-[4%] bottom-[18%] hidden size-2.5 rounded-full bg-[#FF8000]/70 [animation-delay:-2s] xl:block" />
+    </div>
+  );
+}
+
+function ServiceTile({ s, index }: { s: ServiceCard; index: number }) {
+  const reduced = useReducedMotion();
+  const Icon = s.icon;
+  return (
+    <motion.li
+      initial={{ opacity: 0, y: reduced ? 0 : 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: EXPO, delay: 0.15 + index * 0.08 }}
+    >
+      {/* El desplazamiento va en un div propio: framer reescribe el transform del li. */}
+      <div className={`h-full ${s.lift}`}>
+        <a
+          href={`#${s.id}`}
+          className={`group relative flex h-full items-stretch gap-3 bg-white p-2 shadow-[0_22px_44px_-22px_rgba(194,65,12,0.35)] ring-1 ring-[#FFE3C7] transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-1 hover:shadow-[0_30px_56px_-22px_rgba(194,65,12,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] md:gap-4 md:p-2.5 ${s.radius} ${s.tilt}`}
+        >
+          <span className={`relative aspect-square w-[34%] shrink-0 overflow-hidden bg-[#FFF0E5] sm:aspect-auto sm:min-h-[13.5rem] sm:w-[44%] xl:w-[40%] ${s.photo}`}>
+            <img
+              src={s.img}
+              alt={s.alt}
+              width={720}
+              height={720}
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.07]"
+            />
+          </span>
+          <span className="absolute top-2 left-[calc(34%-1rem)] flex size-9 items-center justify-center rounded-xl bg-[#FF8000] text-white shadow-[0_8px_18px_-6px_rgba(255,128,0,0.7)] ring-4 ring-white transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:-translate-y-1 group-hover:-rotate-6 sm:top-4 sm:left-[calc(44%-1.25rem)] md:size-11 xl:left-[calc(40%-1.25rem)]">
+            <Icon size={19} aria-hidden="true" />
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col py-1.5 pr-1.5 pl-3 sm:pt-14 sm:pb-2 sm:pl-2">
+            <span className="block text-[15px] font-extrabold leading-tight tracking-tight text-black hyphens-auto md:text-lg xl:text-base 2xl:text-[1.05rem]">{s.title}</span>
+            <span className="mt-1 block text-[13px] leading-snug text-neutral-600 md:mt-2 md:text-sm">{s.desc}</span>
+            <span className="mt-auto flex size-8 items-center justify-center self-end rounded-full bg-[#FF8000] text-white transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-1 md:size-9">
+              <ArrowRight size={16} aria-hidden="true" />
+            </span>
+          </span>
+        </a>
+      </div>
+    </motion.li>
+  );
+}
+
 function Hero() {
   const { openContactModal } = useUI();
   return (
-    <section className="mx-auto grid max-w-[87.5rem] items-center gap-6 px-5 pt-6 pb-6 md:px-10 md:pt-20 md:pb-12 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-20">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, ease: EXPO }}>
-        <p className={EYEBROW}>Nuestros servicios</p>
-        <h1 className="mt-2 text-4xl font-extrabold leading-[1.06] tracking-tight text-black md:text-6xl">
-          Estrategia, Sistema <span className="block text-[#E67300]">y Resultados.</span>
-        </h1>
-        <p className={`mt-4 max-w-xl ${BODY} md:text-lg`}>
-          Cuatro pilares diseñados para que tu inmobiliaria deje de buscar oportunidades y empiece a generarlas.
-        </p>
-        <div className="mt-5 flex flex-wrap gap-3 md:mt-7">
-          <button type="button" onClick={() => openContactModal({ sourceContext: 'servicios_hero' })} className={PRIMARY}>
-            Solicita tu diagnóstico
-            <ArrowRight size={16} aria-hidden="true" />
-          </button>
-          <CalculatorLink className={`hidden sm:inline-flex ${SECONDARY}`}>Calcula tu plan</CalculatorLink>
-        </div>
-      </motion.div>
+    <section className="relative isolate bg-gradient-to-b from-[#FFF8F1] via-[#FFFCF8] to-white">
+      <HeroBackdrop />
+      <div className="relative mx-auto grid max-w-[87.5rem] grid-cols-[minmax(0,1fr)] items-center gap-7 px-5 pt-6 pb-8 md:px-10 md:pt-16 md:pb-16 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] xl:gap-12 xl:pb-24">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, ease: EXPO }}>
+          <p className={`flex items-center gap-3 ${EYEBROW}`}>
+            Nuestros servicios
+            <span aria-hidden="true" className="h-px w-16 bg-[#FFB877]" />
+          </p>
+          <h1 className="mt-3 text-4xl font-extrabold leading-[1.04] tracking-tight text-black md:text-6xl xl:text-[3.2rem] 2xl:text-[3.6rem]">
+            Estrategia, Sistema <span className="block text-[#E67300]">y Resultados.</span>
+          </h1>
+          <p className={`mt-4 max-w-xl ${BODY} md:mt-6 md:text-lg`}>
+            Cuatro pilares diseñados para que tu inmobiliaria deje de buscar oportunidades y empiece a generarlas.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3 md:mt-8">
+            <button type="button" onClick={() => openContactModal({ sourceContext: 'servicios_hero' })} className={`${PRIMARY} rounded-full shadow-[0_10px_24px_-8px_rgba(255,128,0,0.6)]`}>
+              Solicita tu diagnóstico
+              <ArrowRight size={16} aria-hidden="true" />
+            </button>
+            <CalculatorLink className={`hidden rounded-full border-[#FFB877] sm:inline-flex ${SECONDARY}`}>
+              <Calculator size={16} aria-hidden="true" />
+              Calcula tu plan
+            </CalculatorLink>
+          </div>
+        </motion.div>
 
-      <motion.ul
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, ease: EXPO, delay: 0.1 }}
-        className="divide-y divide-neutral-200 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_12px_36px_rgba(0,0,0,0.07)]"
-      >
-        {SERVICES.map((s) => (
-          <li key={s.id}>
-            <a href={`#${s.id}`} className="group flex items-center gap-3 p-3 transition-colors duration-150 hover:bg-[#FFF8F1] focus-visible:bg-[#FFF8F1] focus-visible:outline-none md:gap-4 md:p-5">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#FFF0E5] text-[#E67300] md:size-12">{s.icon}</span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[15px] font-bold text-black md:text-base">{s.title}</span>
-                <span className="block text-[13px] leading-snug text-neutral-600 md:text-sm">{s.desc}</span>
-              </span>
-              <ArrowRight size={18} aria-hidden="true" className="shrink-0 text-[#E67300] transition-transform duration-200 group-hover:translate-x-0.5" />
-            </a>
-          </li>
-        ))}
-      </motion.ul>
+        <div className="relative">
+          {/* Curvas que unen las tarjetas por detrás (solo escritorio). */}
+          <svg aria-hidden="true" viewBox="0 0 400 300" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 -z-10 hidden h-full w-full text-[#FFB877] xl:block" fill="none">
+            <path d="M130 70C190 40 240 110 300 80M120 240C180 210 240 280 300 250" stroke="currentColor" strokeWidth="1.5" strokeDasharray="5 7" />
+          </svg>
+          <ul className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 sm:gap-4 xl:gap-x-6 xl:gap-y-7">
+            {SERVICES.map((s, i) => (
+              <ServiceTile key={s.id} s={s} index={i} />
+            ))}
+          </ul>
+        </div>
+      </div>
     </section>
   );
 }

@@ -43,17 +43,20 @@ export function fitLogo(src: string): Promise<string | null> {
 }
 
 export function useFittedLogo(src: string | null): string | null {
-  const [fitted, setFitted] = useState<string | null>(null);
+  // Se guarda junto a la imagen de la que sale: si la burbuja cambia de logo, el
+  // resultado anterior deja de valer sin tener que vaciarlo.
+  const [fitted, setFitted] = useState<{ src: string; url: string | null } | null>(null);
   useEffect(() => {
-    setFitted(null);
     if (!src) return;
     let alive = true;
-    fitLogo(src).then((url) => alive && setFitted(url));
+    fitLogo(src).then((url) => {
+      if (alive) setFitted({ src, url });
+    });
     return () => {
       alive = false;
     };
   }, [src]);
-  return fitted;
+  return fitted && fitted.src === src ? fitted.url : null;
 }
 
 async function process(src: string): Promise<string | null> {
