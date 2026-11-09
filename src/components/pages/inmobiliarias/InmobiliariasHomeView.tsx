@@ -458,8 +458,11 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             {/* IZQUIERDA: carrusel de logos */}
             <Reveal>
               <div className="text-center sm:text-left">
-                <h2 className="text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
-                  Propietarios de toda España ya confían en nosotros
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
+                  Red de inmobiliarias
+                </p>
+                <h2 className="mt-3 text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
+                  Propietarios de toda España ya confían en nosotros para encontrar su inmobiliaria ideal
                 </h2>
               </div>
               <div className="mt-6">
@@ -468,25 +471,48 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             </Reveal>
 
             {/* DERECHA: por qué buscar con Cosiris — panel gris para diferenciarla del carrusel */}
-            <Reveal delay={0.1} className="h-full">
-              <div className="flex h-full flex-col justify-center rounded-2xl border border-slate-100 bg-slate-50 p-5 text-center sm:text-left sm:p-8">
-                <h2 className="text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
+            <Reveal delay={0.1}>
+              <div className="h-full rounded-2xl border border-slate-100 bg-slate-50 p-6 text-center sm:text-left sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
+                  Para quien quiere vender
+                </p>
+                <h2 className="mt-3 text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
                   La forma más segura de encontrar tu inmobiliaria
                 </h2>
+                <p className="mt-2 text-sm leading-relaxed text-slate-500 md:text-base">
+                  No eliges a ciegas. Estas son las razones por las que buscar con Cosiris es mejor que buscar por tu cuenta.
+                </p>
 
-                <div className="mt-4 grid grid-cols-2 gap-2 text-left sm:mt-6 sm:gap-3">
+                <div className="mt-6 grid grid-cols-1 gap-3 text-left sm:grid-cols-2">
                   {[
-                    { icon: ShieldCheck, title: 'Solo verificadas' },
-                    { icon: Wallet, title: '100% gratis' },
-                    { icon: MapPin, title: 'Cercanía real' },
-                    { icon: Zap, title: 'Respuesta rápida' },
-                  ].map(({ icon: Icon, title }, i) => (
+                    {
+                      icon: ShieldCheck,
+                      title: 'Solo verificadas',
+                      desc: 'Cada agencia pasa un proceso de verificación antes de entrar al directorio.',
+                    },
+                    {
+                      icon: Wallet,
+                      title: '100% gratis',
+                      desc: 'Buscar y contactar con tu inmobiliaria ideal no tiene ningún coste.',
+                    },
+                    {
+                      icon: MapPin,
+                      title: 'Cercanía real',
+                      desc: 'Profesionales que conocen tu zona — no un call center genérico.',
+                    },
+                    {
+                      icon: Zap,
+                      title: 'Respuesta rápida',
+                      desc: 'Tu solicitud llega directo a la inmobiliaria que elijas.',
+                    },
+                  ].map(({ icon: Icon, title, desc }, i) => (
                     <Reveal key={title} delay={0.1 + i * 0.06}>
-                      <div className="group flex h-full items-center gap-2 rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF8000]/20 hover:shadow-md hover:shadow-[#FF8000]/5 sm:gap-3 sm:p-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FF8000]/10 text-[#FF8000] transition-all duration-200 group-hover:bg-[#FF8000] group-hover:text-white sm:h-9 sm:w-9">
+                      <div className="group h-full rounded-xl border border-slate-100 bg-white p-4 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF8000]/20 hover:shadow-md hover:shadow-[#FF8000]/5">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FF8000]/10 text-[#FF8000] transition-all duration-200 group-hover:bg-[#FF8000] group-hover:text-white">
                           <Icon size={17} />
                         </div>
-                        <p className="text-[13px] font-bold leading-tight text-slate-900 sm:text-sm">{title}</p>
+                        <p className="mt-3 text-sm font-bold text-slate-900">{title}</p>
+                        <p className="mt-1 text-xs leading-relaxed text-slate-500">{desc}</p>
                       </div>
                     </Reveal>
                   ))}

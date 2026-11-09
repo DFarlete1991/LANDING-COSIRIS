@@ -7,6 +7,10 @@
 // Solo funciona con imágenes servidas con CORS (el almacenamiento de Supabase
 // lo permite). Si el servidor no lo permite, devuelve null y el logo se pinta
 // tal cual. Cada logo se procesa una vez por visita.
+//
+// Diferencia con el script: aquí un logo alargado sin fondo liso se pinta sobre
+// el color de sus esquinas, no sobre una copia difuminada (con logos del
+// directorio, a menudo JPG con ruido o un borde, el difuminado quedaba sucio).
 
 import { useEffect, useState } from 'react';
 
@@ -101,13 +105,14 @@ async function process(src: string): Promise<string | null> {
   };
 
   if (!transparent && !uniform) {
-    // A sangre: cuadrada, recorte central; alargada, entera sobre sí misma difuminada.
+    // A sangre: cuadrada, recorte central; alargada, entera sobre el color de
+    // fondo que más se repite en sus esquinas.
     if (Math.max(W, H) / Math.min(W, H) < 1.1) {
       drawCover();
     } else {
-      ctx.filter = 'blur(12px) brightness(0.85)';
-      drawCover();
-      ctx.filter = 'none';
+      const shared = corners.find((c, i) => corners.some((d, j) => j !== i && near(c, d, 30)));
+      ctx.fillStyle = `rgb(${(shared ?? avg(corners)).slice(0, 3).join(',')})`;
+      ctx.fillRect(0, 0, SIZE, SIZE);
       const s = (SIZE * DIAGONAL) / Math.hypot(W, H);
       ctx.drawImage(img, (SIZE - W * s) / 2, (SIZE - H * s) / 2, W * s, H * s);
     }
