@@ -225,11 +225,13 @@ function FollowUpFlow({ live }: { live: boolean }) {
   return (
     <Stage live={live}>
       <svg viewBox="0 0 400 400" className="absolute inset-0 h-full w-full" fill="none">
-        <motion.path variants={draw} d="M200 110C200 180 90 170 90 240" stroke={ORANGE} strokeWidth="2.5" strokeDasharray="6 6" />
-        <motion.path variants={draw} d="M200 110C200 180 310 170 310 240" stroke={ORANGE} strokeWidth="2.5" strokeDasharray="6 6" />
+        {/* Arrancan bajo la etiqueta "CRM" (que acaba hacia y=118) y llegan a lo alto de Email y WhatsApp. */}
+        <motion.path variants={draw} d="M200 128C200 190 90 180 90 240" stroke={ORANGE} strokeWidth="2.5" strokeDasharray="6 6" />
+        <motion.path variants={draw} d="M200 128C200 190 310 180 310 240" stroke={ORANGE} strokeWidth="2.5" strokeDasharray="6 6" />
         <motion.path variants={draw} d="M125 285h150" stroke={ORANGE} strokeWidth="2.5" strokeDasharray="6 6" />
       </svg>
-      <FlowNode icon={Database} label="CRM" className="top-[7%] left-1/2 -translate-x-1/2" />
+      {/* Centrado con márgenes y no con translate: la animación pop reescribe el transform. */}
+      <FlowNode icon={Database} label="CRM" className="top-[7%] inset-x-0 mx-auto" />
       <FlowNode icon={Mail} label="Email" className="top-[60%] left-[10%]" />
       <FlowNode icon={MessageCircle} label="WhatsApp" className="top-[60%] right-[10%]" />
     </Stage>

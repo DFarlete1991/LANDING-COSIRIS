@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CLIENT_LOGOS } from '@/data/client-logos';
 import { navigateTo } from '@/lib/utils';
+import { useFittedLogo } from '@/lib/fit-logo';
 
 const VISIBLE = 13;
 const GRID = 15;
@@ -9,11 +10,13 @@ const SECONDS = 28;
 const INK = '#7A3E12';
 const BOX = 'hop-box pointer-events-none absolute right-0 bottom-3 h-40 w-[13.5rem] origin-bottom md:h-44 md:w-60';
 
-type Bubble = { src: string; alt: string; href: string; bg?: string; cover?: boolean };
+// circle: logo ya preparado para el círculo (los locales); los del directorio no lo traen.
+type Bubble = { src: string; alt: string; href: string; bg?: string; cover?: boolean; circle?: boolean };
 
 // Hasta que llega el directorio (o si falla) se usan los logos locales.
 const FALLBACK: Bubble[] = CLIENT_LOGOS.filter((l) => l.profile).map((l) => ({
-  src: l.src,
+  src: l.circle ?? l.src,
+  circle: Boolean(l.circle),
   alt: l.alt,
   bg: l.bg,
   cover: l.cover,
@@ -39,11 +42,20 @@ async function loadDirectory() {
   const agencies = await fetchLiveInmobiliarias();
   const bubbles = agencies
     .filter((a) => a.logo_url)
-    .map((a): Bubble => ({ src: a.logo_url as string, alt: a.nombre_comercial.trim(), href: agencyProfilePath(a, agencies) }));
+    .map((a): Bubble => {
+      const href = agencyProfilePath(a, agencies);
+      // Si es una de nuestras inmobiliarias, mejor el logo local preparado para el círculo.
+      const local = FALLBACK.find((l) => l.href === href && l.circle);
+      return local ? { ...local, alt: a.nombre_comercial.trim() } : { src: a.logo_url as string, alt: a.nombre_comercial.trim(), href };
+    });
   return { total: agencies.length, bubbles };
 }
 
 function HopBubble({ logo, onBroken }: { logo: Bubble; onBroken: (logo: Bubble) => void }) {
+  // Los logos del directorio se ajustan al círculo al cargar; si no se puede
+  // (servidor sin CORS) se pintan como antes, con margen.
+  const fitted = useFittedLogo(logo.circle ? null : logo.src);
+  const filled = logo.circle || fitted !== null || logo.cover;
   const { href } = logo;
   return (
     <a
@@ -56,10 +68,10 @@ function HopBubble({ logo, onBroken }: { logo: Bubble; onBroken: (logo: Bubble) 
       className="group/bubble relative block rounded-full transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:scale-110 focus-visible:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] focus-visible:ring-offset-2"
     >
       <span
-        className={`flex size-14 items-center justify-center overflow-hidden rounded-full shadow-[0_6px_16px_rgba(0,0,0,0.12)] ring-1 ring-black/5 md:size-[4.5rem] ${logo.cover ? '' : 'p-2 md:p-2.5'}`}
-        style={{ backgroundColor: logo.bg ?? '#FFFFFF' }}
+        className={`flex size-14 items-center justify-center overflow-hidden rounded-full shadow-[0_6px_16px_rgba(0,0,0,0.12)] ring-1 ring-black/5 md:size-[4.5rem] ${filled ? '' : 'p-2 md:p-2.5'}`}
+        style={{ backgroundColor: logo.circle || fitted ? '#FFFFFF' : (logo.bg ?? '#FFFFFF') }}
       >
-        <img src={logo.src} alt="" loading="lazy" decoding="async" onError={() => onBroken(logo)} className={logo.cover ? 'h-full w-full object-cover' : 'max-h-full max-w-full object-contain'} />
+        <img src={fitted ?? logo.src} alt="" loading="lazy" decoding="async" onError={() => onBroken(logo)} className={filled ? 'h-full w-full object-cover' : 'max-h-full max-w-full object-contain'} />
       </span>
       <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap xl:block rounded-full bg-black px-3 py-1 text-xs font-semibold text-white opacity-0 transition-opacity duration-150 group-hover/bubble:opacity-100 group-focus-visible/bubble:opacity-100">
         {logo.alt}

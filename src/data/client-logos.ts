@@ -4,9 +4,16 @@
 // cover: el logo tiene fondo propio y llena el círculo, sin margen.
 // profile: <ciudad>/<nombre> de su ficha, /inmobiliarias-en-<ciudad>/<nombre>.
 // Sin él, la inmobiliaria no tiene ficha publicada en el directorio.
-export type ClientLogo = { src: string; alt: string; bg?: string; cover?: boolean; profile?: string };
+// circle: versión cuadrada para los círculos, con el margen recortado y su color
+// de fondo hasta el borde. Se genera con `npm run logos` al añadir un logo.
+export type ClientLogo = { src: string; alt: string; bg?: string; cover?: boolean; profile?: string; circle?: string };
 
-const local = (file: string, alt: string, extra: Partial<ClientLogo> = {}): ClientLogo => ({ src: `/assets/clientes/${file}.webp`, alt, ...extra });
+const local = (file: string, alt: string, extra: Partial<ClientLogo> = {}): ClientLogo => ({
+  src: `/assets/clientes/${file}.webp`,
+  circle: `/assets/clientes/circulo/${file}.webp`,
+  alt,
+  ...extra,
+});
 
 export const CLIENT_LOGOS: ClientLogo[] = [
   local('capital', 'Inmobiliaria Capital'),

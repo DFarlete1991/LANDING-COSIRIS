@@ -7,6 +7,7 @@
     "node": ">=22.0.0"
   },
   "scripts": {
+    "logos": "node scripts/logos-circulo.mjs",
     "dev": "vite",
     "build": "node scripts/generate-sitemap.mjs && tsc -b && vite build",
     "lint": "eslint .",

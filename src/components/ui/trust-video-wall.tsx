@@ -67,10 +67,9 @@ function StarField() {
 function LogoBubble({ logo, duplicate }: { logo: (typeof CLIENT_LOGOS)[number]; duplicate: boolean }) {
   const circle = (
     <span
-      style={{ backgroundColor: logo.bg ?? '#FFFFFF' }}
-      className={`flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full shadow-[0_8px_24px_rgba(0,0,0,0.08)] ring-1 ring-black/5 md:size-20 ${logo.cover ? '' : 'p-2 md:p-3'}`}
+      className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-[0_8px_24px_rgba(0,0,0,0.08)] ring-1 ring-black/5 md:size-20"
     >
-      <img src={logo.src} alt={logo.profile ? '' : logo.alt} title={logo.alt} decoding="async" className={logo.cover ? 'h-full w-full object-cover' : 'max-h-full max-w-full object-contain'} />
+      <img src={logo.circle ?? logo.src} alt={logo.profile ? '' : logo.alt} title={logo.alt} decoding="async" className="h-full w-full object-cover" />
     </span>
   );
   if (!logo.profile) return circle;
