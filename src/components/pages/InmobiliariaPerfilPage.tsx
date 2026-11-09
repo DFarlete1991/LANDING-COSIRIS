@@ -23,6 +23,7 @@ import { fetchResenasManuales, type ResenaManual } from '@/data/live-resenas';
 import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 import { useValidImageUrl } from '@/lib/use-valid-image-url';
 import { animate, splitText, stagger } from 'animejs';
+import { useFluidPage } from '@/lib/use-fluid-page';
 
 // three.js + fiber pesan varios cientos de KB — nada de esto debe entrar en
 // el bundle inicial de una landing de campaña de pago. Se carga solo si el
@@ -1187,6 +1188,7 @@ function LeadFormModal({
  * compartieron enlaces con ese formato.
  */
 export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?: string; slug?: string }) {
+  useFluidPage();
   const { agencies, loading } = useInmobiliarias();
   const agency = useMemo(
     () =>
@@ -1516,7 +1518,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
         />
       )}
 
-      <main className="relative z-10 mx-auto w-full max-w-[1400px] px-6 pb-20 pt-12">
+      <main className="relative z-10 mx-auto w-full max-w-[87.5rem] px-5 md:px-10 pb-20 pt-12">
 
         <div className="relative">
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -1656,7 +1658,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                     <BadgeCheck size={15} className="shrink-0 text-primary" /> Inmobiliaria verificada por Cosiris
                   </p>
 
-                  <p ref={bioRef} className={`mt-6 max-w-[520px] text-body leading-relaxed text-ink-muted ${bioExpanded ? '' : 'line-clamp-3'}`}>
+                  <p ref={bioRef} className={`mt-6 max-w-[40rem] text-body leading-relaxed text-ink-muted ${bioExpanded ? '' : 'line-clamp-3'}`}>
                     {agency.texto_presentacion}
                   </p>
                   {(bioOverflowing || bioExpanded) && (
@@ -1730,7 +1732,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
           convierten (valoración arriba, reseñas, mapa). */}
       {agency.mostrar_diferenciales !== false && (
         <section className="bg-surface">
-          <div className="relative mx-auto max-w-[1400px] px-6 py-10 sm:py-12">
+          <div className="relative mx-auto max-w-[87.5rem] px-5 md:px-10 py-10 sm:py-12">
             <span className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Confianza</span>
             <h3 className="mt-1 text-2xl font-bold text-[#0F172A] sm:text-[26px]">Por qué elegirnos</h3>
             <div className="mt-5">
@@ -1742,7 +1744,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
       {/* Bloque 3 — mapa a la izquierda, reseñas a la derecha */}
       <section ref={mapSectionRef} className="bg-white">
-        <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
+        <div className="relative mx-auto max-w-[87.5rem] px-5 md:px-10 py-16 sm:py-24">
           {/* El globo va en la esquina del bloque, no encima del texto — un
               detalle que casi no se nota a primer vistazo, no algo que
               compita con el título de la sección. También en desktop, three.js
@@ -1787,7 +1789,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
       {/* Bloque 3 — objeciones FAQ */}
       <section className="bg-surface">
-        <div className="relative mx-auto max-w-[1400px] px-6 py-16 sm:py-24">
+        <div className="relative mx-auto max-w-[87.5rem] px-5 md:px-10 py-16 sm:py-24">
           <div className="mb-14">
             <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">PREGUNTAS / PROPIETARIOS</span>
             <h2 className="mt-4 text-[44px] font-bold leading-[110%] tracking-[-0.02em] text-foreground sm:text-[48px]">
@@ -1808,7 +1810,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
           último bloque de la página — sin footer genérico del sitio detrás,
           que solo distraía con navegación que no pinta nada aquí. */}
       <section className="bg-primary">
-        <div className="mx-auto max-w-[1400px] px-6 py-16 text-center sm:py-20">
+        <div className="mx-auto max-w-[87.5rem] px-5 md:px-10 py-16 text-center sm:py-20">
           <h2 className="text-[32px] font-bold leading-[110%] tracking-[-0.02em] text-white sm:text-[40px]">
             ¿Listo para saber cuánto vale tu vivienda?
           </h2>
