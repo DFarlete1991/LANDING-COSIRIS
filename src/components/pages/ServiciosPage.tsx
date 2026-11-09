@@ -3,8 +3,9 @@ import { motion, useInView, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight, BarChart3, Bell, Database, Eye, FileText, Clock, Brain, ChevronDown,
   Megaphone, Mail, MessageCircle, CheckCircle2, Target, Users, Video,
-  TrendingUp, PhoneCall, CalendarCheck, Filter, Repeat2, Trophy,
+  TrendingUp, Filter, Repeat2, Trophy,
   LayoutGrid, MessageSquareHeart, ThumbsUp, Settings, Calculator,
+  CalendarPlus, ShieldCheck, Check,
   type LucideIcon,
 } from 'lucide-react';
 import { useUI } from '@/context/UIContext';
@@ -190,7 +191,7 @@ function ServiceTile({ s, index }: { s: ServiceCard; index: number }) {
       <div className={`h-full ${s.lift}`}>
         <a
           href={`#${s.id}`}
-          className={`group relative flex h-full items-stretch gap-3 bg-white p-2 shadow-[0_22px_44px_-22px_rgba(194,65,12,0.35)] ring-1 ring-[#FFE3C7] transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-1 hover:shadow-[0_30px_56px_-22px_rgba(194,65,12,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] md:gap-4 md:p-2.5 ${s.radius} ${s.tilt}`}
+          className={`group relative flex h-full items-stretch gap-3 bg-white p-2 shadow-[0_22px_44px_-22px_rgba(194,65,12,0.35)] ring-1 ring-[#FFE3C7] transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:z-10 hover:-translate-y-1 hover:scale-[1.04] hover:shadow-[0_30px_56px_-22px_rgba(194,65,12,0.45)] motion-reduce:hover:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] md:gap-4 md:p-2.5 ${s.radius} ${s.tilt}`}
         >
           <span className={`relative aspect-square w-[34%] shrink-0 overflow-hidden bg-[#FFF0E5] sm:aspect-auto sm:min-h-[13.5rem] sm:w-[44%] xl:w-[40%] ${s.photo}`}>
             <img
@@ -480,7 +481,7 @@ function RedesSection() {
           {SOCIAL_PACKS.map((pack, i) => (
             <li key={pack.name}>
               <FadeUp delay={i * 0.06} className="h-full">
-                <div className={`relative flex h-full flex-col rounded-2xl border p-5 ${pack.highlight ? 'border-[#FF8000] bg-[#FFF8F1] ring-1 ring-[#FF8000]' : 'border-neutral-200 bg-white'}`}>
+                <div className={`relative flex h-full flex-col rounded-2xl border p-5 transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:z-10 hover:scale-[1.04] hover:shadow-[0_24px_48px_-20px_rgba(194,65,12,0.35)] motion-reduce:hover:scale-100 ${pack.highlight ? 'border-[#FF8000] bg-[#FFF8F1] ring-1 ring-[#FF8000]' : 'border-neutral-200 bg-white'}`}>
                   {pack.highlight && (
                     <span className="absolute -top-3 left-5 rounded-full bg-[#FF8000] px-3 py-0.5 text-[11px] font-bold text-white">Más popular</span>
                   )}
@@ -506,11 +507,11 @@ function RedesSection() {
 
 // ─── Email Marketing ─────────────────────────────────────────────────────────
 
-const EMAIL_BENEFITS = [
-  { icon: <PhoneCall size={16} />, label: 'Seguimiento automático' },
-  { icon: <TrendingUp size={16} />, label: 'Más conversiones' },
-  { icon: <CalendarCheck size={16} />, label: 'Secuencias programadas' },
-  { icon: <Mail size={16} />, label: 'Sin esfuerzo manual' },
+const EMAIL_BENEFITS: { icon: LucideIcon; label: string }[] = [
+  { icon: BarChart3, label: 'Seguimiento automático' },
+  { icon: CalendarPlus, label: 'Secuencias programadas' },
+  { icon: TrendingUp, label: 'Más conversiones' },
+  { icon: ShieldCheck, label: 'Sin esfuerzo manual' },
 ];
 
 const EMAIL_FEATURES = [
@@ -520,31 +521,102 @@ const EMAIL_FEATURES = [
   'Flujo automatizado incluido',
 ];
 
+// Sobre abierto con una carta y una @, dibujado con los naranjas de marca.
+function EnvelopeArt({ className }: { className: string }) {
+  return (
+    <svg viewBox="0 0 200 170" aria-hidden="true" className={className}>
+      <path d="M18 70 100 14l82 56v78a12 12 0 0 1-12 12H30a12 12 0 0 1-12-12Z" fill="#E67300" />
+      <rect x="44" y="26" width="112" height="96" rx="10" fill="#fff" transform="rotate(-6 100 74)" />
+      <text x="100" y="94" textAnchor="middle" fontSize="62" fontWeight="800" fill="#FF8000" transform="rotate(-6 100 74)" fontFamily="inherit">@</text>
+      <path d="M18 72v76a12 12 0 0 0 12 12h140a12 12 0 0 0 12-12V72l-82 54Z" fill="#FFA640" />
+      <path d="M18 158 84 112M182 158l-66-46" stroke="#FFB877" strokeWidth="3" strokeLinecap="round" />
+      <path d="M150 38 162 18M168 50l20-8" stroke="#FFA640" strokeWidth="5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// Avión de papel con su estela discontinua.
+function PaperPlaneArt({ className }: { className: string }) {
+  return (
+    <svg viewBox="0 0 220 120" aria-hidden="true" fill="none" className={className}>
+      <path d="M8 104C40 70 20 40 52 30s40 40 70 26 34-30 50-34" stroke="#FFB877" strokeWidth="2" strokeDasharray="5 6" strokeLinecap="round" />
+      <path d="M216 4 150 30l26 10Z" fill="#FF8000" />
+      <path d="M216 4 176 40l6 26Z" fill="#E67300" />
+      <path d="M176 40 182 66l8-20Z" fill="#C2410C" />
+    </svg>
+  );
+}
+
 function EmailSection() {
   const { openContactModal } = useUI();
   return (
-    <section className="bg-[#FFF8F1]">
-      <div className="mx-auto grid max-w-[87.5rem] items-center gap-5 px-5 py-10 md:px-10 md:py-16 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-12">
+    <section className="relative isolate overflow-hidden bg-[#FFF8F1]">
+      {/* Fondo: dos manchas suaves para dar profundidad sin degradados fuertes. */}
+      <div aria-hidden="true" className="pointer-events-none absolute -top-24 -left-24 -z-10 size-72 rounded-full bg-[#FFEBD8]/70" />
+      <div aria-hidden="true" className="pointer-events-none absolute -right-32 -bottom-40 -z-10 size-[30rem] rounded-full bg-[#FFEBD8]/70" />
+
+      <div className="mx-auto grid max-w-[87.5rem] grid-cols-[minmax(0,1fr)] items-center gap-8 px-5 py-10 md:px-10 md:py-16 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-12 lg:py-20">
         <FadeUp>
-          <p className={EYEBROW}>Campañas de captación de leads · Estrategia, no spam</p>
-          <h2 className={`mt-2 ${TITLE}`}>Email Marketing</h2>
-          <p className={`mt-3 max-w-xl ${BODY}`}>
+          <p className={`inline-flex items-center gap-2 rounded-full bg-[#FFEBD8] px-3.5 py-1.5 ${EYEBROW}`}>
+            <Megaphone size={15} aria-hidden="true" className="shrink-0" />
+            Campañas de captación de leads · Estrategia, no spam
+          </p>
+          <h2 className={`mt-4 ${TITLE}`}>
+            Email{' '}
+            <span className="relative inline-block text-[#E67300]">
+              Marketing
+              <svg viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden="true" className="absolute -bottom-2 left-0 h-2.5 w-full md:h-3" fill="none">
+                <path d="M3 10C50 3 120 2 197 7" stroke="#FF8000" strokeWidth="4" strokeLinecap="round" />
+                <path d="M30 13C80 8 130 8 180 11" stroke="#FFB877" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+            </span>
+          </h2>
+          <p className={`mt-5 max-w-xl ${BODY} md:text-lg`}>
             Automatizamos el seguimiento de tus leads para que no pierdas oportunidades por falta de contacto. Tu marca comunica mientras tus correos trabajan por ti.
           </p>
-          <BenefitGrid items={EMAIL_BENEFITS} />
+          <ul className="mt-6 grid grid-cols-2 gap-3 md:mt-8 xl:grid-cols-4 xl:gap-0">
+            {EMAIL_BENEFITS.map((b) => {
+              const Icon = b.icon;
+              return (
+                <li key={b.label} className="flex items-center xl:border-l xl:border-[#FFD3A1] xl:px-4 xl:first:border-l-0 xl:first:pl-0">
+                  <span className="group flex items-center gap-3">
+                    <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#E67300] shadow-[0_8px_20px_-10px_rgba(194,65,12,0.45)] ring-1 ring-[#FFE3C7] transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:-translate-y-0.5 md:size-12">
+                      <Icon size={20} aria-hidden="true" />
+                    </span>
+                    <span className="max-w-[7.5rem] text-[13px] font-bold leading-tight text-black md:text-sm">{b.label}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
         </FadeUp>
 
-        <FadeUp delay={0.06}>
-          <div className="flex flex-col rounded-2xl bg-white p-5 shadow-[0_12px_36px_rgba(0,0,0,0.07)] md:p-6">
-            <p className="text-2xl font-extrabold tracking-tight text-black">PACK PRO</p>
-            <p className="text-[13px] font-medium text-neutral-600">Gestión completa</p>
-            <PackFeatures features={EMAIL_FEATURES} />
+        <FadeUp delay={0.06} className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
+          <PaperPlaneArt className="pointer-events-none absolute -top-10 -right-2 hidden w-48 lg:block xl:-right-6 xl:w-56" />
+          <EnvelopeArt className="pointer-events-none absolute -right-3 bottom-6 w-24 rotate-[8deg] drop-shadow-[0_14px_20px_rgba(194,65,12,0.25)] sm:-right-8 sm:w-32 lg:-right-6 lg:bottom-10 lg:w-28 xl:-right-10 xl:w-44" />
+
+          <div className="relative mr-10 flex flex-col rounded-[1.75rem] bg-white p-6 shadow-[0_28px_60px_-28px_rgba(194,65,12,0.45)] ring-1 ring-[#FFE3C7] transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:scale-[1.03] hover:shadow-[0_36px_70px_-28px_rgba(194,65,12,0.55)] motion-reduce:hover:scale-100 sm:mr-16 md:p-8 lg:mr-12 lg:-rotate-2 xl:mr-32">
+            <p className="text-3xl font-extrabold tracking-tight text-black md:text-[2rem]">
+              PACK <span className="text-[#E67300]">PRO</span>
+            </p>
+            <p className="mt-0.5 text-sm font-medium text-neutral-600">Gestión completa</p>
+            <ul className="mt-5 space-y-3">
+              {EMAIL_FEATURES.map((f) => (
+                <li key={f} className="flex items-center gap-3 text-[15px] text-neutral-800">
+                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#FF8000] text-white">
+                    <Check size={13} strokeWidth={3} aria-hidden="true" />
+                  </span>
+                  {f}
+                </li>
+              ))}
+            </ul>
             <button
               type="button"
               onClick={() => openContactModal({ initialServices: ['Email Marketing'], sourceContext: 'email_pro_plan' })}
-              className={`mt-5 w-full ${PRIMARY}`}
+              className={`group/cta mt-7 w-full rounded-2xl shadow-[0_12px_24px_-10px_rgba(255,128,0,0.7)] ${PRIMARY}`}
             >
               Empezar
+              <ArrowRight size={16} aria-hidden="true" className="transition-transform duration-200 group-hover/cta:translate-x-1" />
             </button>
           </div>
         </FadeUp>
@@ -562,37 +634,52 @@ const CRM_BENEFITS = [
   { icon: <Brain size={16} />, label: 'Agente de IA' },
 ];
 
-const CRM_COLUMNS = [
-  { name: 'Nuevo', cards: 1 },
-  { name: 'Contactado', cards: 2 },
-  { name: 'Visita', cards: 1 },
-];
-
-// Maqueta de ejemplo: no lleva cifras ni datos de clientes.
+// Grabación real de Cosiris CRM moviendo una oportunidad de fase. El vídeo solo
+// se descarga y reproduce cuando la sección está en pantalla.
 function CrmBoard() {
+  const ref = useRef<HTMLVideoElement>(null);
+  const inView = useInView(ref, { margin: '120px' });
+  const reduced = useReducedMotion();
+
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || reduced) return;
+    if (inView) v.play().catch(() => {});
+    else v.pause();
+  }, [inView, reduced]);
+
   return (
-    <div aria-hidden="true" className="rounded-2xl bg-[#0A0A0A] p-3 text-white md:p-4">
-      <p className="mb-3 text-[13px] font-semibold text-neutral-300">Ejemplo de tu CRM</p>
-      <div className="grid grid-cols-3 gap-2">
-        {CRM_COLUMNS.map((c, i) => (
-          <div key={c.name} className="flex min-h-36 flex-col gap-2 rounded-xl bg-white/5 p-2 md:min-h-44">
-            <span className="text-xs font-semibold text-neutral-300">{c.name}</span>
-            {Array.from({ length: c.cards }, (_, n) => (
-              <span key={n} className={`rounded-lg p-2 text-[11px] font-bold leading-tight ${i === 0 ? 'bg-[#FF8000] text-white' : 'bg-white/10 text-neutral-300'}`}>
-                {i === 0 ? 'Lead nuevo' : i === 1 ? 'Llamar hoy' : 'Visita de captación'}
-              </span>
-            ))}
-          </div>
-        ))}
+    <figure className="overflow-hidden rounded-2xl bg-white shadow-[0_28px_60px_-28px_rgba(194,65,12,0.4)] ring-1 ring-[#FFE3C7]">
+      <div aria-hidden="true" className="flex items-center gap-1.5 border-b border-[#FFE3C7] px-4 py-2.5">
+        <span className="size-2.5 rounded-full bg-[#FFB877]" />
+        <span className="size-2.5 rounded-full bg-[#FFD3A1]" />
+        <span className="size-2.5 rounded-full bg-neutral-200" />
+        <span className="ml-3 text-xs font-semibold text-neutral-500">Así verás tu CRM</span>
       </div>
-    </div>
+      <video
+        ref={ref}
+        muted
+        loop
+        playsInline
+        preload="none"
+        controls={reduced ?? false}
+        poster="/assets/servicios/crm-demo.webp"
+        width={800}
+        height={450}
+        aria-label="Demostración de Cosiris CRM: una oportunidad se arrastra de fase y se abre su ficha con el historial de WhatsApp"
+        className="block aspect-video h-auto w-full bg-white"
+      >
+        <source src="/assets/servicios/crm-demo.webm" type="video/webm" />
+        <source src="/assets/servicios/crm-demo.mp4" type="video/mp4" />
+      </video>
+    </figure>
   );
 }
 
 function CrmSection() {
   const { openContactModal } = useUI();
   return (
-    <section className="mx-auto grid max-w-[87.5rem] grid-cols-[minmax(0,1fr)] items-center gap-5 px-5 py-10 md:px-10 md:py-16 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-12">
+    <section className="mx-auto grid max-w-[87.5rem] grid-cols-[minmax(0,1fr)] items-center gap-5 px-5 py-10 md:px-10 md:py-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-12">
       <FadeUp>
         <p className={EYEBROW}>Seguimiento de tus leads por WhatsApp y email</p>
         <h2 className={`mt-2 ${TITLE}`}>Automatizaciones IA y CRM</h2>
