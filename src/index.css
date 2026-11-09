@@ -159,10 +159,13 @@
   animation: hop-box infinite;
 }
 
-/* Mientras se ve la home, todo su tamaño va en rem y escala con la pantalla.
-   Por debajo de 1600 px no cambia nada. */
-html.home-fluid {
-  font-size: max(100%, 1vw);
+/* En pantallas anchas la página crece un poco con el ancho para no dejar bordes
+   vacíos, pero solo la mitad de lo que crece la pantalla: así el zoom del
+   navegador sigue agrandando o achicando la web (con 1vw entero se anulaba).
+   Por debajo de 1600 px no cambia nada; el tope evita textos enormes. Se aplica
+   a toda la web para que el menú y los márgenes midan igual en todas las páginas. */
+html {
+  font-size: clamp(100%, 0.5vw + 50%, 125%);
 }
 
 @media (prefers-reduced-motion: reduce) {

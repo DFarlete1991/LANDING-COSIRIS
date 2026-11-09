@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Building2, Check, ChevronDown } from 'lucide-react';
-import { FormNavbar } from '../ui/form-navbar';
+import { LandingNavbar } from '@/components/pages/landing-navbar';
 import { SharedLandingSections } from '../ui/shared-landing-sections';
 import { useSEO } from '@/lib/seo';
 import { getAttributionFields } from '@/lib/utm';
@@ -585,7 +585,7 @@ export function CaptacionInmobiliariasPage() {
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#FF8000]/30 flex flex-col text-center">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-70 pointer-events-none" />
 
-      <FormNavbar />
+      <LandingNavbar />
 
       <main className="z-10 flex flex-col flex-1 pb-12 pt-0 w-full relative">
         <InmobiliariasHero />

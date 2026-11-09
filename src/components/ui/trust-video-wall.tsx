@@ -99,10 +99,6 @@ export function TrustVideoWall() {
       <StarField />
 
       <div className="relative flex flex-1 flex-col items-center justify-center px-5 pt-8 pb-4 text-center md:pt-20 md:pb-10">
-        <span className="mb-4 whitespace-nowrap rounded-full border border-[#FFD3A1] bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.02em] text-[#C2410C] sm:text-[11px] sm:tracking-[0.08em] md:mb-6 md:px-4 md:text-xs md:tracking-[0.12em]">
-          Marketing · Captación · Automatizaciones IA
-        </span>
-
         <motion.h1
           id="trust-wall-title"
           initial={{ opacity: 0, y: 20 }}
@@ -113,8 +109,8 @@ export function TrustVideoWall() {
           Plataforma de marketing y captación <span className="text-[#E67300]">para inmobiliarias</span>
         </motion.h1>
 
-        <p className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-neutral-600 md:mt-5 md:text-lg">
-          Campañas de captación y un CRM que hace el seguimiento de tus leads por WhatsApp y email.
+        <p className="mt-4 text-xs font-bold uppercase tracking-[0.08em] text-[#E67300] sm:text-sm md:mt-6 md:text-base md:tracking-[0.12em]">
+          Marketing · Captación · Automatizaciones IA
         </p>
 
         <div className="mt-5 flex flex-col items-center gap-1 sm:flex-row sm:gap-3 md:mt-7">

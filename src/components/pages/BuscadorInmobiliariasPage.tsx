@@ -51,7 +51,7 @@ export function BuscadorInmobiliariasPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased">
-      <LandingNavbar invertOnScroll homeHref="/inmobiliarias" />
+      <LandingNavbar />
 
       {searchPoint ? (
         <InmobiliariasResultsView initialQuery={query} searchPoint={searchPoint} onSearch={handleSearch} onBack={handleBack} />

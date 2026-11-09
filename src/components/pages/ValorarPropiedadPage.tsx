@@ -331,7 +331,7 @@ export function ValorarPropiedadPage() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased">
-      <LandingNavbar invertOnScroll />
+      <LandingNavbar />
 
       <header className="relative overflow-hidden bg-[#0F172A]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,128,0,0.14),transparent_55%)]" />

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Check, Megaphone, Share2, Bot, Mail } from 'lucide-react';
-import { FormNavbar } from '../ui/form-navbar';
+import { LandingNavbar } from '@/components/pages/landing-navbar';
 import { SharedLandingSections } from '../ui/shared-landing-sections';
 import { navigateTo } from '@/lib/utils';
 import { useSEO } from '@/lib/seo';
@@ -51,7 +51,7 @@ export function PlanesInmobiliariasPage() {
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#FF8000]/30">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-70 pointer-events-none" />
 
-      <FormNavbar />
+      <LandingNavbar />
 
       <main className="relative z-10 mx-auto w-full max-w-[87.5rem] px-4 pb-20 pt-16 text-center md:px-10">
         <motion.div

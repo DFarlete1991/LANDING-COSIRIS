@@ -24,6 +24,7 @@ import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 import { useValidImageUrl } from '@/lib/use-valid-image-url';
 import { animate, splitText, stagger } from 'animejs';
 import { useFluidPage } from '@/lib/use-fluid-page';
+import { LandingNavbar } from '@/components/pages/landing-navbar';
 
 // three.js + fiber pesan varios cientos de KB — nada de esto debe entrar en
 // el bundle inicial de una landing de campaña de pago. Se carga solo si el
@@ -1475,25 +1476,17 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 antialiased">
-      <div className="sticky top-0 z-30 border-b border-slate-100 bg-white/90 backdrop-blur-sm">
-        <div className="flex h-14 w-full items-center justify-between px-1 sm:px-2">
-          <button
-            type="button"
-            onClick={() => navigateTo(backUrl)}
-            className="group flex items-center gap-1 rounded-full px-1.5 py-1.5 text-sm font-semibold text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-95"
-            aria-label="Volver a resultados"
-          >
-            <ArrowLeft size={15} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
-            <span className="hidden sm:inline">Volver al directorio</span>
-          </button>
-          <a
-            href="/inmobiliarias"
-            onClick={(e) => { e.preventDefault(); navigateTo('/inmobiliarias'); }}
-            className="shrink-0 transition-transform duration-200 hover:scale-105 active:scale-90"
-          >
-            <img src="/assets/logo_orange.png" alt="Cosiris" width="380" height="170" className="h-10 w-auto" />
-          </a>
-        </div>
+      <LandingNavbar />
+
+      <div className="mx-auto w-full max-w-[87.5rem] px-5 py-3 md:px-10">
+        <button
+          type="button"
+          onClick={() => navigateTo(backUrl)}
+          className="group inline-flex items-center gap-1 rounded-full px-1.5 py-1.5 text-sm font-semibold text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-95"
+        >
+          <ArrowLeft size={15} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
+          Volver al directorio
+        </button>
       </div>
 
       <ValuationHero agency={agency} onSelect={setSelectedTipo} />

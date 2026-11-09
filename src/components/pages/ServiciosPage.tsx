@@ -238,7 +238,7 @@ function Hero() {
           </p>
           <div className="mt-5 flex flex-wrap gap-3 md:mt-8">
             <button type="button" onClick={() => openContactModal({ sourceContext: 'servicios_hero' })} className={`${PRIMARY} rounded-full shadow-[0_10px_24px_-8px_rgba(255,128,0,0.6)]`}>
-              Solicita tu diagnóstico
+              Solicitar más información
               <ArrowRight size={16} aria-hidden="true" />
             </button>
             <CalculatorLink className={`hidden rounded-full border-[#FFB877] sm:inline-flex ${SECONDARY}`}>

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
 import { AddressAutocomplete } from '../ui/AddressAutocomplete';
-import { FormNavbar } from '../ui/form-navbar';
+import { LandingNavbar } from '@/components/pages/landing-navbar';
 import { WhyChooseCosiris, HowItWorks } from '../ui/valoracion-blocks';
 import { useSEO } from '@/lib/seo';
 import { getAttributionFields } from '@/lib/utm';
@@ -142,7 +142,7 @@ export function ValoracionPage() {
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#FF8000]/30 flex flex-col items-center">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-70"></div>
 
-      <FormNavbar />
+      <LandingNavbar />
 
       <main className="z-10 flex-1 flex flex-col w-full relative">
         <section className={`flex flex-col items-center justify-center px-4 pt-10 pb-20 w-full max-w-2xl mx-auto ${isFormsPath ? 'min-h-[80vh]' : 'mt-8 md:mt-12'}`}>

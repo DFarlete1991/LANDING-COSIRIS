@@ -194,7 +194,7 @@ export function ClientsSection() {
       <div className={WRAP}>
         <Reveal className="mb-6 md:mb-12">
           <h2 className={H2}>
-            Ellos ya captan con Cosiris. <span className="block text-[#E67300]">Ahora te toca a ti.</span>
+            Ellos ya trabajan con nosotros. <span className="block text-[#E67300]">Ahora es tu turno.</span>
           </h2>
           <p className={`mt-3 ${LEAD}`}>No te lo contamos nosotros: te lo cuentan las inmobiliarias.</p>
         </Reveal>

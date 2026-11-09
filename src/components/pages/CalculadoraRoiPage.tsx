@@ -4,11 +4,8 @@ import { Footer } from '@/components/Footer';
 import { PlanCalculator } from '@/components/plan-calculator/PlanCalculator';
 import { useUI } from '@/context/UIContext';
 import { useSEO } from '@/lib/seo';
-import { useFluidPage } from '@/lib/use-fluid-page';
 
 export function CalculadoraRoiPage() {
-  useFluidPage();
-
   useSEO({
     path: '/calculadora-roi',
     title: 'Calculadora de tu plan de captación inmobiliaria | Cosiris',
@@ -37,7 +34,7 @@ export function CalculadoraRoiPage() {
           <PlanCalculator />
         </div>
 
-        <section className="mx-4 mb-20 overflow-hidden rounded-2xl bg-[#FF8000] md:mx-10 2xl:mx-auto 2xl:max-w-[82.5rem]">
+        <section className="mx-4 mb-20 overflow-hidden rounded-2xl bg-[#FF8000] md:mx-auto md:max-w-5xl">
           <div className="relative px-6 py-10 text-center md:px-10 md:py-14">
             <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10" />
             <p className="relative mb-2 text-[10px] font-bold uppercase tracking-[0.28em] text-white/80">

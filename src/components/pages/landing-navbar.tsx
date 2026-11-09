@@ -2,25 +2,16 @@ import React from 'react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
-import { useScroll } from '@/components/ui/use-scroll';
 import { useUI } from '@/context/UIContext';
 
-// homeHref: a dónde lleva el logo. En el portal de inmobiliarias vuelve al
-// inicio del portal; en el resto de la web, a la home.
-export function LandingNavbar({ invertOnScroll = false, homeHref = '/' }: { invertOnScroll?: boolean; homeHref?: string } = {}) {
+// El mismo menú en todas las páginas y en todo momento: no cambia de tamaño,
+// fondo ni posición al hacer scroll, y el logo siempre lleva a la home.
+export function LandingNavbar() {
   const [open, setOpen] = React.useState(false);
-  const scrolled = useScroll(10);
   const { isContactModalOpen } = useUI();
-
-  // Por defecto el header no tiene fondo propio hasta hacer scroll — pensado
-  // para páginas que empiezan con una sección clara. `invertOnScroll` es para
-  // páginas con hero oscuro (video, imagen): arranca sólido (fondo blanco,
-  // colores normales) para quedar legible sobre el hero, y al hacer scroll
-  // pasa al mismo look difuminado que ya usa el resto del sitio.
-  const isSolidAtTop = invertOnScroll && !scrolled && !open;
+  const homeHref = '/';
 
   const links = [
-    { label: 'Home', href: '/' },
     { label: 'Servicios', href: '/servicios' },
     { label: 'Nosotros', href: '/nosotros' },
     { label: 'Buscador de inmobiliarias', href: '/inmobiliarias' },
@@ -63,20 +54,15 @@ export function LandingNavbar({ invertOnScroll = false, homeHref = '/' }: { inve
   return (
     <header
       className={cn(
-        'sticky top-0 z-30 mx-auto w-full md:max-w-fit transition-[filter,background-color,box-shadow] duration-300 md:top-8 md:rounded-md md:ease-out',
+        'sticky top-0 z-30 mx-auto w-full border-slate-100 font-sans bg-white/95 shadow-sm backdrop-blur-xl md:top-4 md:max-w-fit md:rounded-md md:border md:shadow-md',
         {
-          'border-white/25 bg-white/95 shadow-sm backdrop-blur-xl md:top-4 md:border md:shadow-md':
-            scrolled && !open,
-          'border-slate-100 bg-white shadow-sm md:top-4 md:border md:shadow-md': isSolidAtTop,
           'pointer-events-none': isContactModalOpen,
           'bg-white': open,
         },
       )}
     >
       <nav
-        className={cn('flex h-14 w-full items-center justify-between px-4 md:h-12 md:px-6 md:transition-all md:ease-out', {
-          'md:px-5': scrolled,
-        })}
+        className="flex h-14 w-full items-center justify-between px-4 md:h-12 md:px-6"
       >
         <button 
           onClick={() => {
@@ -88,6 +74,7 @@ export function LandingNavbar({ invertOnScroll = false, homeHref = '/' }: { inve
               window.scrollTo({ top: 0, behavior: 'instant' });
             }
           }}
+          aria-label="Ir a la página de inicio de Cosiris"
           className="flex items-center hover:opacity-80 transition-opacity"
         >
           <img src="/assets/logo_orange.png" alt="Cosiris" width="380" height="170" className="h-10 w-auto" />
