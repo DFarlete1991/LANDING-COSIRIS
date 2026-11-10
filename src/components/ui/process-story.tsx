@@ -300,14 +300,15 @@ export function ProcessSection() {
   const arrow = 'flex size-12 cursor-pointer items-center justify-center rounded-full border transition-colors duration-150 disabled:cursor-default disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000]';
 
   return (
-    <section id="como-funciona" aria-labelledby="process-title" className="w-full scroll-mt-16 rounded-[2rem] bg-[#0D0D0D] text-white md:rounded-[3rem]">
-      {/* Escritorio: panel fijo mientras la altura de la sección marca el avance. */}
-      <div ref={trackRef} className="hidden lg:block lg:h-[420svh]">
-        <div className="sticky top-0 flex h-svh items-center overflow-hidden pt-16">
+    <section id="como-funciona" aria-labelledby="process-title" className="w-full scroll-mt-16 rounded-[2rem] bg-[#0D0D0D] text-white md:rounded-[3rem] lg:rounded-none lg:bg-transparent">
+      {/* Escritorio: tarjeta negra fija, más baja que la pantalla, mientras la
+          altura de la sección marca el avance. */}
+      <div ref={trackRef} className="hidden lg:block lg:h-[220svh]">
+        <div className="sticky top-20 mx-10 flex h-[min(40rem,calc(100svh-6rem))] items-center overflow-hidden rounded-[3rem] bg-[#0D0D0D]">
           <div className="mx-auto grid w-full max-w-[87.5rem] grid-cols-[minmax(19.5rem,0.8fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-10 px-10 xl:gap-14">
             <div>
               <Heading id="process-title" />
-              <ol className="relative mt-9">
+              <ol className="relative mt-6">
                 <span aria-hidden="true" className="absolute top-3 bottom-3 left-[11px] w-0.5 bg-white/15" />
                 <motion.span
                   aria-hidden="true"
@@ -322,14 +323,14 @@ export function ProcessSection() {
                         type="button"
                         onClick={() => jump(i)}
                         aria-current={state === 'active' ? 'step' : undefined}
-                        className="group relative flex min-h-12 w-full cursor-pointer items-center gap-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000]"
+                        className="group relative flex min-h-11 w-full cursor-pointer items-center gap-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000]"
                       >
                         <span className={`relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-[#0D0D0D] transition-colors duration-200 ${state === 'next' ? 'bg-neutral-600' : 'bg-[#FF8000]'}`}>
                           {state === 'active' && <span className="size-2 rounded-full bg-white" />}
                         </span>
                         <span
                           className={`font-extrabold tracking-[-0.02em] transition-[color,font-size] duration-200 ${
-                            state === 'active' ? 'text-xl text-[#FF8000] xl:text-2xl' : state === 'done' ? 'text-lg text-neutral-300' : 'text-lg text-neutral-500 group-hover:text-neutral-300'
+                            state === 'active' ? 'text-lg text-[#FF8000] xl:text-xl' : state === 'done' ? 'text-base text-neutral-300' : 'text-base text-neutral-500 group-hover:text-neutral-300'
                           }`}
                         >
                           {pad(i + 1)}. {s.name}
@@ -341,21 +342,21 @@ export function ProcessSection() {
               </ol>
             </div>
 
-            <div className="min-h-[24rem]">
+            <div className="min-h-[20rem]">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={active} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: EXPO }}>
                   <span className="inline-block rounded-full border border-white/25 px-3.5 py-1 text-xs font-bold tracking-[0.08em]">
                     PASO {pad(active + 1)} DE {pad(STEPS.length)}
                   </span>
-                  <p className="mt-5 text-lg font-bold text-[#FF8000]">{step.name}</p>
-                  <h3 className="mt-1 text-3xl font-extrabold leading-[1.12] tracking-[-0.02em] xl:text-4xl">{step.title}</h3>
-                  <p className="mt-4 text-base leading-relaxed text-neutral-300">{step.text}</p>
+                  <p className="mt-4 text-base font-bold text-[#FF8000]">{step.name}</p>
+                  <h3 className="mt-1 text-2xl font-extrabold leading-[1.12] tracking-[-0.02em] xl:text-3xl">{step.title}</h3>
+                  <p className="mt-3 text-[15px] leading-relaxed text-neutral-300">{step.text}</p>
                   <div className="mt-6">
                     <GoalTag goal={step.goal} />
                   </div>
                 </motion.div>
               </AnimatePresence>
-              <div className="mt-8 flex items-center gap-3">
+              <div className="mt-6 flex items-center gap-3">
                 <button type="button" onClick={() => jump(active - 1)} disabled={active === 0} aria-label="Paso anterior" className={`${arrow} border-white/25 text-white`}>
                   <ArrowLeft size={18} />
                 </button>
@@ -366,7 +367,7 @@ export function ProcessSection() {
             </div>
 
             <AnimatePresence mode="wait" initial={false}>
-              <motion.div key={active} exit={{ opacity: 0, transition: { duration: 0.15 } }}>
+              <motion.div key={active} exit={{ opacity: 0, transition: { duration: 0.15 } }} className="origin-center scale-[0.82]">
                 <step.Scene live />
               </motion.div>
             </AnimatePresence>
@@ -375,7 +376,7 @@ export function ProcessSection() {
       </div>
 
       {/* Móvil: secuencia vertical; cada maqueta se monta al entrar en pantalla. */}
-      <div className="px-5 py-12 md:py-20 lg:hidden">
+      <div className="px-5 py-10 md:py-14 lg:hidden">
         <Heading />
         <SwipeRow dark label="Pasos del sistema" className="-mx-5 mt-6 scroll-pl-5 px-5 md:mt-10">
           {STEPS.map((s, i) => (
@@ -387,8 +388,8 @@ export function ProcessSection() {
               <h3 className="mt-1 text-xl font-extrabold leading-tight tracking-[-0.02em]">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-neutral-300">{s.text}</p>
               {/* Las maquetas se diseñaron a 20rem: se reducen enteras, sin recolocar piezas. */}
-              <div className="relative mx-auto mt-3 size-56 overflow-hidden">
-                <div className="absolute top-0 left-0 w-80 origin-top-left scale-[0.7]">
+              <div className="relative mx-auto mt-3 size-48 overflow-hidden">
+                <div className="absolute top-0 left-0 w-80 origin-top-left scale-[0.6]">
                   <s.Scene live={false} />
                 </div>
               </div>

@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { CLIENT_LOGOS } from '@/data/client-logos';
+import { LogosHop } from '@/components/ui/logos-hop';
 import { navigateTo } from '@/lib/utils';
+import { useUI } from '@/context/UIContext';
 
 const EXPO: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const SNAPPY = 'ease-[cubic-bezier(0.23,1,0.32,1)]';
 
-// Hero: el mensaje sobre un fondo de estrellas y, debajo, el carrusel de
-// inmobiliarias y las cifras.
+// Hero: el mensaje sobre un fondo de estrellas y, debajo, la animación de
+// inmobiliarias saltando a la caja y las cifras.
 
 const METRICS = [
   { value: '+11 años', label: 'en el sector inmobiliario' },
@@ -62,38 +63,8 @@ function StarField() {
   );
 }
 
-// El duplicado del carrusel existe solo para que el bucle no se corte: sus enlaces
-// quedan fuera del tabulador. Las inmobiliarias sin ficha no llevan enlace.
-function LogoBubble({ logo, duplicate }: { logo: (typeof CLIENT_LOGOS)[number]; duplicate: boolean }) {
-  const circle = (
-    <span
-      className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-[0_8px_24px_rgba(0,0,0,0.08)] ring-1 ring-black/5 md:size-20"
-    >
-      <img src={logo.circle ?? logo.src} alt={logo.profile ? '' : logo.alt} title={logo.alt} decoding="async" className="h-full w-full object-cover" />
-    </span>
-  );
-  if (!logo.profile) return circle;
-
-  const href = `/inmobiliarias-en-${logo.profile}`;
-  return (
-    <a
-      href={href}
-      onClick={(e) => {
-        e.preventDefault();
-        navigateTo(href);
-      }}
-      aria-label={`Ver la ficha de ${logo.alt}`}
-      tabIndex={duplicate ? -1 : undefined}
-      className={`block shrink-0 rounded-full transition-transform duration-200 ${SNAPPY} hover:scale-110 focus-visible:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] focus-visible:ring-offset-2`}
-    >
-      {circle}
-    </a>
-  );
-}
-
-const FADE_SIDES = 'linear-gradient(to right, transparent, #000 8%, #000 92%, transparent)';
-
 export function TrustVideoWall() {
+  const { openContactModal } = useUI();
   return (
     <section aria-labelledby="trust-wall-title" className="relative flex w-full flex-col overflow-hidden bg-white text-[#0A0A0A] xl:min-h-[calc(100svh-6rem)]">
       <StarField />
@@ -114,13 +85,14 @@ export function TrustVideoWall() {
         </p>
 
         <div className="mt-5 flex flex-col items-center gap-1 sm:flex-row sm:gap-3 md:mt-7">
-          <a
-            href="#servicios"
+          <button
+            type="button"
+            onClick={() => openContactModal({ sourceContext: 'home_hero' })}
             className={`group inline-flex min-h-12 items-center gap-2 rounded-lg bg-[#FF8000] px-7 text-sm font-bold text-white transition-[background-color,transform] duration-150 ${SNAPPY} hover:bg-[#E67300] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2`}
           >
             Conoce nuestros servicios
             <ArrowRight size={16} className={`transition-transform duration-200 ${SNAPPY} group-hover:translate-x-0.5`} />
-          </a>
+          </button>
           <a
             href="#testimonios"
             className="inline-flex min-h-12 items-center px-5 text-sm font-semibold underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
@@ -146,23 +118,7 @@ export function TrustVideoWall() {
         </nav>
       </div>
 
-      {/* Carrusel: se pausa al pasar el ratón, al tocarlo o al tabular dentro. */}
-      <div className="relative">
-        <p className="px-5 pb-3 text-center text-sm font-medium text-neutral-600">Inmobiliarias que ya captan con Cosiris · pulsa un logo para ver su minisite</p>
-        <div className="group overflow-hidden" style={{ maskImage: FADE_SIDES, WebkitMaskImage: FADE_SIDES }}>
-          <div className="animate-marquee -mb-6 flex w-max items-center pt-2 pb-8" style={{ animationDuration: '120s' }}>
-            {[false, true].map((hidden) => (
-              <div key={String(hidden)} aria-hidden={hidden || undefined} className="flex items-center gap-4 pr-4 md:gap-8 md:pr-8">
-                {CLIENT_LOGOS.map((logo) => (
-                  <LogoBubble key={logo.src} logo={logo} duplicate={hidden} />
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="relative mx-auto w-full max-w-5xl px-5 pt-3 pb-8 md:pt-6 md:pb-24">
+      <div className="relative mx-auto w-full max-w-5xl px-5 pt-3 pb-6 md:pt-6 md:pb-10">
         <dl className="grid grid-cols-3 divide-x divide-neutral-200 rounded-2xl border border-neutral-200 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
           {METRICS.map((m) => (
             <div key={m.value} className="flex flex-col items-center gap-1 px-2 py-3 text-center md:px-6 md:py-6">
@@ -171,6 +127,11 @@ export function TrustVideoWall() {
             </div>
           ))}
         </dl>
+      </div>
+
+      {/* Inmobiliarias saltando a la caja (se detiene al pasar el ratón o tabular dentro). */}
+      <div className="relative mx-auto w-full max-w-6xl px-6 pb-6 md:px-10 md:pb-10">
+        <LogosHop />
       </div>
     </section>
   );

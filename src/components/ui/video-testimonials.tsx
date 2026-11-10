@@ -33,7 +33,7 @@ export function VideoTestimonials() {
                 type="button"
                 onClick={() => setActiveVideo(t.id)}
                 aria-label={`Haz clic para escuchar el testimonio de ${t.company}`}
-                className="group relative block aspect-video w-full shrink-0 cursor-pointer overflow-hidden bg-neutral-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E67300]"
+                className={`group relative block ${t.short ? 'aspect-[9/16]' : 'aspect-video'} w-full shrink-0 cursor-pointer overflow-hidden bg-neutral-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E67300]`}
               >
                 {/* hqdefault es 4:3 con franjas negras: el recorte 16:9 ya las elimina. */}
                 <img
@@ -43,7 +43,7 @@ export function VideoTestimonials() {
                   decoding="async"
                   width={480}
                   height={360}
-                  className={`h-full w-full object-cover transition-transform duration-300 ${SNAPPY} [@media(hover:hover)]:group-hover:scale-[1.03]`}
+                  className={`h-full w-full object-cover transition-transform duration-300 ${SNAPPY} ${t.short ? 'scale-[1.32] [@media(hover:hover)]:group-hover:scale-[1.38]' : '[@media(hover:hover)]:group-hover:scale-[1.03]'}`}
                 />
                 <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/80 px-3 py-1.5 text-xs font-bold text-white">
                   <Play size={12} fill="currentColor" strokeWidth={0} aria-hidden="true" />
@@ -74,8 +74,10 @@ export function VideoTestimonials() {
                 )}
                 {filled(t.quote) ? (
                   <p className="mt-3 mb-4 border-t border-neutral-200 pt-3 text-[15px] font-semibold italic leading-snug">“{t.quote}”</p>
-                ) : (
+                ) : videoTitle(t.id) ? (
                   <p className="mt-3 mb-4 border-t border-neutral-200 pt-3 text-[15px] font-semibold leading-snug">{videoTitle(t.id)}</p>
+                ) : (
+                  <div className="mb-4" />
                 )}
                 <button
                   type="button"
@@ -90,7 +92,7 @@ export function VideoTestimonials() {
         ))}
       </SwipeRow>
 
-      {activeVideo && <VideoModal videoId={activeVideo} onClose={closeVideo} />}
+      {activeVideo && <VideoModal videoId={activeVideo} onClose={closeVideo} vertical={HOME_TESTIMONIALS.find((t) => t.id === activeVideo)?.short} />}
     </>
   );
 }

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, ArrowUpRight, MessageCircle, Play, Plus } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, MessageCircle, Play, Plus } from 'lucide-react';
 import { useUI } from '@/context/UIContext';
 import { navigateTo } from '@/lib/utils';
 import { FAQS } from '@/data/faqs';
-import { LogosHop } from '@/components/ui/logos-hop';
 import { TeamVideo } from '@/components/ui/team-video';
-import { VideoTestimonials } from '@/components/ui/video-testimonials';
+import { TEAM_PILLARS } from '@/data/team-pillars';
+import { VideoGrid } from '@/components/ui/video-grid';
 
 // Secciones de la home, en estilo editorial. Siguen el guion de contenido de
 // Cosiris: qué servicios hay, quién lo cuenta, quiénes somos y dudas. La evolución
@@ -118,7 +118,7 @@ export function ServicesSection() {
   const [playing, setPlaying] = useState(false);
 
   return (
-    <section className="w-full bg-white py-12 md:py-28">
+    <section className="w-full bg-[#FFF8F1] py-12 md:py-28">
       <div className={WRAP}>
         <div className="grid grid-cols-1 items-center gap-6 md:gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
           <Reveal>
@@ -190,25 +190,10 @@ export function ServicesSection() {
 
 export function ClientsSection() {
   return (
-    <section id="testimonios" className="w-full scroll-mt-16 bg-[#FFF8F1] py-12 md:py-28">
-      <div className={WRAP}>
-        <Reveal className="mb-6 md:mb-12">
-          <h2 className={H2}>
-            Ellos ya trabajan con nosotros. <span className="block text-[#E67300]">Ahora es tu turno.</span>
-          </h2>
-          <p className={`mt-3 ${LEAD}`}>No te lo contamos nosotros: te lo cuentan las inmobiliarias.</p>
-        </Reveal>
-
-        <VideoTestimonials />
-
-        <div className="mt-5 flex justify-center md:mt-8">
-          <LinkButton href="/servicios#testimonios">Ver todos los testimonios</LinkButton>
-        </div>
-
-        <h3 className="mt-10 mb-3 text-xl font-extrabold tracking-[-0.02em] md:mt-24 md:text-2xl">Inmobiliarias que confían en Cosiris</h3>
-        <LogosHop />
-
-        <div className="mt-6 flex flex-wrap gap-3 md:mt-8">
+    <section id="testimonios" className="w-full scroll-mt-16 bg-white">
+      <VideoGrid agencyMedia />
+      <div className={`${WRAP} pt-8 pb-12 md:pb-20`}>
+        <div className="flex flex-wrap gap-3">
           <LinkButton href="/inmobiliarias">Inmobiliarias en tu zona</LinkButton>
           <span className="hidden md:contents">
             <LinkButton href={YOUTUBE_URL}>Más vídeos en YouTube</LinkButton>
@@ -237,8 +222,23 @@ export function AboutSection() {
           <p className={`mt-4 max-w-2xl ${LEAD}`}>
             Nuestro equipo lleva más de 11 años visitando inmobiliarias. Sabemos lo que es perseguir a un propietario que no contesta o perder una exclusiva por llegar tarde. Por eso trabajamos al lado de tu equipo, no por libre.
           </p>
-          <div className="mt-5 md:mt-6">
-            <LinkButton href="/nosotros">Conoce al equipo</LinkButton>
+          {/* El contenido de /nosotros, aquí mismo: sin enviar a otra página. */}
+          <div className="mt-6 grid grid-cols-1 gap-6 md:mt-10 md:grid-cols-3 md:gap-8">
+            {TEAM_PILLARS.map((p) => (
+              <div key={p.title} className="border-t-2 border-[#FF8000] pt-4">
+                <p.icon size={22} aria-hidden="true" className="text-[#E67300]" />
+                <h3 className="mt-2 text-lg font-extrabold tracking-tight">{p.title}</h3>
+                {p.subtitle && <p className="mt-0.5 text-[13px] font-semibold leading-snug text-neutral-600">{p.subtitle}</p>}
+                <ul className="mt-3 space-y-1.5">
+                  {p.checks.map((c) => (
+                    <li key={c} className="flex items-start gap-2 text-sm leading-snug text-neutral-700">
+                      <Check size={15} strokeWidth={3} aria-hidden="true" className="mt-0.5 shrink-0 text-[#E67300]" />
+                      {c}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </Reveal>
       </div>

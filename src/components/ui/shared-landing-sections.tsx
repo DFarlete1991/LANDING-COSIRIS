@@ -90,7 +90,7 @@ export function FadeUp({
   );
 }
 
-export function VideoModal({ videoId, onClose }: { videoId: string; onClose: () => void }) {
+export function VideoModal({ videoId, onClose, vertical = false }: { videoId: string; onClose: () => void; vertical?: boolean }) {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handleKey);
@@ -107,14 +107,14 @@ export function VideoModal({ videoId, onClose }: { videoId: string; onClose: () 
         onClick={onClose}
       >
         <motion.div
-          className="relative w-full max-w-3xl overflow-hidden rounded-xl shadow-2xl"
+          className={`relative w-full overflow-hidden rounded-xl shadow-2xl ${vertical ? 'max-w-[min(24rem,calc(85vh*0.5625))]' : 'max-w-3xl'}`}
           initial={{ opacity: 0, scale: 0.95, y: 24 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.4, ease: EXPO }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="aspect-video w-full bg-black">
+          <div className={`${vertical ? 'aspect-[9/16]' : 'aspect-video'} w-full bg-black`}>
             <iframe
               className="h-full w-full"
               src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}

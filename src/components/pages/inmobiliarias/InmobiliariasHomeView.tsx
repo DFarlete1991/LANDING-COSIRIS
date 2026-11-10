@@ -32,6 +32,7 @@ import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 import { useValidImageUrl } from '@/lib/use-valid-image-url';
 import { optimizedImageUrl } from '@/lib/image-optimize';
 import { FadeImage } from '../../ui/FadeImage';
+import { VideoGrid } from '../../ui/video-grid';
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -51,7 +52,7 @@ function Reveal({ children, delay = 0, className }: { children: React.ReactNode;
 
 // Sin foto ni video reproducible, la tarjeta caía al video genérico de fondo
 // como último recurso — mejor no mostrar la inmobiliaria en este carrusel.
-function hasShowcaseMedia(agency: InmobiliariaPublica): boolean {
+export function hasShowcaseMedia(agency: InmobiliariaPublica): boolean {
   if (agency.foto_url) return true;
   if (!agency.media_presentacion_url) return false;
   return !!getVideoEmbed(agency.media_presentacion_url) || isDirectVideoUrl(agency.media_presentacion_url);
@@ -132,7 +133,8 @@ function cardImageUrl(agency: InmobiliariaPublica): string | null {
   return embed?.platform === 'youtube' ? `https://img.youtube.com/vi/${embed.id}/mqdefault.jpg` : null;
 }
 
-function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica; agencies: InmobiliariaPublica[] }) {
+// `onSelect` sustituye la navegación a la ficha (la home abre el vídeo en grande).
+export function AgencyShowcaseCard({ agency, agencies, onSelect }: { agency: InmobiliariaPublica; agencies: InmobiliariaPublica[]; onSelect?: () => void }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [inView, setInView] = useState(false);
   const [directVideoBroken, setDirectVideoBroken] = useState(false);
@@ -167,7 +169,7 @@ function AgencyShowcaseCard({ agency, agencies }: { agency: InmobiliariaPublica;
       initial={{ opacity: 0, scale: 0.94 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3, ease: EASE, layout: { duration: 0.35, ease: EASE } }}
-      onClick={() => { rememberDirectoryUrl(); navigateTo(agencyProfilePath(agency, agencies)); }}
+      onClick={onSelect ?? (() => { rememberDirectoryUrl(); navigateTo(agencyProfilePath(agency, agencies)); })}
       className="group relative w-36 shrink-0 overflow-hidden rounded-2xl bg-slate-800 shadow-2xl shadow-black/40 transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] sm:w-44 md:w-56 lg:w-64"
       style={{ aspectRatio: '9/16' }}
     >
@@ -814,6 +816,9 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           </Reveal>
         </div>
       </section>
+
+      {/* Vídeos: primero los testimonios de clientes. */}
+      <VideoGrid id="buscador-videos-title" titulo="Inmobiliarias que ya trabajan con nosotros." acento="Escúchalas de primera mano." subtitulo="Testimonios y entrevistas de las inmobiliarias de nuestra red." />
     </div>
   );
 }

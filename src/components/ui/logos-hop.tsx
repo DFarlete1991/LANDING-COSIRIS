@@ -3,7 +3,7 @@ import { CLIENT_LOGOS } from '@/data/client-logos';
 import { navigateTo } from '@/lib/utils';
 import { useFittedLogo } from '@/lib/fit-logo';
 
-const VISIBLE = 13;
+const VISIBLE = 9;
 const GRID = 15;
 const GRID_PHONE = 10;
 const SECONDS = 28;
@@ -40,15 +40,23 @@ async function loadDirectory() {
     import('@/lib/agency-url'),
   ]);
   const agencies = await fetchLiveInmobiliarias();
-  const bubbles = agencies
-    .filter((a) => a.logo_url)
-    .map((a): Bubble => {
-      const href = agencyProfilePath(a, agencies);
-      // Si es una de nuestras inmobiliarias, mejor el logo local preparado para el círculo.
-      const local = FALLBACK.find((l) => l.href === href && l.circle);
-      return local ? { ...local, alt: a.nombre_comercial.trim() } : { src: a.logo_url as string, alt: a.nombre_comercial.trim(), href };
-    });
-  return { total: agencies.length, bubbles };
+  // Una misma inmobiliaria puede estar varias veces en el directorio (sedes o
+  // fichas repetidas): se muestra una sola burbuja por nombre, enlace y logo.
+  const clave = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const vistos = new Set<string>();
+  const bubbles: Bubble[] = [];
+  for (const a of agencies) {
+    if (!a.logo_url) continue;
+    const href = agencyProfilePath(a, agencies);
+    const nombre = clave(a.nombre_comercial);
+    const claves = [`n:${nombre}`, `h:${href}`, `l:${a.logo_url}`];
+    if (claves.some((k) => vistos.has(k))) continue;
+    claves.forEach((k) => vistos.add(k));
+    // Si es una de nuestras inmobiliarias, mejor el logo local preparado para el círculo.
+    const local = FALLBACK.find((l) => l.href === href && l.circle);
+    bubbles.push(local ? { ...local, alt: a.nombre_comercial.trim() } : { src: a.logo_url as string, alt: a.nombre_comercial.trim(), href });
+  }
+  return { bubbles };
 }
 
 function HopBubble({ logo, onBroken }: { logo: Bubble; onBroken: (logo: Bubble) => void }) {
@@ -98,7 +106,6 @@ function HopBubble({ logo, onBroken }: { logo: Bubble; onBroken: (logo: Bubble) 
 export function LogosHop() {
   const rootRef = useRef<HTMLDivElement>(null);
   const [pool, setPool] = useState<Bubble[]>(FALLBACK);
-  const [total, setTotal] = useState<number | null>(null);
   const [slots, setSlots] = useState<Bubble[]>(FALLBACK.slice(0, VISIBLE));
   const queue = useRef<Bubble[]>(FALLBACK.slice(VISIBLE));
 
@@ -111,10 +118,9 @@ export function LogosHop() {
         if (!entry.isIntersecting) return;
         observer.disconnect();
         loadDirectory()
-          .then(({ total: count, bubbles }) => {
+          .then(({ bubbles }) => {
             if (cancelled || bubbles.length === 0) return;
             const mixed = shuffle(bubbles);
-            setTotal(count);
             setPool(mixed);
             setSlots(mixed.slice(0, VISIBLE));
             queue.current = mixed.slice(VISIBLE);
@@ -154,12 +160,8 @@ export function LogosHop() {
 
   return (
     <div ref={rootRef}>
-      {total !== null && (
-        <p className="mb-4 text-base text-slate-600">
-          {total} inmobiliarias en nuestro directorio. Pulsa una para ver su ficha.
-        </p>
-      )}
-      <div className="hop-track relative hidden h-80 xl:block motion-reduce:hidden">
+      <p className="mb-2 text-center text-base font-medium text-slate-700">Todos estos clientes ya confían en nosotros</p>
+      <div className="hop-track relative hidden h-64 xl:block motion-reduce:hidden">
         <span aria-hidden="true" className="absolute right-0 bottom-3 left-0 border-b-2 border-dashed border-neutral-200" />
 
         <svg aria-hidden="true" viewBox="0 0 240 180" className={BOX} style={beat} strokeLinejoin="round">
@@ -196,7 +198,7 @@ export function LogosHop() {
         </div>
       </div>
 
-      <ul className="flex flex-wrap justify-center gap-3 md:gap-4 xl:hidden motion-reduce:flex">
+      <ul className="flex flex-wrap justify-center gap-4 md:gap-6 xl:hidden motion-reduce:flex">
         {pool.slice(0, GRID).map((l, i) => (
           <li key={l.href} className={i >= GRID_PHONE ? 'hidden sm:block' : undefined}>
             <HopBubble logo={l} onBroken={dropBroken} />

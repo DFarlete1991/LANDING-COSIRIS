@@ -133,7 +133,7 @@
   83.75% { transform: translate(calc((100cqw - 21rem) * 0.9167), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
   87.38% { transform: translate(calc((100cqw - 21rem) * 0.9583), -4.5rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
   91.00% { transform: translate(calc((100cqw - 21rem) * 1.0000), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
-  95.5% { transform: translate(calc(100cqw - 14.5rem), -12.5rem); animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5); }
+  95.5% { transform: translate(calc(100cqw - 14.5rem), -10rem); animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5); }
   99.9% { transform: translate(calc(100cqw - 10.25rem), -0.5rem) scale(0.9); opacity: 1; }
   100% { transform: translate(calc(100cqw - 10.25rem), -0.5rem) scale(0.9); opacity: 0; }
 }
@@ -194,7 +194,7 @@ html {
   }
 }
 
-
-
-
-
+/* Brillo que cruza las tarjetas de carga (agency-video-skeleton). */
+@keyframes shimmer {
+  to { transform: translateX(100%); }
+}

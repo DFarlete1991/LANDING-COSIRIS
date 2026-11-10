@@ -9,11 +9,11 @@ import { ProcessSection } from '@/components/ui/process-story';
 import { useSEO } from '@/lib/seo';
 import { useFluidPage } from '@/lib/use-fluid-page';
 
-// Orden del guion de contenido de Cosiris:
-// 1. qué es Cosiris + logos y cifras, 2. evolución del sector, 3. del anuncio a la
-// captación, 4. vídeo y servicios, 5. testimonios, 6. equipo, 7. dudas,
-// 8. calculadora y contacto, con un botón flotante de dudas durante todo el
-// recorrido.
+// Orden de la home (pedido por el cliente, 2026-11-10):
+// 1. qué es Cosiris + logos y cifras, 2. evolución del sector, 3. equipo,
+// 4. vídeo y servicios, 5. del anuncio a la captación (panel negro),
+// 6. testimonios, 7. dudas, 8. calculadora y contacto, con un botón flotante
+// de dudas durante todo el recorrido. Los fondos alternan crema y blanco.
 export default function LandingPages() {
   useFluidPage();
 
@@ -33,14 +33,14 @@ export default function LandingPages() {
         <main className="relative z-20 grow">
           <TrustVideoWall />
           <EvolutionSection />
+          <AboutSection />
+          <ServicesSection />
           {/* El panel negro tiene esquinas redondeadas: cada mitad del fondo continúa
               el color de la sección vecina. */}
-          <div className="bg-[linear-gradient(#FFF8F1_50%,#FFFFFF_50%)]">
+          <div className="bg-[linear-gradient(#FFF8F1_50%,#FFFFFF_50%)] lg:bg-[linear-gradient(#FFF8F1,#FFFFFF)] lg:py-6">
             <ProcessSection />
           </div>
-          <ServicesSection />
           <ClientsSection />
-          <AboutSection />
           <FaqSection />
           <AuthorityPage />
           <Footer />

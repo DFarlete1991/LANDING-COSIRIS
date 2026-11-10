@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { animate, motion, useInView, useReducedMotion } from 'framer-motion';
-import { ArrowRight, Calendar, Check, Layers, Mic, Play, TrendingUp, Volume2, VolumeX, Youtube } from 'lucide-react';
+import { ArrowRight, Check, Mic, Play, Volume2, VolumeX, Youtube } from 'lucide-react';
 import { useUI } from '@/context/UIContext';
 import { LandingNavbar } from '@/components/pages/landing-navbar';
 import { Footer } from '@/components/Footer';
@@ -9,6 +9,7 @@ import { SwipeRow } from '@/components/ui/swipe-row';
 import { TeamVideo } from '@/components/ui/team-video';
 import { useSEO } from '@/lib/seo';
 import { useFluidPage } from '@/lib/use-fluid-page';
+import { TEAM_PILLARS as PILLARS } from '@/data/team-pillars';
 
 const EXPO: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const SNAPPY = 'ease-[cubic-bezier(0.23,1,0.32,1)]';
@@ -98,25 +99,6 @@ const STATS = [
   { target: 11, prefix: '+', label: 'Años de experiencia real' },
   { target: 1000, prefix: '+', label: 'Inmobiliarias visitadas' },
   { target: 100, suffix: '%', label: 'Digitalizamos tu negocio' },
-];
-
-const PILLARS = [
-  {
-    icon: TrendingUp,
-    title: 'Trayectoria real',
-    checks: ['Especializados en el sector inmobiliario', 'Más de 11 años de experiencia', 'Visitando a inmobiliarias de toda España'],
-  },
-  {
-    icon: Layers,
-    title: 'Servicios',
-    subtitle: 'Un único proveedor para todo lo digital',
-    checks: ['Gestión de redes', 'Captación de leads', 'Email marketing', 'Automatizaciones IA'],
-  },
-  {
-    icon: Calendar,
-    title: 'Condiciones de pago',
-    checks: ['Sin pagos por adelantado', 'La fidelidad tiene premio'],
-  },
 ];
 
 const VIDEOS = [
