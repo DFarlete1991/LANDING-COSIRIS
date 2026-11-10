@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback, useState } from 'react';
 import { ArrowRight, Play } from 'lucide-react';
 import { VideoModal } from '@/components/ui/shared-landing-sections';
-import { SHORTS_CLIENTES, VIDEO_GRID, type VideoTestimonial } from '@/data/video-testimonials';
+import { VIDEO_GRID, type VideoTestimonial } from '@/data/video-testimonials';
 import { navigateTo } from '@/lib/utils';
 import { AgencyVideoSkeleton } from '@/components/ui/agency-video-skeleton';
 
@@ -66,16 +66,18 @@ function VideoCard({ video, onPlay, visibility }: { video: VideoTestimonial; onP
 // Muro de vídeos en tarjetas: filtro por tipo, cuadrícula uniforme y reproducción
 // en ventana emergente. El reproductor de YouTube no se carga hasta el clic: aquí
 // solo hay miniaturas. Se muestran dos filas y el resto se despliega con un botón.
-// Con `agencyMedia` (home) solo salen los shorts de clientes, sin filtros, y el
-// botón trae las fotos y vídeos de las inmobiliarias del buscador (no más
-// vídeos de YouTube).
+// Con `agencyMedia` (home) el despliegue va en dos pasos: el primer "Ver más
+// vídeos" saca el resto de YouTube y el segundo, en "Todos", los vídeos de las
+// inmobiliarias del buscador (por lotes).
 export function VideoGrid({ id = 'testimonios-title', titulo, acento, subtitulo, agencyMedia = false }: { id?: string; titulo?: string; acento?: string; subtitulo?: string; agencyMedia?: boolean } = {}) {
   const [filter, setFilter] = useState<Filter>('Todos');
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
+  // Segundo "Ver más vídeos" (solo home): tras los de YouTube, los de las inmobiliarias.
+  const [showAgencies, setShowAgencies] = useState(false);
   const closeVideo = useCallback(() => setActiveVideo(null), []);
   // "Todos" deja fuera el vídeo que repite testimonio; sigue en su filtro.
-  const videos = agencyMedia ? SHORTS_CLIENTES : VIDEO_GRID.filter((v) => (filter === 'Todos' ? !v.repeat : v.category === filter));
+  const videos = VIDEO_GRID.filter((v) => (filter === 'Todos' ? !v.repeat : v.category === filter));
   const visibilityOf = (index: number) => {
     if (showAll || index < BASE_VIDEOS) return undefined;
     return index < WIDE_VIDEOS ? 'hidden xl:block' : 'hidden';
@@ -94,7 +96,7 @@ export function VideoGrid({ id = 'testimonios-title', titulo, acento, subtitulo,
             </p>
           </div>
 
-          {!agencyMedia && <div className="flex shrink-0 flex-wrap gap-2" role="group" aria-label="Filtrar vídeos">
+          <div className="flex shrink-0 flex-wrap gap-2" role="group" aria-label="Filtrar vídeos">
             {FILTERS.map((f) => (
               <button
                 key={f}
@@ -108,7 +110,7 @@ export function VideoGrid({ id = 'testimonios-title', titulo, acento, subtitulo,
                 {f}
               </button>
             ))}
-          </div>}
+          </div>
         </div>
 
         <ul className="mt-5 flex flex-wrap justify-center gap-3 md:mt-8 md:gap-5 [&>li]:w-[calc((100%-0.75rem)/2)] md:[&>li]:w-[calc((100%-1.25rem)/2)] lg:[&>li]:w-[calc((100%-2.5rem)/3)] xl:[&>li]:w-[calc((100%-3.75rem)/4)]">
@@ -117,7 +119,7 @@ export function VideoGrid({ id = 'testimonios-title', titulo, acento, subtitulo,
           ))}
         </ul>
 
-        {agencyMedia && showAll && (
+        {agencyMedia && showAgencies && filter === 'Todos' && (
           <Suspense fallback={<AgencyVideoSkeleton />}>
             <AgencyShowcaseMore />
           </Suspense>
@@ -127,10 +129,22 @@ export function VideoGrid({ id = 'testimonios-title', titulo, acento, subtitulo,
           {agencyMedia && showAll && (
             <button
               type="button"
-              onClick={() => setShowAll(false)}
+              onClick={() => {
+                setShowAll(false);
+                setShowAgencies(false);
+              }}
               className="min-h-12 cursor-pointer rounded-lg border border-neutral-300 bg-white px-6 text-sm font-bold text-black transition-colors duration-150 hover:border-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300]"
             >
               Ver menos
+            </button>
+          )}
+          {agencyMedia && showAll && !showAgencies && filter === 'Todos' && (
+            <button
+              type="button"
+              onClick={() => setShowAgencies(true)}
+              className="min-h-12 cursor-pointer rounded-lg border border-neutral-300 bg-white px-6 text-sm font-bold text-black transition-colors duration-150 hover:border-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300]"
+            >
+              Ver más vídeos
             </button>
           )}
           {!showAll && (agencyMedia || videos.length > BASE_VIDEOS) && (

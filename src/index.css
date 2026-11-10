@@ -198,3 +198,13 @@ html {
 @keyframes shimmer {
   to { transform: translateX(100%); }
 }
+
+/* Fondo de la portada: deriva y respiración lentas (hero-backdrop). */
+@keyframes backdrop-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-2.5rem, 1.75rem); }
+}
+@keyframes backdrop-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}

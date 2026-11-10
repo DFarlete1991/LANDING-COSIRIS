@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { LogosHop } from '@/components/ui/logos-hop';
+import { HeroBackdrop } from '@/components/ui/hero-backdrop';
 import { navigateTo } from '@/lib/utils';
 import { useUI } from '@/context/UIContext';
 
@@ -66,7 +67,9 @@ function StarField() {
 export function TrustVideoWall() {
   const { openContactModal } = useUI();
   return (
-    <section aria-labelledby="trust-wall-title" className="relative flex w-full flex-col overflow-hidden bg-white text-[#0A0A0A] xl:min-h-[calc(100svh-6rem)]">
+    <section aria-labelledby="trust-wall-title" className="relative isolate flex w-full flex-col overflow-hidden bg-gradient-to-b from-[#FFF8F1] via-[#FFFCF8] to-white text-[#0A0A0A] xl:min-h-[calc(100svh-6rem)]">
+      {/* El mismo fondo que la cabecera de /servicios, con las estrellas encima. */}
+      <HeroBackdrop animated />
       <StarField />
 
       <div className="relative flex flex-1 flex-col items-center justify-center px-5 pt-8 pb-4 text-center md:pt-20 md:pb-10">
