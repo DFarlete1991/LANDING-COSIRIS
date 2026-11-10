@@ -2,7 +2,8 @@ import { useEffect, useState, lazy, Suspense } from 'react';
 import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { useUI } from './context/UIContext';
 import { parseAgencyProfilePath } from '@/lib/agency-url';
-import { captureAttribution } from '@/lib/utm';
+import { captureAttribution } from '@/lib/utm';
+import { onFirstInteraction } from '@/lib/first-interaction';
 import { applyStoredConsentOnLoad, syncOpenAIRoute } from '@/lib/cookieConsent';
 
 // ContactModal arrastraba react-select + las banderas de país (~290 kB) al
@@ -77,22 +78,12 @@ function ContactModalMount() {
     if (isContactModalOpen) setMounted(true);
   }, [isContactModalOpen]);
 
-  // Precarga en cuanto el navegador queda ocioso, para que el chunk ya esté
-  // en caché al pulsar el CTA y no se note la descarga. `timeout` cubre el
-  // caso de una pestaña que nunca llega a estar ociosa.
+  // Precarga en la primera interacción (o a los 12 s), para que el chunk ya
+  // esté en caché al pulsar el CTA sin competir con la carga inicial: antes se
+  // pedía al quedar ocioso y sumaba ~35 kB de react-select al arranque.
   useEffect(() => {
     if (mounted) return;
-    const preload = () => { void import('./components/ContactModal'); };
-    // Safari no tuvo requestIdleCallback hasta la 18: se comprueba con un
-    // booleano aparte porque `'x' in window` estrecha el tipo de window y deja
-    // la rama del setTimeout como inalcanzable para TypeScript.
-    const supportsIdleCallback = typeof window.requestIdleCallback === 'function';
-    if (supportsIdleCallback) {
-      const id = window.requestIdleCallback(preload, { timeout: 3000 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const id = window.setTimeout(preload, 2000);
-    return () => window.clearTimeout(id);
+    return onFirstInteraction(() => { void import('./components/ContactModal'); });
   }, [mounted]);
 
   if (!mounted) return null;

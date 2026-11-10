@@ -1,0 +1,28 @@
+{
+  "specVersion": "1.0",
+  "entries": [
+    {
+      "identifier": "urn:air:cosiris.com:docs:llms-txt",
+      "displayName": "Cosiris: guía para asistentes de IA",
+      "description": "Resumen en Markdown de Cosiris, agencia de marketing y captación para inmobiliarias en España: servicios, calculadora ROI, buscador de inmobiliarias y contacto.",
+      "type": "text/markdown",
+      "url": "https://cosiris.com/llms.txt",
+      "representativeQueries": [
+        "¿Qué servicios de marketing ofrece Cosiris a las inmobiliarias?",
+        "¿Cómo capta Cosiris propietarios que quieren vender su vivienda?",
+        "¿Cuánto cuesta el plan de captación de Cosiris?"
+      ]
+    },
+    {
+      "identifier": "urn:air:cosiris.com:docs:sitemap",
+      "displayName": "Cosiris: mapa del sitio",
+      "description": "Todas las páginas públicas de cosiris.com, incluidas las fichas de las inmobiliarias del buscador.",
+      "type": "application/xml",
+      "url": "https://cosiris.com/sitemap.xml",
+      "representativeQueries": [
+        "¿Qué inmobiliarias trabajan con Cosiris en mi ciudad?",
+        "¿Dónde está la calculadora ROI de Cosiris?"
+      ]
+    }
+  ]
+}

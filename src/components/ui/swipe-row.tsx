@@ -27,10 +27,15 @@ export function SwipeRow({ children, className = '', arrowsClassName = '', dark 
     setEdges({ start: row.scrollLeft < 8, end: row.scrollLeft + row.clientWidth >= row.scrollWidth - 8 });
   }, []);
 
+  // ResizeObserver avisa después de calcular el diseño (y una vez al empezar):
+  // medir en el montaje obligaba al navegador a recalcular toda la página antes
+  // de tiempo (Lighthouse: "redistribución forzada", ~200 ms en móvil).
   useEffect(() => {
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
+    const row = rowRef.current;
+    if (!row) return;
+    const observer = new ResizeObserver(update);
+    observer.observe(row);
+    return () => observer.disconnect();
   }, [update]);
 
   const move = (direction: 1 | -1) => {

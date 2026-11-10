@@ -23,7 +23,6 @@ function VideoCard({ video, onPlay, visibility }: { video: VideoTestimonial; onP
       <button
         type="button"
         onClick={onPlay}
-        aria-label={`Ver vídeo: ${video.title}, ${video.agency}`}
         className={`group flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl bg-white text-left shadow-[0_6px_20px_rgba(0,0,0,0.08)] transition-[box-shadow,transform] duration-200 ${SNAPPY} active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] focus-visible:ring-offset-2 [@media(hover:hover)]:hover:-translate-y-1 [@media(hover:hover)]:hover:shadow-[0_12px_28px_rgba(0,0,0,0.12)]`}
       >
         <span className="relative block aspect-video shrink-0 overflow-hidden bg-neutral-200">
@@ -52,7 +51,7 @@ function VideoCard({ video, onPlay, visibility }: { video: VideoTestimonial; onP
           </span>
         </span>
         <span className="flex flex-1 flex-col p-3 md:p-4">
-          <span className="line-clamp-3 min-h-[3.75em] text-[13px] font-bold leading-[1.25] tracking-tight text-black md:line-clamp-2 md:min-h-[2.5em] md:text-[15px]">{video.title}</span>
+          <span className="line-clamp-3 min-h-[3.75em] text-[13px] font-bold leading-[1.25] tracking-tight text-black md:line-clamp-2 md:min-h-[2.5em] md:text-[15px]"><span className="sr-only">Ver vídeo: </span>{video.title}</span>
           <span className="mt-auto block truncate pt-1 text-xs text-neutral-600 md:text-[13px]">
             <span className="hidden md:inline">{video.who} · </span>
             {video.agency}

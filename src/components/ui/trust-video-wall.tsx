@@ -75,8 +75,10 @@ export function TrustVideoWall() {
       <div className="relative flex flex-1 flex-col items-center justify-center px-5 pt-8 pb-4 text-center md:pt-20 md:pb-10">
         <motion.h1
           id="trust-wall-title"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          // Solo sube, sin fundido: el título es el LCP y un elemento con
+          // opacidad 0 no cuenta como pintado hasta que acaba la animación.
+          initial={{ y: 20 }}
+          animate={{ y: 0 }}
           transition={{ duration: 0.7, ease: EXPO }}
           className="max-w-[22ch] text-balance text-[2.1rem] font-extrabold leading-[1.08] tracking-[-0.03em] md:text-6xl"
         >

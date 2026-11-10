@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CLIENT_LOGOS } from '@/data/client-logos';
 import { navigateTo } from '@/lib/utils';
 import { useFittedLogo } from '@/lib/fit-logo';
+import { onFirstInteraction } from '@/lib/first-interaction';
 
 const VISIBLE = 9;
 const GRID = 15;
@@ -150,30 +151,25 @@ export function LogosHop() {
   const [mini, setMini] = useState<Bubble[]>(FALLBACK.slice(VISIBLE, VISIBLE + MINI));
 
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
+    // La caja está en la portada: esperar a verla no aplazaba nada. Mientras
+    // salen los logos locales, el directorio (Supabase, ~60 kB) se pide en la
+    // primera interacción o a los 8 s, fuera de la carga inicial.
     let cancelled = false;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        observer.disconnect();
-        loadDirectory()
-          .then(({ bubbles }) => {
-            if (cancelled || bubbles.length === 0) return;
-            const mixed = shuffle(bubbles);
-            setPool(mixed);
-            setSlots(mixed.slice(0, VISIBLE));
-            setMini(mixed.slice(VISIBLE, VISIBLE + MINI));
-            queue.current = mixed.slice(VISIBLE + MINI);
-          })
-          .catch(() => undefined);
-      },
-      { rootMargin: '800px 0px' },
-    );
-    observer.observe(root);
+    const stop = onFirstInteraction(() => {
+      loadDirectory()
+        .then(({ bubbles }) => {
+          if (cancelled || bubbles.length === 0) return;
+          const mixed = shuffle(bubbles);
+          setPool(mixed);
+          setSlots(mixed.slice(0, VISIBLE));
+          setMini(mixed.slice(VISIBLE, VISIBLE + MINI));
+          queue.current = mixed.slice(VISIBLE + MINI);
+        })
+        .catch(() => undefined);
+    }, 8000);
     return () => {
       cancelled = true;
-      observer.disconnect();
+      stop();
     };
   }, []);
 

@@ -95,15 +95,20 @@ function InlineVideo({ playing, onPlay }: { playing: boolean; onPlay: () => void
           aria-label="Reproducir el vídeo: ¿Tus anuncios captan pisos o solo leads?"
           className="group absolute inset-0 cursor-pointer focus-visible:outline-none"
         >
-          <img
-            src={`https://img.youtube.com/vi/${HOW_TO_VIDEO}/maxresdefault.jpg`}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            width={1280}
-            height={720}
-            className={`absolute inset-0 h-full w-full object-cover transition-transform duration-500 ${SNAPPY} [@media(hover:hover)]:group-hover:scale-[1.02]`}
-          />
+          {/* En móvil y tablet basta la portada de 640 px (~40 kB); la de 1280 px
+              (~130 kB) solo en escritorio, donde el vídeo se ve grande. */}
+          <picture>
+            <source media="(min-width: 1024px)" srcSet={`https://img.youtube.com/vi/${HOW_TO_VIDEO}/maxresdefault.jpg`} />
+            <img
+              src={`https://img.youtube.com/vi/${HOW_TO_VIDEO}/sddefault.jpg`}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              width={1280}
+              height={720}
+              className={`absolute inset-0 h-full w-full object-cover transition-transform duration-500 ${SNAPPY} [@media(hover:hover)]:group-hover:scale-[1.02]`}
+            />
+          </picture>
           {/* Abajo a la derecha: la portada lleva el título en grande y no hay que taparlo. */}
           <span className={`absolute right-4 bottom-4 flex size-16 items-center justify-center rounded-full bg-[#FF8000] text-white shadow-md transition-transform duration-200 ${SNAPPY} group-hover:scale-105 group-focus-visible:ring-2 group-focus-visible:ring-white md:size-20`}>
             <Play size={26} fill="currentColor" strokeWidth={0} className="ml-1" />
@@ -158,22 +163,31 @@ export function ServicesSection() {
 
         <ul className="mt-5 grid grid-cols-2 gap-3 md:mt-7 md:gap-4 xl:grid-cols-4">
           {SERVICES.map((s, i) => (
-            <Reveal key={s.title} delay={i * 0.06}>
-              <li className={`flex h-full flex-col gap-2 rounded-2xl border border-neutral-200/70 bg-white p-3 shadow-[0_4px_16px_rgba(0,0,0,0.05)] md:flex-row md:items-center md:gap-4 md:p-4 transition-transform duration-200 ${SNAPPY} md:[@media(hover:hover)]:hover:-translate-y-1`}>
+            <motion.li
+              key={s.title}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.6, ease: EXPO, delay: i * 0.06 }}
+              className="h-full"
+            >
+              {/* La tarjeta va en un div propio: framer escribe el transform del li y
+                  anularía el desplazamiento al pasar el ratón. */}
+              <div className={`flex h-full flex-col gap-2 rounded-2xl border border-neutral-200/70 bg-white p-3 shadow-[0_4px_16px_rgba(0,0,0,0.05)] md:flex-row md:items-center md:gap-4 md:p-4 transition-transform duration-200 ${SNAPPY} md:[@media(hover:hover)]:hover:-translate-y-1`}>
                 <span className={`flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full md:size-24 2xl:size-28 ${s.tint}`}>
                   <img src={s.image} alt="" loading="lazy" decoding="async" width={222} height={195} className="w-full" />
                 </span>
                 <div className="flex min-w-0 flex-1 flex-col self-stretch">
                   <span className="hidden size-7 items-center justify-center rounded-full bg-[#FFF0E5] text-xs md:inline-flex font-bold tabular-nums text-[#C2410C]">0{i + 1}</span>
-                  <h4 className="flex-1 text-sm font-extrabold leading-snug md:mt-2 md:flex-none md:text-base tracking-[-0.01em]">{s.title}</h4>
+                  <h3 className="flex-1 text-sm font-extrabold leading-snug md:mt-2 md:flex-none md:text-base tracking-[-0.01em]">{s.title}</h3>
                   <p className="mt-1 hidden flex-1 text-[13px] leading-relaxed text-neutral-600 md:block">{s.text}</p>
                   <a href={s.href} onClick={go(s.href)} className="group/link inline-flex min-h-11 w-fit items-center gap-1.5 text-[13px] font-bold text-[#C2410C] underline underline-offset-4 hover:text-[#9A3412] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300]">
                     Ver servicio
                     <ArrowRight size={14} className={`transition-transform duration-200 ${SNAPPY} group-hover/link:translate-x-0.5`} aria-hidden="true" />
                   </a>
                 </div>
-              </li>
-            </Reveal>
+              </div>
+            </motion.li>
           ))}
         </ul>
 
