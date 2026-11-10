@@ -14,7 +14,7 @@ export function GraciasVenderPage() {
   });
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#FF8000]/30 flex flex-col items-center">
+    <div className="relative min-h-screen bg-white font-sans text-neutral-900 antialiased selection:bg-[#FF8000]/30 flex flex-col items-center">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-70"></div>
       <LandingNavbar />
 
@@ -25,7 +25,7 @@ export function GraciasVenderPage() {
               <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-orange-100 bg-orange-50">
                 <Check size={32} strokeWidth={2.5} className="text-[#FF8000]" />
               </div>
-              <h2 className="text-2xl font-bold tracking-tight text-slate-900 mb-3 text-center">Solicitud recibida correctamente</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-neutral-900 mb-3 text-center">Solicitud recibida correctamente</h2>
               <p className="text-center text-slate-600 mb-8 max-w-md">
                 Muchas gracias por confiar en nosotros. Nuestro equipo está analizando los datos y te contactaremos en menos de 24 horas.
               </p>

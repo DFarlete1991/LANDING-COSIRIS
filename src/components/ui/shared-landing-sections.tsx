@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { Youtube, Play, X, Users, MapPin, Calendar, Check } from 'lucide-react';
 import { TESTIMONIALS } from '@/data/testimonials';
+import { SwipeRow } from '@/components/ui/swipe-row';
 
 const EXPO: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
@@ -142,7 +143,7 @@ const VIDEOS = [
     guest: 'David Farlete',
     duration: '42 min',
     tag: 'Podcast',
-    color: 'from-slate-800 to-slate-900',
+    color: 'from-neutral-800 to-neutral-900',
   },
   {
     id: 'pUM7kt0Tcwk',
@@ -150,7 +151,7 @@ const VIDEOS = [
     guest: 'David Farlete',
     duration: '38 min',
     tag: 'Entrevista',
-    color: 'from-orange-900 to-slate-900',
+    color: 'from-orange-900 to-neutral-900',
   },
   {
     id: 'RRMdW8X_mPo',
@@ -158,7 +159,7 @@ const VIDEOS = [
     guest: 'David Farlete',
     duration: '55 min',
     tag: 'Estrategia',
-    color: 'from-slate-900 to-orange-950',
+    color: 'from-neutral-900 to-orange-950',
   },
 ];
 
@@ -214,7 +215,7 @@ export function VideoCard({
         <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#FF8000]">
           {video.guest}
         </p>
-        <h3 className="text-sm font-bold leading-snug tracking-tight text-slate-900 line-clamp-2">
+        <h3 className="text-sm font-bold leading-snug tracking-tight text-neutral-900 line-clamp-2">
           {video.title}
         </h3>
         <div className="mt-3 flex items-center gap-2">
@@ -235,7 +236,7 @@ export function SharedLandingSections({ disableYouTube = false }: { disableYouTu
     <>
       {/* 3. Trayectoria */}
       <section className="mx-auto w-full max-w-6xl px-6 py-12 md:py-16">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-8">
           {[
             {
               icon: <Users size={24} className="text-[#FF8000]" />,
@@ -271,20 +272,20 @@ export function SharedLandingSections({ disableYouTube = false }: { disableYouTu
             },
           ].map((card) => (
             <FadeIn key={card.title} delay={card.delay}>
-              <div className="group relative flex h-full flex-col rounded-2xl border border-slate-100 bg-white p-10 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 hover:border-[#FF8000]/20 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]">
-                <div className="mb-7 flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50 text-[#FF8000] transition-colors group-hover:text-white">
+              <div className="group relative flex h-full flex-col rounded-2xl border border-slate-100 bg-white p-6 md:p-10 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 hover:border-[#FF8000]/20 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]">
+                <div className="mb-4 flex h-12 w-12 items-center md:mb-7 justify-center rounded-xl bg-orange-50 text-[#FF8000] transition-colors group-hover:text-white">
                   {card.icon}
                 </div>
-                <h3 className="text-xl font-extrabold tracking-tight text-slate-900">
+                <h3 className="text-xl font-extrabold tracking-tight text-neutral-900">
                   {card.title}
                 </h3>
                 {card.subtitle && (
-                  <p className="mt-2 mb-6 text-[13px] font-semibold leading-relaxed text-slate-500">
+                  <p className="mt-2 mb-4 text-[13px] font-semibold leading-relaxed text-neutral-600 md:mb-6">
                     {card.subtitle}
                   </p>
                 )}
-                {!card.subtitle && <div className="h-6" />}
-                <ul className="flex-1 space-y-4">
+                {!card.subtitle && <div className="h-4 md:h-6" />}
+                <ul className="flex-1 space-y-2.5 md:space-y-4">
                   {card.checks.map((item, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <div className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#FF8000]/10 text-[#FF8000]">
@@ -305,13 +306,18 @@ export function SharedLandingSections({ disableYouTube = false }: { disableYouTu
       {/* 4. Social Proof */}
       <section className="mx-auto w-full max-w-6xl px-6 py-12 md:py-16">
         <FadeUp>
-          <p className="mb-8 text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
+          <p className="mb-8 text-xs font-bold uppercase tracking-[0.2em] text-neutral-600">
             Clientes reales, resultados reales.
           </p>
         </FadeUp>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <SwipeRow
+          label="Opiniones de clientes"
+          arrowsClassName="md:hidden"
+          className="-mx-6 scroll-pl-6 px-6 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:[&>li]:w-auto md:[&>li]:max-w-none"
+        >
           {TESTIMONIALS.map((t, i) => (
-            <FadeUp key={t.author} delay={i * 0.1}>
+            <li key={t.author}>
+            <FadeUp delay={i * 0.1} className="h-full">
               <figure className="rounded-xl border border-slate-200 bg-slate-50 p-6 shadow-sm flex flex-col justify-between h-full">
                 <blockquote className="text-sm leading-relaxed text-slate-700 font-medium italic flex-1">
                   "{t.quote}"
@@ -327,56 +333,63 @@ export function SharedLandingSections({ disableYouTube = false }: { disableYouTu
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-900">{t.author}</p>
+                    <p className="text-sm font-bold text-neutral-900">{t.author}</p>
                     <p className="text-xs text-slate-500">{t.role}</p>
                   </div>
                 </figcaption>
               </figure>
             </FadeUp>
+            </li>
           ))}
-        </div>
+        </SwipeRow>
       </section>
 
       {/* 5. Youtube */}
       <section className="mx-auto w-full max-w-5xl px-6 py-12 md:py-20">
         <FadeIn>
-          <div className="mb-14 max-w-2xl">
-            <span className="mb-3 inline-block text-[10px] font-bold uppercase tracking-[0.28em] text-[#FF8000]">
+          <div className="mb-8 max-w-2xl md:mb-14">
+            <span className="mb-3 inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#E67300]">
               Canal de YouTube
             </span>
-            <h2 className="text-3xl font-black tracking-tighter text-slate-900 md:text-4xl">
+            <h2 className="text-3xl font-black tracking-tighter text-neutral-900 md:text-4xl">
               Aportamos valor real al sector.
             </h2>
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <SwipeRow
+          label="Vídeos del canal de YouTube"
+          arrowsClassName="md:hidden"
+          className="-mx-6 scroll-pl-6 px-6 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:[&>li]:w-auto md:[&>li]:max-w-none"
+        >
           {VIDEOS.map((video, i) => (
-            <FadeIn key={video.id + i} delay={i * 0.1}>
-              <VideoCard video={video} onPlay={() => setActiveVideo(video.id)} disabled={disableYouTube} />
-            </FadeIn>
+            <li key={video.id + i}>
+              <FadeIn delay={i * 0.1}>
+                <VideoCard video={video} onPlay={() => setActiveVideo(video.id)} disabled={disableYouTube} />
+              </FadeIn>
+            </li>
           ))}
-        </div>
+        </SwipeRow>
       </section>
 
       {/* 6. Stats */}
-      <section className="bg-slate-50 py-16 mt-8 w-full">
+      <section className="bg-slate-50 py-8 mt-8 w-full md:py-16">
         <div className="mx-auto max-w-5xl px-6 border-y border-slate-100 py-12 md:py-16">
-          <div className="grid grid-cols-1 gap-10 text-center md:grid-cols-3">
+          <div className="grid grid-cols-3 gap-3 text-center md:gap-10">
             {[
               { target: 11, prefix: '+', suffix: '', label: 'Años de experiencia real' },
               { target: 1000, prefix: '+', suffix: '', label: 'Inmobiliarias Visitadas' },
               { target: 100, prefix: '', suffix: '%', label: 'Enfoque en captación de vendedores' },
             ].map((stat, i) => (
               <FadeIn key={stat.label} delay={i * 0.12}>
-                <p className="text-5xl font-black tracking-tighter text-slate-900 md:text-6xl">
+                <p className="text-3xl font-black tracking-tighter text-neutral-900 sm:text-5xl md:text-6xl">
                   <AnimatedCounter
                     target={stat.target}
                     prefix={stat.prefix}
                     suffix={stat.suffix}
                   />
                 </p>
-                <p className="mt-2 text-sm font-medium leading-snug text-slate-500">{stat.label}</p>
+                <p className="mt-2 text-xs font-medium leading-snug text-neutral-600 sm:text-sm">{stat.label}</p>
               </FadeIn>
             ))}
           </div>

@@ -176,7 +176,7 @@ export function AgencySearchBar({
     <div ref={wrapperRef} className="relative w-full">
       <div
         className={`flex items-center gap-2 rounded-full border border-slate-200 bg-white transition-[border-color,box-shadow] duration-200 ease-out focus-within:border-[#FF8000] focus-within:ring-4 focus-within:ring-[#FF8000]/15 ${
-          isHero ? 'p-2 shadow-2xl shadow-slate-900/20' : 'p-1 shadow-sm'
+          isHero ? 'p-2 shadow-2xl shadow-neutral-900/20' : 'p-1 shadow-sm'
         }`}
       >
         <div className="relative flex-1">
@@ -193,7 +193,7 @@ export function AgencySearchBar({
             }}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className={`w-full rounded-full bg-transparent pl-11 pr-4 font-medium text-slate-900 placeholder:text-slate-400 outline-none ${
+            className={`w-full rounded-full bg-transparent pl-11 pr-4 font-medium text-neutral-900 placeholder:text-slate-400 outline-none ${
               isHero ? 'py-3 text-base' : 'py-2.5 text-sm'
             }`}
           />
@@ -221,7 +221,7 @@ export function AgencySearchBar({
           exit={{ opacity: 0, scale: 0.95, y: -4 }}
           transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
           style={{ transformOrigin: 'top' }}
-          className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/15"
+          className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl shadow-neutral-900/15"
         >
           {suggestions.map((s, index) => (
             <li
@@ -272,7 +272,7 @@ export function AgencySearchBar({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.96 }}
             transition={{ duration: 0.25, ease: [0.19, 1, 0.22, 1] }}
-            className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-xl border border-[#FF8000]/20 bg-[#0F172A] shadow-2xl shadow-black/30"
+            className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-xl border border-[#FF8000]/20 bg-[#0A0A0A] shadow-2xl shadow-black/30"
           >
             <div className="flex items-start gap-3 p-4">
               <div className="mt-0.5 shrink-0">

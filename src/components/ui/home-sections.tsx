@@ -329,13 +329,18 @@ export function FaqSection() {
 /* ── Botón flotante de dudas ───────────────────────────────────────────── */
 
 // Aparece cuando el visitante ya ha bajado del hero (allí ya tiene el botón
-// principal) y se esconde mientras el formulario de contacto está abierto.
+// principal) y se esconde mientras el formulario de contacto está abierto y al
+// llegar al final, donde ya están el bloque de la calculadora y el pie.
 export function FloatingHelpButton() {
   const { openContactModal, isContactModalOpen } = useUI();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.6);
+    const onScroll = () => {
+      const y = window.scrollY;
+      const nearEnd = y + window.innerHeight > document.documentElement.scrollHeight - window.innerHeight * 1.2;
+      setVisible(y > window.innerHeight * 0.6 && !nearEnd);
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -350,12 +355,12 @@ export function FloatingHelpButton() {
       aria-hidden={!shown}
       aria-label="¿Dudas? Escríbenos"
       tabIndex={shown ? 0 : -1}
-      className={`fixed right-4 bottom-4 z-40 inline-flex size-14 cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-sm font-bold text-white shadow-lg shadow-black/25 ring-1 ring-white/15 transition-[opacity,transform,background-color] duration-200 ${SNAPPY} hover:bg-neutral-800 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] md:right-6 md:bottom-6 md:size-auto md:min-h-12 md:py-3 md:pr-5 md:pl-4 ${
+      className={`fixed right-4 bottom-4 z-40 inline-flex size-14 cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-sm font-bold text-white shadow-lg shadow-black/25 ring-1 ring-white/15 transition-[opacity,transform,background-color] duration-200 ${SNAPPY} hover:bg-neutral-800 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] md:right-6 md:bottom-6 lg:size-auto lg:min-h-12 lg:py-3 lg:pr-5 lg:pl-4 ${
         shown ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'
       }`}
     >
       <MessageCircle size={20} className="text-[#FF8000]" />
-      <span className="hidden md:inline">¿Dudas? Escríbenos</span>
+      <span className="hidden lg:inline">¿Dudas? Escríbenos</span>
     </button>
   );
 }

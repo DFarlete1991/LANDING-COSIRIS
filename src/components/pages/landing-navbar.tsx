@@ -13,6 +13,7 @@ export function LandingNavbar() {
 
   const links = [
     { label: 'Servicios', href: '/servicios' },
+    { label: 'Calculadora ROI', href: '/calculadora-roi' },
     { label: 'Nosotros', href: '/nosotros' },
     { label: 'Buscador de inmobiliarias', href: '/inmobiliarias' },
   ];
@@ -51,7 +52,10 @@ export function LandingNavbar() {
     }
   }, [isContactModalOpen]);
 
+  // El panel móvil va fuera del <header>: el backdrop-blur de la cabecera
+  // convierte en su referencia a los hijos `fixed` y el panel quedaba con 2 px.
   return (
+    <>
     <header
       className={cn(
         'sticky top-0 z-30 mx-auto w-full border-slate-100 font-sans bg-white/95 shadow-sm backdrop-blur-xl md:top-4 md:max-w-fit md:rounded-md md:border md:shadow-md',
@@ -109,6 +113,7 @@ export function LandingNavbar() {
           <Button
             size="icon"
             variant="outline"
+            className="size-11"
             onClick={() => setOpen(!open)}
             aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={open}
@@ -117,6 +122,7 @@ export function LandingNavbar() {
           </Button>
         </div>
       </nav>
+    </header>
 
       <div
         className={cn(
@@ -152,6 +158,6 @@ export function LandingNavbar() {
           </div>
         </div>
       </div>
-    </header>
+    </>
   );
 }

@@ -6,7 +6,7 @@ import { getAttributionFields, getAttributionSummaryLine } from '@/lib/utm';
 import { ConsentCheckbox } from './ConsentCheckbox';
 
 const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:border-[#FF8000] focus:ring-4 focus:ring-[#FF8000]/15';
+  'w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-neutral-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:border-[#FF8000] focus:ring-4 focus:ring-[#FF8000]/15';
 
 type Phase = 'idle' | 'loading' | 'sent' | 'error';
 
@@ -204,11 +204,11 @@ export function AgencyLeadForm({
           <motion.form key="s1" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.25 }} onSubmit={handleStep1} noValidate className="space-y-3">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Solicita una valoración gratuita</p>
             <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-900">Dirección de la vivienda</label>
+              <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-900">Dirección de la vivienda</label>
               <input value={direccion} onChange={(e) => setDireccion(e.target.value)} className={inputClass} placeholder="Calle, número" />
             </div>
             <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-900">Código postal</label>
+              <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-900">Código postal</label>
               <input value={cp} onChange={(e) => setCp(e.target.value.replace(/\D/g, '').slice(0, 5))} className={inputClass} placeholder="28001" />
             </div>
 
@@ -282,16 +282,16 @@ export function AgencyLeadForm({
           <motion.form key="s5" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.25 }} onSubmit={handleSubmit} noValidate className="space-y-3">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Tus datos de contacto</p>
             <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-900">Nombre</label>
+              <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-900">Nombre</label>
               <input value={nombre} onChange={(e) => setNombre(e.target.value)} className={inputClass} placeholder="Tu nombre" />
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-900">Teléfono</label>
+                <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-900">Teléfono</label>
                 <input value={telefono} onChange={(e) => setTelefono(e.target.value)} className={inputClass} placeholder="600 000 000" />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-900">Email</label>
+                <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-900">Email</label>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} placeholder="tu@email.com" />
               </div>
             </div>

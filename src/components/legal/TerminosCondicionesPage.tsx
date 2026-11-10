@@ -7,7 +7,7 @@ export function TerminosCondicionesPage() {
       <p>Cosiris le ayuda a encontrar, comprar y administrar propiedades de inversión utilizando nuestra plataforma en línea y algoritmos de IA patentados. Por favor, lea atentamente nuestros Términos y Condiciones antes de acceder o utilizar nuestra plataforma.</p>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">1. Nuestra información</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">1. Nuestra información</h2>
         <p>Nuestros términos y condiciones completos se encuentran a continuación, pero algunos puntos importantes para que usted sepa antes de convertirse en un cliente se establecen a continuación:</p>
         <ul className="list-disc pl-6 space-y-2">
           <li>Podemos modificar estas Condiciones, las características de la Plataforma o su Cuenta en cualquier momento, notificándoselo por escrito;</li>
@@ -25,14 +25,14 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">2. Introducción</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">2. Introducción</h2>
         <p>2.1 Los presentes términos y condiciones (Términos) se establecen entre CONSULTORA NEGOCIO COSIRIS SL (nosotros, nos o nuestro) y usted, conjuntamente las Partes y cada una de ellas una Parte.</p>
         <p>2.2 Proporcionamos una plataforma de software como servicio basada en la nube en la que ayudamos a los clientes a encontrar y comprar propiedades de inversión (Plataforma).</p>
         <p>2.3 En estas Condiciones, usted es la persona o entidad registrada con nosotros como titular de una Cuenta.</p>
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">3. Aceptación y licencia de la Plataforma</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">3. Aceptación y licencia de la Plataforma</h2>
         <p>3.1 Usted acepta estas Condiciones marcando la casilla, haciendo clic en "Acepto" o registráándose en la Plataforma.</p>
         <p>3.2 Al aceptar estas Condiciones y en contraprestación por los Honorarios, usted acepta designarnos para actuar como su agente exclusivo durante el Periodo de Vigencia únicamente para llevar a cabo los Servicios, incluyendo la búsqueda y tasación de inmuebles, la negociación de la compra del inmueble y la puja en subastas según sea necesario en su nombre (Servicios). Usted acepta que este nombramiento es exclusivo y nos autoriza a realizar los Servicios y cualquier otra actividad necesaria o accesoria para el correcto desempeño de los Servicios, como la contratación de terceros para realizar inspecciones de inmuebles.</p>
         <p>3.3 Usted debe ser mayor de 18 años para utilizar la Plataforma y nuestros Servicios.</p>
@@ -51,7 +51,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">4. Servicios Cosiris</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">4. Servicios Cosiris</h2>
         <p>4.1 Como contraprestación por el pago de los honorarios, nos comprometemos a proporcionarle acceso a la Plataforma, a los Servicios, a los servicios de apoyo que se detallan en esta sección y a cualquier otro servicio que acordemos prestar según lo establecido en su cuenta de la Plataforma.</p>
         <p>4.2 Nos comprometemos a hacer todo lo posible para que la Plataforma esté disponible en todo momento. No obstante, de vez en cuando podremos realizar tareas de mantenimiento razonables, tanto programadas como de emergencia, y la Plataforma podrá no estar disponible durante el tiempo en que realicemos dichas tareas de mantenimiento.</p>
         <p>4.3 Si no puede acceder a la Plataforma, o si tiene cualquier otra pregunta o problema que afecte a su uso y disfrute de la Plataforma, debe solicitarlo por teléfono o por correo electrónico. Nos esforzaremos por responder a cualquier solicitud de asistencia en un plazo razonable.</p>
@@ -62,7 +62,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">5. Cuentas</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">5. Cuentas</h2>
         <p>5.1 Debe registrarse en la Plataforma y crear una cuenta (Cuenta) para acceder a las funciones de la Plataforma y a los Servicios.</p>
         <p>5.2 Cuando se registre para crear una Cuenta, deberá facilitar información básica, como su nombre de contacto, dirección de correo electrónico, número de teléfono y datos de inversión, y deberá elegir una contraseña.</p>
         <p>5.3 Una vez que haya registrado una Cuenta, la información de su Cuenta se utilizará para crear un perfil que podrá conservar.</p>
@@ -74,7 +74,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">6. Tarifas, pago y plazo</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">6. Tarifas, pago y plazo</h2>
         <p>6.1 Una vez que haya creado una Cuenta, se compromete a pagar las tarifas establecidas en la Plataforma (Tarifa de contratación) en la fecha especificada en la Plataforma (Fecha de pago) para acceder/utilizar determinadas funciones de la Plataforma y beneficiarse de su Cuenta.</p>
         <p>6.2 Su Cuenta está sujeta a un plazo mínimo, tal y como se establece en la Plataforma (Plazo Mínimo). Sin perjuicio de los derechos que le otorga la Ley del Consumidor de Australia, sólo podrá cancelar su Cuenta cuando expire el Plazo Mínimo.</p>
         <p>6.3 Una vez que haya creado una Cuenta, se compromete a pagar la cuota establecida en la Plataforma (Cuota de Contratación) antes de la fecha de finalización de su Plazo Mínimo, si no ha adquirido una propiedad de conformidad con las Condiciones, y si así lo acuerdan las Partes, renovaremos su Plazo por otros 6 meses (Plazo de Renovación) y no se le cobrará una nueva Cuota de Contratación. Sin limitar sus derechos en virtud de la Ley del Consumidor de Australia, puede cancelar su Cuenta en cualquier momento de acuerdo con la cláusula "Cancelación de Cuentas" de estas Condiciones, pero la cancelación sólo tendrá efecto a partir de la expiración del Plazo Mínimo o del Plazo de Renovación al que se haya comprometido.</p>
@@ -88,7 +88,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">7. Pago de las tasas</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">7. Pago de las tasas</h2>
         <p>7.1 Como contraprestación por la prestación de los Servicios, usted se compromete a pagarnos la Comisión de Éxito del Agente del Comprador establecida en la Plataforma (Comisión de Éxito del Agente del Comprador) y los Gastos en que se haya incurrido con su consentimiento cuando se produzca alguno de los siguientes supuestos:</p>
         <ul className="list-disc pl-6 space-y-2">
           <li>(a) cuando usted o cualquiera de sus Afiliadas celebre, o procure que cualquier otra persona o entidad celebre, un contrato de compra de un Inmueble Relevante (Contrato de Compraventa) durante el Periodo de Vigencia, y se intercambie un Contrato de Compraventa entre el comprador y el vendedor (tanto si el Contrato de Compraventa está sujeto a aprobaciones o condiciones que aún no se hayan cumplido como si no, e independientemente de si el Contrato de Compraventa se completa en la liquidación); o bien</li>
@@ -106,7 +106,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">8. Sus obligaciones</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">8. Sus obligaciones</h2>
         <p>8.1 Al aceptar estas Condiciones, usted se compromete a:</p>
         <ul className="list-disc pl-6 space-y-2">
           <li>(a) notificarnos por escrito cualquier modificación de los datos personales o de las especificaciones de la propiedad que figuran en la sección "Formulario del Comprador" de la Plataforma, o cualquier hecho material relativo a su propuesta de compra de un Bien Inmueble Relevante;</li>
@@ -117,7 +117,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">9. Nuestra propiedad intelectual</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">9. Nuestra propiedad intelectual</h2>
         <p>9.1 Usted reconoce y acepta que cualquier Propiedad Intelectual o contenido (incluidos los derechos de autor y las marcas comerciales) disponible en la Plataforma, la propia Plataforma y cualquier algoritmo o modelo de aprendizaje automático utilizado en la Plataforma (Nuestra Propiedad Intelectual) nos corresponderá en todo momento, o seguirá correspondiéndonos a nosotros. Nada de lo dispuesto en estas Condiciones constituye una transferencia o cesión de ningún derecho de propiedad intelectual sobre nuestros materiales (incluida Nuestra Propiedad Intelectual).</p>
         <p>9.2 Le autorizamos a utilizar Nuestra Propiedad Intelectual exclusivamente para su uso personal. Usted no debe explotar Nuestra Propiedad Intelectual para ningún otro fin, ni permitir, ayudar o facilitar dicho uso a terceros. Sólo podrá acceder a Nuestra Propiedad Intelectual en su dispositivo personal, y no podrá utilizar Nuestra Propiedad Intelectual para ningún fin comercial.</p>
         <p>9.3 Usted no debe, sin nuestro consentimiento previo por escrito:</p>
@@ -130,7 +130,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">10. Sus datos</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">10. Sus datos</h2>
         <p>10.1 Usted es el propietario de todos los datos, información o contenidos que cargue en la Plataforma (Sus Datos). Nosotros somos propietarios de cualquier dato o información generada por la Plataforma utilizando sus Datos como entrada, incluyendo cualquier información que le hayamos proporcionado en relación con cualquier anuncio inmobiliario (Datos de Salida). Tenga en cuenta que los Datos de salida no incluyen los Análisis (tal y como se describen a continuación).</p>
         <p>10.2 Usted nos concede una licencia limitada para copiar, transmitir, almacenar, realizar copias de seguridad y/o acceder o utilizar de cualquier otro modo sus Datos para:</p>
         <ul className="list-disc pl-6 space-y-2">
@@ -154,7 +154,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">11. Garantías</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">11. Garantías</h2>
         <p>11.1 Usted declara, garantiza y acepta que:</p>
         <ul className="list-disc pl-6 space-y-2">
           <li>(a) no utilizará nuestra Plataforma, incluida Nuestra Propiedad Intelectual, de ninguna manera que compita con nuestro negocio;</li>
@@ -171,7 +171,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">12. Legislación australiana en materia de consumo</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">12. Legislación australiana en materia de consumo</h2>
         <p>12.1 Determinada legislación, incluida la Ley Australiana del Consumidor (Australian Consumer Law, ACL) en la Ley de Competencia y Consumo de 2010 (Competition and Consumer Act 2010, Cth), y leyes y reglamentos similares de protección del consumidor, pueden conferirle derechos, garantías y recursos relacionados con la prestación de la Plataforma y los Servicios por nuestra parte que no pueden excluirse, restringirse ni modificarse (Derechos de la Ley del Consumidor).</p>
         <p>12.2 Si el ACL le es aplicable como consumidor, nada de lo dispuesto en estas Condiciones excluye sus Derechos Legales como consumidor en virtud del ACL. Usted acepta que nuestra Responsabilidad por la Plataforma y los Servicios prestados a una entidad definida como consumidor en virtud de la ACL se rige exclusivamente por la ACL y estas Condiciones.</p>
         <p>12.3 Sin perjuicio de sus derechos en virtud de la Ley del Consumidor, excluimos todas las garantías expresas e implícitas, y todos los materiales, trabajos y servicios (incluida la Plataforma) se le proporcionan sin garantías de ningún tipo, ya sean expresas o implícitas, estatutarias, legales o de cualquier otro tipo.</p>
@@ -179,7 +179,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">13. Responsabilidad</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">13. Responsabilidad</h2>
         <p>13.1 A pesar de cualquier disposición en contrario, en la medida máxima permitida por la ley:</p>
         <ul className="list-disc pl-6 space-y-2">
           <li>(a) usted acepta indemnizarnos por cualquier Responsabilidad en la que incurramos debido a su incumplimiento de la cláusula de Aceptación y Licencia de la Plataforma y de la cláusula de Propiedad Intelectual de estas Condiciones;</li>
@@ -191,7 +191,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">14. Cancelación</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">14. Cancelación</h2>
         <p>14.1 Cancelación de Cuentas: Puede solicitar la cancelación de su Cuenta en cualquier momento notificándonoslo por correo electrónico. No podrá cancelar su Cuenta hasta que expire el Periodo Mínimo establecido en su Cuenta. Su cancelación surtirá efecto a partir del final del Período Mínimo. Si cancela su Cuenta porque hemos cambiado las inclusiones de la Cuenta y el cambio tiene un impacto sustancial y adverso para usted, o porque hemos cambiado las Comisiones, entonces la cancelación de la Cuenta será inmediata, y le reembolsaremos las Comisiones que haya pagado por adelantado pero que no se hayan utilizado de forma prorrateada.</p>
         <p>14.2 En la medida en que la ley lo permita, las Tarifas de contratación no son reembolsables ni cancelables una vez abonadas.</p>
         <p>14.3 Podremos cancelar su Cuenta en cualquier momento notificándoselo por escrito con 30 días de antelación (cancelación por conveniencia).</p>
@@ -213,7 +213,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">15. Notificación relativa a Apple</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">15. Notificación relativa a Apple</h2>
         <p>15.1 En la medida en que utilice o acceda a nuestra Plataforma en un dispositivo iOS, reconoce y acepta los términos de la presente cláusula. Usted reconoce que las presentes Condiciones se establecen únicamente entre usted y nosotros, y no con Apple Inc. (Apple), y que Apple no es responsable de la Plataforma ni de ningún contenido disponible en la misma.</p>
         <p>15.2 Apple no tiene ninguna obligación de proporcionarle ningún servicio de mantenimiento y asistencia con respecto a nuestra Plataforma.</p>
         <p>15.3 Si nuestra aplicación móvil no cumple con cualquier garantía aplicable, puede notificarlo a Apple y Apple le reembolsará el precio de compra de la aplicación móvil. En la medida máxima permitida por la legislación aplicable, Apple no tendrá ninguna otra obligación de garantía con respecto a la aplicación móvil y cualquier otra reclamación, pérdida, responsabilidad, daño, coste o gasto atribuible a cualquier incumplimiento de cualquier garantía será responsabilidad nuestra.</p>
@@ -225,7 +225,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">16. General</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">16. General</h2>
         <p>16.1 Cesión: Sin perjuicio de lo dispuesto en la cláusula siguiente, una Parte no debe ceder ni negociar la totalidad o parte de sus derechos u obligaciones en virtud de las presentes Condiciones sin el consentimiento previo por escrito de la otra Parte (dicho consentimiento no se denegará de forma injustificada).</p>
         <p>16.2 Cesión de deuda: Usted acepta que podamos ceder o transferir cualquier deuda que tenga con nosotros, derivada de estas Condiciones o relacionada con ellas, a un cobrador de deudas, agencia de cobro de deudas u otro tercero.</p>
         <p>16.3 Confidencialidad: Usted se compromete a mantener estrictamente confidencial toda la información proporcionada por nosotros durante el transcurso del Plazo. Usted no debe transmitir detalles de propiedades o informes de investigación o cualquier información proporcionada a terceros sin nuestra autorización expresa por escrito.</p>
@@ -240,7 +240,7 @@ export function TerminosCondicionesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">17. Definiciones</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">17. Definiciones</h2>
         <p>17.1 Afiliado significa cualquier persona o entidad (incluyendo, sin limitación, empresas, asociaciones, fideicomisos, fideicomisos inmobiliarios cotizados y fideicomisos inmobiliarios no cotizados) que, en relación con sus inversiones inmobiliarias o asuntos comerciales, actúe o pueda esperarse razonablemente que actúe de acuerdo con sus instrucciones o deseos, o en concierto con usted, incluyendo cualquier entidad asociada tal y como se define este término en la s50AAA de la Ley de Sociedades Anónimas de 2001 (Cth);</p>
         <p>17.2 Pérdida consecuencial incluye cualquier pérdida consecuencial, pérdida indirecta, pérdida real o anticipada de beneficios, pérdida de beneficios, pérdida de ingresos, pérdida de negocio, pérdida de fondo de comercio, pérdida de oportunidades, pérdida de ahorros, pérdida de reputación, pérdida de uso y/o pérdida o corrupción de datos, ya sea bajo estatuto, contrato, equidad, agravio (incluyendo negligencia), indemnización o de otro modo.</p>
         <p>17.3 Propiedad intelectual significa cualquier derecho de autor, diseños registrados o no registrados, patentes o marcas comerciales, nombres de dominio, know-how, invenciones, procesos, secretos comerciales o información confidencial; o diseños de circuitos, software, programas informáticos, bases de datos o códigos fuente, incluyendo cualquier solicitud, o derecho a solicitar, el registro de, y cualquier mejora, perfeccionamiento o modificación de, lo anterior.</p>

@@ -30,7 +30,7 @@ type GeocodeResult = {
 const EXPO = [0.19, 1, 0.22, 1] as const;
 
 const inputBaseClass =
-  'w-full rounded-md border bg-slate-50 px-4 py-3.5 text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#FF8000]/15';
+  'w-full rounded-md border bg-slate-50 px-4 py-3.5 text-sm font-medium text-neutral-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#FF8000]/15';
 
 // Mismo mapeo que usa el registro de inmobiliarias (RegistroInmobiliariaPage) —
 // Google devuelve la dirección ya desglosada en address_components, mucho más

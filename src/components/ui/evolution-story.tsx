@@ -283,7 +283,7 @@ const TIMELINE = [
   { year: '1990', title: 'Métodos tradicionales', text: 'Revista, escaparate, buzoneo y puerta fría.', Scene: Scene1990 },
   { year: '2000', title: 'Primera etapa digital', text: 'Nacen los portales inmobiliarios y crece la obra nueva.', Scene: Scene2000 },
   { year: '2010', title: 'Crisis inmobiliaria', text: 'Más viviendas que compradores. Las inmobiliarias empiezan a vender a través de portales.', Scene: Scene2010 },
-  { year: '2020', title: 'La era de los portales', text: 'El 90% de las inmobiliarias publica en portales [fuente]. Cada vez más aperturas y más dificultad para captar.', Scene: Scene2020 },
+  { year: '2020', title: 'La era de los portales', text: 'El 90% de las inmobiliarias publica en portales. Cada vez más aperturas y más dificultad para captar.', Scene: Scene2020 },
   { year: '2026', title: 'Hoy', text: 'Escasez de vivienda, más competencia y menos referidos. Tu cliente ideal está en una pantalla.', Scene: Scene2026 },
 ];
 
@@ -564,7 +564,7 @@ export function EvolutionSection() {
         >
           <ShieldCheck size={26} aria-hidden="true" className="shrink-0 text-[#E67300]" />
           <p className="text-base font-medium leading-snug md:text-lg">
-            Nuestro equipo lleva <strong className="font-extrabold">más de 11 años</strong> visitando a <strong className="font-extrabold">[miles de]</strong> inmobiliarias.{' '}
+            Nuestro equipo lleva <strong className="font-extrabold">más de 11 años</strong> visitando a <strong className="font-extrabold">más de 1.000</strong> inmobiliarias.{' '}
             <span className="font-extrabold text-[#C2410C]">Cosiris: un equipo que entiende tu inmobiliaria.</span>
           </p>
         </motion.div>

@@ -28,7 +28,7 @@ const CRM_API_URL = import.meta.env.VITE_CRM_API_URL ?? 'http://localhost:3000';
 const MADRID = { lat: 40.4168, lng: -3.7038 };
 
 const baseInputClass =
-  'w-full rounded-xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#FF8000] focus:bg-white focus-visible:ring-2 focus-visible:ring-[#FF8000]/20 disabled:opacity-50';
+  'w-full rounded-xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm text-neutral-900 outline-none transition placeholder:text-slate-400 focus:border-[#FF8000] focus:bg-white focus-visible:ring-2 focus-visible:ring-[#FF8000]/20 disabled:opacity-50';
 
 type GeocodedPlace = {
   label: string;
@@ -607,7 +607,7 @@ export function RegistroInmobiliariaPage() {
   return (
     <main className="grid min-h-screen md:grid-cols-2">
       {/* Panel izquierdo — marca */}
-      <section className="relative h-full w-full overflow-hidden bg-slate-900 px-8 py-10 text-white sm:px-10 sm:py-12 md:flex md:flex-col md:justify-between">
+      <section className="relative h-full w-full overflow-hidden bg-neutral-900 px-8 py-10 text-white sm:px-10 sm:py-12 md:flex md:flex-col md:justify-between">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,128,0,0.22),transparent_55%),radial-gradient(circle_at_80%_75%,rgba(255,128,0,0.18),transparent_45%)]" />
 
         <div className="relative z-10">
@@ -656,7 +656,7 @@ export function RegistroInmobiliariaPage() {
                 <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#FF8000]">
                   <Check size={28} strokeWidth={2.5} className="text-[#FF8000]" />
                 </div>
-                <h2 className="text-2xl font-extrabold text-slate-900">Solicitud enviada</h2>
+                <h2 className="text-2xl font-extrabold text-neutral-900">Solicitud enviada</h2>
                 <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-600">
                   Tu cuenta será validada y tendrás acceso en 24–48 horas si tu solicitud fue aprobada.
                   Te avisaremos por email a <strong>{clientForm.email}</strong>.
@@ -673,7 +673,7 @@ export function RegistroInmobiliariaPage() {
               <motion.div key="form" initial={{ opacity: 1 }}>
                 <div className="mb-6 space-y-3">
                   <img src="/assets/logo_orange.png" alt="Cosiris" width="380" height="170" className="h-9 w-auto" />
-                  <h2 className="text-2xl font-extrabold leading-tight text-slate-900">Registra tu inmobiliaria</h2>
+                  <h2 className="text-2xl font-extrabold leading-tight text-neutral-900">Registra tu inmobiliaria</h2>
                   <p className="text-sm text-slate-600">
                     {step === 1 ? 'Cuéntanos quién eres — los revisamos y te avisamos por correo.' : 'Ahora completa el perfil que verán tus futuros leads.'}
                   </p>

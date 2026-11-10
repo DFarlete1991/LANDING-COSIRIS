@@ -10,7 +10,7 @@ import { getAttributionFields } from '@/lib/utm';
 const EXPO = [0.19, 1, 0.22, 1] as const;
 
 const inputClass =
-  'w-full rounded-md border bg-slate-50 px-4 py-3.5 text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#FF8000]/15';
+  'w-full rounded-md border bg-slate-50 px-4 py-3.5 text-sm font-medium text-neutral-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#FF8000]/15';
 
 type Reason = 'Cambio de vivienda' | 'Herencia' | 'Separación o divorcio' | 'Problemas económicos' | 'Otro' | '';
 type Timeframe = 'Aún no la he puesto a la venta.' | 'Ya se la he dado a otras inmobiliarias.' | 'La tengo anunciada como particular.' | 'Lleva más de 3 meses a la venta y no se ha vendido.' | '';
@@ -139,7 +139,7 @@ export function ValoracionPage() {
   const progress = submitted ? 100 : ((step - 1) / 4) * 100;
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#FF8000]/30 flex flex-col items-center">
+    <div className="relative min-h-screen bg-white font-sans text-neutral-900 antialiased selection:bg-[#FF8000]/30 flex flex-col items-center">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-70"></div>
 
       <LandingNavbar />
@@ -149,7 +149,7 @@ export function ValoracionPage() {
           <AnimatePresence mode="wait">
             {!submitted && (
               <motion.div key="headers" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="mb-8 rounded-xl bg-white/60 p-4 text-center backdrop-blur-sm">
-                <h1 className={`tracking-tighter text-slate-900 leading-tight ${isFormsPath ? 'text-3xl md:text-4xl font-bold' : 'text-3xl md:text-5xl font-black uppercase'}`}>
+                <h1 className={`tracking-tighter text-neutral-900 leading-tight ${isFormsPath ? 'text-3xl md:text-4xl font-bold' : 'text-3xl md:text-5xl font-black uppercase'}`}>
                   {isFormsPath ? 'Valora tu vivienda con precisión' : 'Vender una vivienda empieza por una buena valoración de mercado.'}
                 </h1>
                 <p className="mt-4 text-sm md:text-base text-slate-600 font-medium">
@@ -178,7 +178,7 @@ export function ValoracionPage() {
                     <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-orange-100 bg-orange-50">
                       <Check size={32} strokeWidth={2.5} className="text-[#FF8000]" />
                     </div>
-                    <h2 className="text-2xl font-bold tracking-tight text-slate-900 mb-3 text-center">¡Solicitud completada!</h2>
+                    <h2 className="text-2xl font-bold tracking-tight text-neutral-900 mb-3 text-center">¡Solicitud completada!</h2>
                     <p className="text-center text-slate-600 mb-8">Procesaremos tus datos y te enviaremos la valoración lo antes posible.</p>
                     <a href="/" className="inline-flex items-center justify-center rounded-md bg-[#FF8000] px-8 py-4 text-sm font-bold uppercase tracking-widest text-white transition-all hover:bg-[#E67300] hover:-translate-y-1 shadow-[0_10px_30px_rgba(255,128,0,0.3)]">
                       SABER MÁS SOBRE COSIRIS
@@ -186,7 +186,7 @@ export function ValoracionPage() {
                   </motion.div>
                 ) : step === 1 ? (
                   <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.4 }} className="space-y-6">
-                    <h2 className="text-xl font-bold tracking-tight text-slate-900">Dirección del inmueble</h2>
+                    <h2 className="text-xl font-bold tracking-tight text-neutral-900">Dirección del inmueble</h2>
                     <div className="space-y-4">
                       <div>
                         <label className="block text-[11px] font-bold text-slate-700 mb-1.5">Dirección</label>
@@ -215,7 +215,7 @@ export function ValoracionPage() {
                   </motion.div>
                 ) : step === 2 ? (
                   <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.4 }} className="space-y-6">
-                    <h2 className="text-xl font-bold tracking-tight text-slate-900">¿Cuál es el motivo principal de la venta?</h2>
+                    <h2 className="text-xl font-bold tracking-tight text-neutral-900">¿Cuál es el motivo principal de la venta?</h2>
                     <div className="grid grid-cols-1 gap-3">
                       {(['Cambio de vivienda', 'Herencia', 'Separación o divorcio', 'Problemas económicos', 'Otro'] as Reason[]).map((r) => (
                         <button
@@ -244,7 +244,7 @@ export function ValoracionPage() {
                   </motion.div>
                 ) : step === 3 ? (
                   <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.4 }} className="space-y-6">
-                    <h2 className="text-xl font-bold tracking-tight text-slate-900">¿Cuánto tiempo llevas intentando vender tu propiedad?</h2>
+                    <h2 className="text-xl font-bold tracking-tight text-neutral-900">¿Cuánto tiempo llevas intentando vender tu propiedad?</h2>
                     <div className="flex flex-col gap-3">
                       {(['Aún no la he puesto a la venta.', 'Ya se la he dado a otras inmobiliarias.', 'La tengo anunciada como particular.', 'Lleva más de 3 meses a la venta y no se ha vendido.'] as Timeframe[]).map((t) => (
                         <button
@@ -273,7 +273,7 @@ export function ValoracionPage() {
                   </motion.div>
                 ) : (
                   <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.4 }} className="space-y-6">
-                    <h2 className="text-xl font-bold tracking-tight text-slate-900">Datos de contacto</h2>
+                    <h2 className="text-xl font-bold tracking-tight text-neutral-900">Datos de contacto</h2>
                     <div className="space-y-4">
                       <div>
                         <label className="block text-[11px] font-bold text-slate-700 mb-1.5">Email</label>

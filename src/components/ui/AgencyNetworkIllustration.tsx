@@ -79,7 +79,7 @@ function StatCard({ value, label, x, y, delay = 0 }: StatCardProps) {
       animate={{ opacity: 1, y: [0, -2, 0] }}
       transition={{ duration: 5 + delay, repeat: Infinity, delay, ease: 'easeInOut' }}
     >
-      <p className="text-sm font-black text-[#0F172A] leading-none">{value}</p>
+      <p className="text-sm font-black text-[#0A0A0A] leading-none">{value}</p>
       <p className="mt-0.5 text-[9px] font-medium text-slate-400 whitespace-nowrap">{label}</p>
     </motion.div>
   );
@@ -124,8 +124,28 @@ export function AgencyNetworkIllustration({ agencies }: { agencies: Inmobiliaria
     { x: '5%', y: '60%', delay: 0.9 },
   ];
 
+  // En móvil la ilustración flotante no cabe (etiquetas cortadas, texto de 7 px):
+  // ahí se ven las inmobiliarias como una cuadrícula sencilla de logos.
   return (
-    <div className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-br from-white via-orange-50/20 to-white" style={{ aspectRatio: '16/9' }}>
+    <>
+    <ul aria-label="Algunas inmobiliarias del directorio" className="grid grid-cols-2 gap-2 sm:hidden">
+      {agencies.slice(0, 6).map((agency) => (
+        <li key={agency.id} className="flex min-w-0 items-center gap-2.5 rounded-xl border border-neutral-100 bg-white px-3 py-2.5 shadow-[0_4px_16px_-8px_rgba(0,0,0,0.15)]">
+          <span
+            className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg text-[11px] font-bold text-white"
+            style={{ backgroundColor: agency.logo_url ? 'transparent' : (agency.color_hex ?? '#FF8000') }}
+          >
+            {agency.logo_url ? (
+              <FadeImage src={optimizedImageUrl(agency.logo_url, 64)} alt="" className="h-full w-full object-contain" loading="lazy" decoding="async" />
+            ) : (
+              agency.nombre_comercial.split(' ').map((w) => w[0]).slice(0, 2).join('')
+            )}
+          </span>
+          <span className="min-w-0 truncate text-[13px] font-semibold leading-tight text-neutral-800">{agency.nombre_comercial}</span>
+        </li>
+      ))}
+    </ul>
+    <div className="relative hidden w-full overflow-hidden rounded-3xl bg-gradient-to-br from-white via-orange-50/20 to-white sm:block" style={{ aspectRatio: '16/9' }}>
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-16 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[#FF8000]/8 blur-[100px]" />
         <div className="absolute -bottom-20 left-1/4 h-56 w-56 rounded-full bg-[#FF8000]/5 blur-[80px]" />
@@ -276,7 +296,7 @@ export function AgencyNetworkIllustration({ agencies }: { agencies: Inmobiliaria
               </div>
               <div className="rounded-lg border border-slate-100 bg-white p-2 shadow-sm">
                 <div className="flex items-center gap-1.5">
-                  <div className="flex h-4 w-4 items-center justify-center rounded bg-[#1E3A5F]/10 text-[6px] font-bold text-[#1E3A5F]">
+                  <div className="flex h-4 w-4 items-center justify-center rounded bg-[#0A0A0A]/10 text-[6px] font-bold text-[#0A0A0A]">
                     <Home size={8} />
                   </div>
                   <span className="text-[8px] font-semibold text-slate-800">MB Gestors</span>
@@ -284,7 +304,7 @@ export function AgencyNetworkIllustration({ agencies }: { agencies: Inmobiliaria
                 <div className="mt-1 flex items-center gap-1 text-[7px] text-slate-400">
                   <MapPin size={6} /> Barcelona
                 </div>
-                <div className="mt-1 rounded bg-[#1E3A5F]/8 px-1 py-0.5 text-[7px] font-bold text-[#1E3A5F]">
+                <div className="mt-1 rounded bg-[#0A0A0A]/8 px-1 py-0.5 text-[7px] font-bold text-[#0A0A0A]">
                   156 propiedades
                 </div>
               </div>
@@ -308,5 +328,6 @@ export function AgencyNetworkIllustration({ agencies }: { agencies: Inmobiliaria
         <div className="mx-auto -mt-px h-1.5 w-[108%] rounded-b-lg bg-slate-100" />
       </motion.div>
     </div>
+    </>
   );
 }

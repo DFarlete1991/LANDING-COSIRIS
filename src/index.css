@@ -6,7 +6,7 @@
   :root {
     --color-primary: #FF8000;
     --color-background: #FFFFFF;
-    --color-ink: #0F172A;
+    --color-ink: #0A0A0A;
   }
 
   html {
@@ -16,7 +16,7 @@
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
     background-color: #FFFFFF;
-    color: #0F172A;
+    color: #0A0A0A;
   }
 
   body {
@@ -166,6 +166,16 @@
    a toda la web para que el menú y los márgenes midan igual en todas las páginas. */
 html {
   font-size: clamp(100%, 0.5vw + 50%, 125%);
+}
+
+/* iOS hace zoom al tocar un campo con letra de menos de 16 px. En móvil todos
+   los campos de texto miden 16 px aunque lleven text-sm (más especificidad). */
+@media (max-width: 767px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

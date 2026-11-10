@@ -87,7 +87,7 @@ export default function EvolutionSection() {
 					}}
 					className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center"
 				>
-					<h2 className="mb-6 text-5xl font-light tracking-tighter text-slate-900 md:text-8xl leading-[1.1]">
+					<h2 className="mb-6 text-5xl font-light tracking-tighter text-neutral-900 md:text-8xl leading-[1.1]">
 						Historia y Evolución <br />
 						<span className="font-serif italic text-[#FF8000]">del Sector Inmobiliario</span>
 					</h2>
@@ -223,12 +223,12 @@ Mejorando tu presencia local.
 					<div className="space-y-6">
 						<div className="relative pl-5 border-l-2 border-slate-200 before:absolute before:-left-[5px] before:top-1.5 before:w-2 before:h-2 before:rounded-full before:bg-[#FF8000]">
 							<p className="text-base font-normal leading-relaxed text-slate-700">
-								El 90% de las inmobiliarias publican en portales. <span className="font-semibold text-slate-900 border-b border-[#FF8000]/30 pb-0.5">La digitalización llega</span> y empieza a ganar territorio.
+								El 90% de las inmobiliarias publican en portales. <span className="font-semibold text-neutral-900 border-b border-[#FF8000]/30 pb-0.5">La digitalización llega</span> y empieza a ganar territorio.
 							</p>
 						</div>
 						<div className="relative pl-5 border-l-2 border-slate-200 before:absolute before:-left-[5px] before:top-1.5 before:w-2 before:h-2 before:rounded-full before:bg-[#FF8000]">
 							<p className="text-base font-normal leading-relaxed text-slate-700">
-								Momento de <span className="font-semibold text-slate-900 border-b border-[#FF8000]/30 pb-0.5">cada vez más aperturas</span> de inmobiliarias y mayor dificultad en captación hasta la actualidad.
+								Momento de <span className="font-semibold text-neutral-900 border-b border-[#FF8000]/30 pb-0.5">cada vez más aperturas</span> de inmobiliarias y mayor dificultad en captación hasta la actualidad.
 							</p>
 						</div>
 						<div className="relative pl-5 border-l-2 border-[#FF8000] before:absolute before:-left-[5px] before:top-1.5 before:w-2 before:h-2 before:rounded-full before:bg-[#FF8000] bg-[#FF8000]/5 p-4 rounded-r-xl">
@@ -248,7 +248,7 @@ Mejorando tu presencia local.
 					}}
 					className="absolute inset-0 z-30 flex items-center justify-center px-4 md:px-12"
 				>
-					<div className="relative w-full max-w-5xl overflow-hidden rounded-3xl border border-white/10 bg-slate-950 p-6 shadow-[0_40px_100px_-20px_rgba(255,128,0,0.2)] md:rounded-[2.5rem] md:p-16">
+					<div className="relative w-full max-w-5xl overflow-hidden rounded-3xl border border-white/10 bg-neutral-950 p-6 shadow-[0_40px_100px_-20px_rgba(255,128,0,0.2)] md:rounded-[2.5rem] md:p-16">
 						<div className="pointer-events-none absolute right-0 top-0 h-full w-[60%] bg-gradient-to-l from-[#FF8000]/20 to-transparent blur-3xl" />
 
 						<div className="relative z-10">

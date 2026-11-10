@@ -33,7 +33,7 @@ export function GraciasPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#FF8000]/30 flex flex-col items-center">
+    <div className="relative min-h-screen bg-white font-sans text-neutral-900 antialiased selection:bg-[#FF8000]/30 flex flex-col items-center">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-70"></div>
       
       <LandingNavbar />
@@ -56,7 +56,7 @@ export function GraciasPage() {
             >
               <Check size={40} strokeWidth={3} className="text-[#FF8000]" />
             </motion.div>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-[#0F172A] mb-4">
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-[#0A0A0A] mb-4">
               Solicitud recibida con éxito.
             </h1>
             <p className="text-lg text-slate-600 font-medium">
@@ -67,11 +67,11 @@ export function GraciasPage() {
           {/* Bloque 2: El Compromiso de los 10 Minutos */}
           <motion.div variants={itemVariants} className="w-full max-w-xl bg-white border border-slate-100 rounded-xl shadow-lg shadow-slate-200/50 p-6 md:p-8 mb-10 flex items-start gap-5">
             <div className="mt-1 flex-shrink-0 bg-slate-100 p-3 rounded-full">
-              <Clock className="w-6 h-6 text-[#0F172A]" />
+              <Clock className="w-6 h-6 text-[#0A0A0A]" />
             </div>
             <div>
               <p className="text-slate-700 font-medium leading-relaxed">
-                Muchas gracias por confiar en nosotros. Nuestro equipo está analizando los datos y <strong className="text-[#0F172A]">te contactaremos en menos de 24 horas.</strong>
+                Muchas gracias por confiar en nosotros. Nuestro equipo está analizando los datos y <strong className="text-[#0A0A0A]">te contactaremos en menos de 24 horas.</strong>
               </p>
             </div>
           </motion.div>
@@ -82,7 +82,7 @@ export function GraciasPage() {
               <div className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 flex items-center gap-1.5 border border-red-200">
                 <Youtube size={14} /> Podcast
               </div>
-              <h2 className="text-2xl font-bold tracking-tight text-[#0F172A] mb-3">
+              <h2 className="text-2xl font-bold tracking-tight text-[#0A0A0A] mb-3">
                 Aprende cómo estamos transformando otras inmobiliarias.
               </h2>
               <p className="text-slate-600 mb-8 max-w-lg mx-auto">

@@ -17,7 +17,7 @@ import type { InmobiliariaPublica } from '@/data/inmobiliarias-mock';
 const EXPO = [0.19, 1, 0.22, 1] as const;
 
 const inputClass =
-  'w-full rounded-md border bg-slate-50 px-4 py-3.5 text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#FF8000]/15';
+  'w-full rounded-md border bg-slate-50 px-4 py-3.5 text-sm font-medium text-neutral-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#FF8000]/15';
 
 type Motivo = 'Cambio de vivienda' | 'Herencia' | 'Separación o divorcio' | 'Problemas económicos' | 'Otro' | '';
 const MOTIVOS: Motivo[] = ['Cambio de vivienda', 'Herencia', 'Separación o divorcio', 'Problemas económicos', 'Otro'];
@@ -162,7 +162,7 @@ function MinimalAgencyCard({
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-1 truncate text-sm font-bold text-slate-900">
+          <p className="flex items-center gap-1 truncate text-sm font-bold text-neutral-900">
             {agency.nombre_comercial}
             <BadgeCheck size={14} className="shrink-0 text-[#FF8000]" aria-label="Cliente verificado" />
           </p>
@@ -177,7 +177,7 @@ function MinimalAgencyCard({
           {Array.from({ length: 5 }).map((_, i) => (
             <Star key={i} size={11} className={i < filledStars ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'} />
           ))}
-          <span className="ml-1 text-[11px] font-bold text-slate-900">{agency.rating}</span>
+          <span className="ml-1 text-[11px] font-bold text-neutral-900">{agency.rating}</span>
           {agency.num_opiniones != null && (
             <span className="text-[11px] text-slate-400">({agency.num_opiniones})</span>
           )}
@@ -330,10 +330,10 @@ export function ValorarPropiedadPage() {
   const progress = ((step - 1) / 4) * 100;
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased">
+    <div className="relative min-h-screen bg-white font-sans text-neutral-900 antialiased">
       <LandingNavbar />
 
-      <header className="relative overflow-hidden bg-[#0F172A]">
+      <header className="relative overflow-hidden bg-[#0A0A0A]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,128,0,0.14),transparent_55%)]" />
         <div className="relative mx-auto w-full max-w-[1400px] px-6 py-14 sm:py-16">
           <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#FF8000]">Portal Inmobiliarias · Cosiris</p>
@@ -352,7 +352,7 @@ export function ValorarPropiedadPage() {
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-orange-100 bg-orange-50">
               <Check size={32} strokeWidth={2.5} className="text-[#FF8000]" />
             </div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">¡Solicitud enviada!</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">¡Solicitud enviada!</h2>
             <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-slate-600">
               Hemos enviado tu valoración a {selectedAgencies.length} {selectedAgencies.length === 1 ? 'inmobiliaria' : 'inmobiliarias'} de tu zona. Te contactarán en breve.
             </p>
@@ -368,7 +368,7 @@ export function ValorarPropiedadPage() {
         ) : phase === 'select' || phase === 'sending' ? (
           <div className="mx-auto w-full max-w-[960px] px-6 pb-16 pt-10 sm:pt-14">
             <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#FF8000]">Elige tu inmobiliaria</span>
-            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
               {matched.length > 0
                 ? '¿A quién quieres que valore tu propiedad?'
                 : 'No hay inmobiliarias en tu zona todavía'}
@@ -461,7 +461,7 @@ export function ValorarPropiedadPage() {
         ) : (
           <div className="mx-auto w-full max-w-lg px-4 pb-20 pt-10 sm:pt-14">
             <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#FF8000]">Valora tu propiedad gratis</span>
-            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
               {step === 1 ? 'Dirección del inmueble' : step === 2 ? '¿Cuál es el motivo principal de la venta?' : step === 3 ? '¿Cuánto tiempo llevas intentando vender?' : 'Datos de contacto'}
             </h2>
             <p className="mt-1 text-sm text-slate-500">

@@ -8,19 +8,19 @@ export function PrivacidadPage() {
       <p>Mediante los formularios de registro del presente sitio web o el envío de correo electrónico se recogen y tratan datos personales de cada usuario que son necesarios para la gestión y mantenimiento de algunos de los servicios prestados y cuyo tratamiento se rige por la presente Política de Privacidad.</p>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">RESPONSABLE DEL TRATAMIENTO DE LOS DATOS PERSONALES</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">RESPONSABLE DEL TRATAMIENTO DE LOS DATOS PERSONALES</h2>
         <p>El responsable del tratamiento de los datos personales que el usuario facilite al acceder y utilizar el sitio web, es, en calidad de propietario, CONSULTORA NEGOCIO COSIRIS, S.L., con C.I.F. núm. B-44913903, con domicilio social a estos efectos en Carrer Mossèn Jacint Verdaguer, número 4, La Sènia, Tarragona, C.P. 43560. Dirección de correo electrónico de contacto comercial@cosiris.com. Inscrita en el Registro Mercantil de Tarragona, al Tomo 3362, Folio 61, Hoja T-60152, Inscripción 1ª.</p>
         <p>CONSULTORA NEGOCIO COSIRIS, S.L.. se compromete a aplicar las medidas de seguridad informática previstas en la normativa citada previamente, con el objetivo de impedir el acceso o uso indebido de los datos, su manipulación, deterioro o pérdida.</p>
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">DURACIÓN DEL ALMACENAMIENTO DE LOS DATOS</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">DURACIÓN DEL ALMACENAMIENTO DE LOS DATOS</h2>
         <p>CONSULTORA NEGOCIO COSIRIS, S.L., como responsable del tratamiento, se compromete a almacenar y gestionar los datos personales e información recogida mediante esta página web con la debida confidencialidad mientras se mantenga la relación profesional surgida y la persona interesada no solicite su supresión, y en su caso, por un plazo no superior a 5 años, a contar desde la finalización de la relación comercial establecida entre el usuario y CONSULTORA NEGOCIO COSIRIS, S.L.</p>
         <p>No obstante, el responsable del tratamiento podrá conservar, debidamente bloqueados, los datos para atender posibles responsabilidades administrativas o jurisdiccionales.</p>
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">FINALIDADES DEL TRATAMIENTO DE DATOS</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">FINALIDADES DEL TRATAMIENTO DE DATOS</h2>
         <p>Las operaciones, gestiones y procedimientos técnicos, ya sean realizados de forma automatizada como no automatizada, que posibiliten la recogida, almacenamiento, modificación, transferencia y otras acciones sobre datos de carácter personal, tienen la consideración de tratamiento de datos personales.</p>
         <p>En CONSULTORA NEGOCIO COSIRIS, S.L. tratamos los datos personales que el usuario nos facilita a través de https://cosiris.com/ con el fin de incluirlos en la agenda de contactos, gestionar la relación comercial solicitada y utilizar así esta información como medio de contacto de dicha empresa. Además, el tratamiento de estos datos recabados también implica gestionar el envío de la información que nos sea solicitada y poder responder a las consultas o cuestiones que el usuario remita a través del sitio web, facilitando a su vez a los interesados las ofertas de servicios que sean de su interés.</p>
         <p>Los campos de los registros se deben cumplimentar obligatoriamente para que CONSULTORA NEGOCIO COSIRIS, S.L. pueda cumplir con las finalidades mencionadas con anterioridad.</p>
@@ -28,7 +28,7 @@ export function PrivacidadPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">LEGITIMACIÓN PARA EL TRATAMIENTO DE LOS DATOS</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">LEGITIMACIÓN PARA EL TRATAMIENTO DE LOS DATOS</h2>
         <p>El tratamiento de los datos personales que proporciona el usuario se realiza en base a las siguientes bases jurídicas que legitiman el mismo:</p>
         <p>La contratación de servicios de CONSULTORA NEGOCIO COSIRIS, S.L.y la ejecución del encargo profesional solicitado, cuyos términos y condiciones se pondrán a disposición del usuario de forma previa a una eventual contratación. Para poder llevar a cabo esta relación profesional solicitada, el interesado está obligado a facilitar sus datos.</p>
         <p>El consentimiento libre, específico, informado e inequívoco, ya que tras la lectura de la presente Política de Privacidad el usuario queda informado y, en caso de estar conforme, puede aceptarla mediante una declaración o una clara acción afirmativa, como el marcado de una casilla que se dispone al efecto.</p>
@@ -36,7 +36,7 @@ export function PrivacidadPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">COMUNICACIÓN DE DATOS</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">COMUNICACIÓN DE DATOS</h2>
         <p>Con carácter general CONSULTORA NEGOCIO COSIRIS, S.L. no comunicará estos datos personales a terceros, con la salvedad de que la prestación de un servicio implique la necesidad de una relación contractual con un encargado de tratamiento y ello sea estrictamente necesario para gestionar y mantener la relación entre el usuario y la mencionada empresa, previa autorización expresa por parte del usuario. Esto se hará sólo durante el tiempo imprescindible para posibilitar la ejecución del contrato de encargo, y en las mismas condiciones y con las mismas responsabilidad que se le exigen al responsable. Una vez finalizado el encargo, el encargado del tratamiento devolverá al Responsable los datos personales y suprimirá cualquier copia de la que disponga.</p>
         <p>Por otra parte, sólo tendrán derecho a acceder a estos datos personales los terceros con los que CONSULTORA NEGOCIO COSIRIS, S.L. tenga una obligación legal o contractual de facilitarlos, entre los que se incluyen, por ejemplo, el Defensor del Pueblo y Jueces y Tribunales interesados en los procedimientos relacionados con las reclamaciones presentadas.</p>
         <p>Además, para poder gestionar su solicitud, CONSULTORA NEGOCIO COSIRIS, S.L. se apoya en los siguientes encargados de tratamiento, con quienes tiene suscrito el correspondiente contrato de encargo:</p>
@@ -49,7 +49,7 @@ export function PrivacidadPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">DERECHOS DE LOS INTERESADOS</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">DERECHOS DE LOS INTERESADOS</h2>
         <p>El usuario podrá ejercitar en todo momento, en los términos establecidos en la legislación vigente, los derechos de acceso, rectificación o supresión de datos, solicitar que se limite el tratamiento, oponerse al mismo, solicitar la portabilidad de sus datos, así como revocar el consentimiento prestado, derechos reconocidos en el citado Reglamento (UE). El ejercicio de estos derechos puede realizarlo el propio usuario dirigiéndose a CONSULTORA NEGOCIO COSIRIS, S.L. en la dirección de su sede social indicada anteriormente o a través del envío de un correo electrónico a comercial@cosiris.com.</p>
         <p>Para el efectivo ejercicio de estos derechos, el usuario deberá acreditar su identidad facilitando su nombre y apellidos, fotocopia del DNI o documento identificativo equivalente que acredite su identidad, petición en la que se concrete la solicitud, dirección a efectos de notificaciones, y fecha y firma del solicitante.</p>
       </section>

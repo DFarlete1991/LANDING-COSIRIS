@@ -49,7 +49,7 @@ export function LogosSection() {
         animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
         transition={{ duration: 0.65, ease: EASE }}
       >
-        Con la confianza de <span className="text-slate-900">expertos</span>
+        Con la confianza de <span className="text-neutral-900">expertos</span>
       </motion.h2>
       <motion.div
         className="relative z-10 mx-auto max-w-4xl"

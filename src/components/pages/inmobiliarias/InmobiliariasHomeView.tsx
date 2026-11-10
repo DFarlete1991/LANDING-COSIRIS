@@ -308,7 +308,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
     <div>
       {/* HERO — video de fondo real, overlay oscuro + buscador */}
       <section id="inicio-directorio" className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-4 pb-20 pt-28 text-center text-white sm:min-h-[92vh] sm:pb-28 sm:pt-32">
-        <div className="absolute inset-0 bg-slate-950">
+        <div className="absolute inset-0 bg-neutral-950">
           {/* scale-125: recorta el video ~12.5% por lado para sacar de cuadro la
               marca de agua que trae el archivo fuente en la esquina superior izquierda. */}
           <BgVideo
@@ -360,7 +360,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           </p>
 
           <div className="mt-9">
-            <AgencySearchBar size="hero" onSelect={onSearch} placeholder="Buscar inmobiliaria en tu zona" />
+            <AgencySearchBar size="hero" onSelect={onSearch} placeholder="Tu ciudad o inmobiliaria" />
           </div>
 
           {/* CTA de baja jerarquía — enlace, no botón: no debe competir con el buscador. */}
@@ -394,14 +394,14 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           </button>
 
           {allCities.length > 0 && (
-            <div className="mt-[22px] flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+            <div className="-mx-4 mt-[22px] flex items-center gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
               <span className="hidden text-xs text-white/50 sm:inline">Ciudades:</span>
               {allCities.map((c) => (
                 <button
                   key={c.city}
                   type="button"
                   onClick={() => handleCityClick(c)}
-                  className="rounded-full border border-white/25 bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-white/90 backdrop-blur-md transition-all duration-200 hover:border-[#FF8000] hover:bg-[#FF8000]/15 hover:text-white active:scale-95 sm:px-3 sm:text-xs"
+                  className="min-h-10 shrink-0 rounded-full border border-white/25 bg-white/10 px-4 text-sm font-semibold text-white/90 backdrop-blur-md transition-all duration-200 hover:border-[#FF8000] hover:bg-[#FF8000]/15 hover:text-white active:scale-95 sm:min-h-0 sm:px-3 sm:py-1 sm:text-xs"
                 >
                   {c.city}
                 </button>
@@ -416,7 +416,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
         <div className="mx-auto max-w-[87.5rem] px-5 md:px-10">
           <Reveal>
             <div className="mb-4 text-center sm:mb-10 md:mb-12">
-              <h2 className="text-3xl font-black leading-[1.1] tracking-[-0.02em] text-[#0F172A] sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-black leading-[1.1] tracking-[-0.02em] text-[#0A0A0A] sm:text-4xl md:text-5xl">
                 Cómo funciona
               </h2>
             </div>
@@ -446,7 +446,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                     <Icon size={20} />
                   </div>
                   <div>
-                    <p className="text-[15px] font-black tracking-[-0.01em] text-[#0F172A] sm:mt-4 sm:text-base">{title}</p>
+                    <p className="text-[15px] font-black tracking-[-0.01em] text-[#0A0A0A] sm:mt-4 sm:text-base">{title}</p>
                     <p className="mt-0.5 text-sm leading-snug text-slate-500 sm:mt-1.5 sm:leading-relaxed">{desc}</p>
                   </div>
                 </div>
@@ -461,7 +461,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
                   Red de inmobiliarias
                 </p>
-                <h2 className="mt-3 text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
+                <h2 className="mt-3 text-xl font-black leading-snug tracking-[-0.02em] text-[#0A0A0A] sm:text-2xl md:text-3xl">
                   Propietarios de toda España ya confían en nosotros para encontrar su inmobiliaria ideal
                 </h2>
               </div>
@@ -476,14 +476,14 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
                   Para quien quiere vender
                 </p>
-                <h2 className="mt-3 text-xl font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-2xl md:text-3xl">
+                <h2 className="mt-3 text-xl font-black leading-snug tracking-[-0.02em] text-[#0A0A0A] sm:text-2xl md:text-3xl">
                   La forma más segura de encontrar tu inmobiliaria
                 </h2>
                 <p className="mt-2 text-sm leading-relaxed text-slate-500 md:text-base">
                   No eliges a ciegas. Estas son las razones por las que buscar con Cosiris es mejor que buscar por tu cuenta.
                 </p>
 
-                <div className="mt-6 grid grid-cols-1 gap-3 text-left sm:grid-cols-2">
+                <div className="mt-6 grid grid-cols-2 gap-2.5 text-left sm:gap-3">
                   {[
                     {
                       icon: ShieldCheck,
@@ -507,12 +507,12 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                     },
                   ].map(({ icon: Icon, title, desc }, i) => (
                     <Reveal key={title} delay={0.1 + i * 0.06}>
-                      <div className="group h-full rounded-xl border border-slate-100 bg-white p-4 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF8000]/20 hover:shadow-md hover:shadow-[#FF8000]/5">
+                      <div className="group h-full rounded-xl border border-slate-100 bg-white p-3.5 shadow-sm shadow-neutral-900/5 transition-all duration-200 hover:-translate-y-0.5 sm:p-4 hover:border-[#FF8000]/20 hover:shadow-md hover:shadow-[#FF8000]/5">
                         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FF8000]/10 text-[#FF8000] transition-all duration-200 group-hover:bg-[#FF8000] group-hover:text-white">
                           <Icon size={17} />
                         </div>
-                        <p className="mt-3 text-sm font-bold text-slate-900">{title}</p>
-                        <p className="mt-1 text-xs leading-relaxed text-slate-500">{desc}</p>
+                        <p className="mt-3 text-sm font-bold text-neutral-900">{title}</p>
+                        <p className="mt-1 text-xs leading-relaxed text-neutral-600">{desc}</p>
                       </div>
                     </Reveal>
                   ))}
@@ -590,7 +590,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
             <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#FF8000]">
               Para inmobiliarias
             </p>
-            <h2 className="mx-auto mt-3 max-w-2xl text-center text-2xl font-black leading-[1.1] tracking-[-0.02em] text-[#0F172A] sm:text-3xl md:text-4xl lg:text-5xl">
+            <h2 className="mx-auto mt-3 max-w-2xl text-center text-2xl font-black leading-[1.1] tracking-[-0.02em] text-[#0A0A0A] sm:text-3xl md:text-4xl lg:text-5xl">
               Todo lo que tu inmobiliaria necesita para crecer
             </h2>
             <div className="mt-6 text-center">
@@ -609,7 +609,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           <Reveal delay={0.05}>
             <div className="mx-auto mt-6 max-w-3xl sm:mt-20 sm:rounded-2xl sm:border sm:border-slate-100 sm:bg-slate-50 sm:p-8">
               <p className="text-sm leading-relaxed text-slate-600">
-                <span className="font-bold text-[#0F172A]">No somos una inmobiliaria.</span>{' '}
+                <span className="font-bold text-[#0A0A0A]">No somos una inmobiliaria.</span>{' '}
                 Conectamos propietarios con inmobiliarias verificadas.
               </p>
               <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-5 sm:grid-cols-3">
@@ -622,7 +622,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FF8000]/10 text-[#FF8000]">
                       <Icon size={18} />
                     </div>
-                    <p className="text-sm font-bold text-[#0F172A]">{label}</p>
+                    <p className="text-sm font-bold text-[#0A0A0A]">{label}</p>
                   </div>
                 ))}
               </div>
@@ -637,7 +637,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
             <div>
               <Reveal>
-                <h3 className="text-lg font-black leading-snug tracking-[-0.02em] text-[#0F172A] sm:text-xl md:text-2xl">
+                <h3 className="text-lg font-black leading-snug tracking-[-0.02em] text-[#0A0A0A] sm:text-xl md:text-2xl">
                   El recorrido del propietario hasta tu inmobiliaria
                 </h3>
               </Reveal>
@@ -683,7 +683,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                           </div>
                           <p
                             className={`text-sm font-semibold leading-snug transition-colors duration-300 sm:text-base ${
-                              active ? 'text-[#0F172A]' : 'text-slate-400'
+                              active ? 'text-[#0A0A0A]' : 'text-slate-400'
                             }`}
                           >
                             {step.title}
@@ -757,7 +757,7 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
                                   {lead.name.charAt(0)}
                                 </div>
                                 <div>
-                                  <p className="text-sm font-semibold text-[#0F172A]">{lead.name}</p>
+                                  <p className="text-sm font-semibold text-[#0A0A0A]">{lead.name}</p>
                                   <p className="text-xs text-slate-400">{lead.price}</p>
                                 </div>
                               </div>
@@ -802,12 +802,12 @@ export function InmobiliariasHomeView({ onSearch }: { onSearch: (s: SearchSugges
               ].map(({ icon: Icon, title }) => (
                 <div
                   key={title}
-                  className="group rounded-xl border border-slate-100 bg-white p-3 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF8000]/20 hover:shadow-md hover:shadow-[#FF8000]/5 sm:p-5"
+                  className="group rounded-xl border border-slate-100 bg-white p-3 shadow-sm shadow-neutral-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF8000]/20 hover:shadow-md hover:shadow-[#FF8000]/5 sm:p-5"
                 >
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FF8000]/10 text-[#FF8000] transition-all duration-200 group-hover:bg-[#FF8000] group-hover:text-white sm:h-10 sm:w-10">
                     <Icon size={18} />
                   </div>
-                  <p className="mt-2 text-[13px] font-bold leading-tight text-slate-900 sm:mt-4 sm:text-sm">{title}</p>
+                  <p className="mt-2 text-[13px] font-bold leading-tight text-neutral-900 sm:mt-4 sm:text-sm">{title}</p>
                 </div>
               ))}
             </div>

@@ -70,7 +70,7 @@ const fieldVariants = {
 // ─── Shared Input Styles ──────────────────────────────────────────────────────
 
 const baseInputClass =
-  'w-full rounded-md border bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#FF8000]/15';
+  'w-full rounded-md border bg-slate-50 px-4 py-3 text-sm font-medium text-neutral-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#FF8000]/15';
 
 // ─── Province Autocomplete ────────────────────────────────────────────────────
 
@@ -208,7 +208,7 @@ function SentScreen() {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: EXPO, delay: 0.28 }}
-        className="text-2xl font-black tracking-[-0.03em] text-[#0F172A]"
+        className="text-2xl font-black tracking-[-0.03em] text-[#0A0A0A]"
       >
         Enviado
       </motion.p>
@@ -396,7 +396,7 @@ export default function ContactModal() {
                       exit={{ opacity: 0 }}
                       onClick={closeContactModal}
                       aria-label="Cerrar"
-                      className="absolute right-5 top-5 z-10 rounded-md p-1.5 text-slate-500 transition-colors hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF8000]"
+                      className="absolute right-2 top-2 z-10 flex size-11 items-center justify-center rounded-md text-slate-500 transition-colors hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF8000]"
                     >
                       <X size={17} strokeWidth={1.8} />
                     </motion.button>
@@ -419,7 +419,7 @@ export default function ContactModal() {
                         </p>
                         <h2
                           id="modal-title"
-                          className="mt-2 text-2xl font-black leading-tight tracking-[-0.03em] text-[#0F172A]"
+                          className="mt-2 text-2xl font-black leading-tight tracking-[-0.03em] text-[#0A0A0A]"
                         >
                           Cuéntanos sobre tu negocio
                         </h2>
@@ -439,7 +439,7 @@ export default function ContactModal() {
                       >
                         {/* Name */}
                         <motion.div variants={fieldVariants}>
-                          <label htmlFor="cm-name" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                          <label htmlFor="cm-name" className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-900">
                             Nombre
                           </label>
                           <input
@@ -455,7 +455,7 @@ export default function ContactModal() {
 
                         {/* Company */}
                         <motion.div variants={fieldVariants}>
-                          <label htmlFor="cm-company" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                          <label htmlFor="cm-company" className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-900">
                             Nombre de empresa
                           </label>
                           <input
@@ -470,7 +470,7 @@ export default function ContactModal() {
 
                         {/* Email */}
                         <motion.div variants={fieldVariants}>
-                          <label htmlFor="cm-email" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                          <label htmlFor="cm-email" className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-900">
                             Email
                           </label>
                           <input
@@ -487,7 +487,7 @@ export default function ContactModal() {
                             número quedaba recortado junto al selector de país */}
                         <div className="grid grid-cols-1 gap-4">
                           <motion.div variants={fieldVariants}>
-                            <label htmlFor="cm-phone" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                            <label htmlFor="cm-phone" className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-900">
                               Teléfono
                             </label>
                             <div className="flex gap-2">
@@ -510,7 +510,7 @@ export default function ContactModal() {
                           </motion.div>
 
                           <motion.div variants={fieldVariants}>
-                            <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-900">
                               Provincia
                             </label>
                             <ProvinceField
@@ -524,7 +524,7 @@ export default function ContactModal() {
 
                         {/* Services multi-select */}
                         <motion.div variants={fieldVariants}>
-                          <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                          <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-900">
                             Servicios de interés{' '}
                             <span className="normal-case font-normal text-slate-400">(opcional)</span>
                           </label>
@@ -537,7 +537,7 @@ export default function ContactModal() {
                                   type="button"
                                   onClick={() => toggleService(service)}
                                   whileTap={{ scale: 0.97 }}
-                                  className={`relative flex items-center justify-between rounded-md border px-3 py-2.5 text-xs font-semibold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF8000] ${
+                                  className={`relative flex items-center justify-between min-h-11 rounded-md border px-3 py-2.5 text-[13px] font-semibold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF8000] ${
                                     active
                                       ? 'border-[#FF8000] bg-orange-50 text-[#FF8000]'
                                       : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-[#FF8000]/40 hover:bg-orange-50/30'
@@ -565,7 +565,7 @@ export default function ContactModal() {
 
                         {/* Employees */}
                         <motion.div variants={fieldVariants}>
-                          <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                          <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-900">
                             Número de empleados
                           </label>
                           <div className="flex gap-1.5">
@@ -577,7 +577,7 @@ export default function ContactModal() {
                                   setFormData((prev) => ({ ...prev, employees: range }));
                                   if (errors.employees) setErrors((prev) => ({ ...prev, employees: '' }));
                                 }}
-                                className={`flex-1 rounded-md border bg-slate-50 px-2 py-3 text-xs font-semibold text-slate-800 transition-all duration-200 hover:border-[#FF8000] hover:bg-orange-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF8000] ${
+                                className={`min-h-11 flex-1 rounded-md border bg-slate-50 px-2 py-3 text-[13px] font-semibold text-slate-800 transition-all duration-200 hover:border-[#FF8000] hover:bg-orange-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF8000] ${
                                   formData.employees === range
                                     ? 'border-[#FF8000] bg-orange-50 text-[#FF8000]'
                                     : errors.employees
@@ -607,7 +607,7 @@ export default function ContactModal() {
                           <button
                             type="submit"
                             disabled={phase === 'loading'}
-                            className="group relative w-full overflow-hidden rounded-md bg-[#FF8000] py-3.5 text-[0.78rem] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:bg-[#E67300] disabled:cursor-not-allowed disabled:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000]"
+                            className="group relative w-full overflow-hidden rounded-md bg-[#FF8000] min-h-12 py-3.5 text-sm font-bold tracking-[0.02em] text-white transition-colors duration-300 hover:bg-[#E67300] disabled:cursor-not-allowed disabled:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000]"
                           >
                             <span
                               aria-hidden="true"

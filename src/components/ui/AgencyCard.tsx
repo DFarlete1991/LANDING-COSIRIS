@@ -87,18 +87,18 @@ export function AgencyCard({
     <button
       type="button"
       onClick={() => { rememberDirectoryUrl(); navigateTo(agencyProfilePath(agency, agencies)); }}
-      className="group flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm shadow-slate-900/5 transition-[transform,border-color,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:border-[#FF8000]/20 hover:shadow-xl hover:shadow-[#FF8000]/10"
+      className="group flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm shadow-neutral-900/5 transition-[transform,border-color,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:border-[#FF8000]/20 hover:shadow-xl hover:shadow-[#FF8000]/10"
     >
       <div
         className="relative h-36 w-full shrink-0 overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${agency.color_hex} 0%, #0F172A 140%)` }}
+        style={{ background: `linear-gradient(135deg, ${agency.color_hex} 0%, #0A0A0A 140%)` }}
       >
         {bannerUrl && (
           <FadeImage src={optimizedImageUrl(bannerUrl, 700)} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         {isNearest && (
-          <span className="absolute left-3 top-3 rounded-full bg-[#0F172A]/90 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-white shadow-sm backdrop-blur-sm">
+          <span className="absolute left-3 top-3 rounded-full bg-[#0A0A0A]/90 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-white shadow-sm backdrop-blur-sm">
             Más cercana
           </span>
         )}
@@ -107,7 +107,7 @@ export function AgencyCard({
             src={optimizedImageUrl(fotoUrl, 100)}
             alt={agency.nombre_agente}
             style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
-            className="absolute -bottom-4 left-4 h-10 w-10 rounded-full border-[3px] border-white object-cover shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-110"
+            className="absolute -bottom-4 left-4 h-10 w-10 rounded-full border-[3px] border-white object-cover shadow-lg shadow-neutral-900/20 transition-transform duration-300 group-hover:scale-110"
             loading="lazy"
             decoding="async"
           />
@@ -116,13 +116,13 @@ export function AgencyCard({
             src={optimizedImageUrl(logoUrl, 100)}
             alt={agency.nombre_comercial}
             style={{ objectPosition: agency.logo_pos ?? '50% 50%' }}
-            className="absolute -bottom-4 left-4 h-10 w-10 rounded-full border-2 border-white object-cover shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-110"
+            className="absolute -bottom-4 left-4 h-10 w-10 rounded-full border-2 border-white object-cover shadow-lg shadow-neutral-900/20 transition-transform duration-300 group-hover:scale-110"
             loading="lazy"
             decoding="async"
           />
         ) : (
           <div
-            className="absolute -bottom-4 left-4 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white text-xs font-black text-white shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-110"
+            className="absolute -bottom-4 left-4 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white text-xs font-black text-white shadow-lg shadow-neutral-900/20 transition-transform duration-300 group-hover:scale-110"
             style={{ backgroundColor: agency.color_hex }}
           >
             {agency.nombre_comercial.slice(0, 1)}
@@ -132,7 +132,7 @@ export function AgencyCard({
 
       <div className="flex-1 px-4 pb-4 pt-6">
         <div className="flex items-start justify-between gap-2">
-          <p className="truncate text-sm font-bold text-slate-900">{agency.nombre_comercial}</p>
+          <p className="truncate text-sm font-bold text-neutral-900">{agency.nombre_comercial}</p>
           <BadgeCheck size={15} className="mt-0.5 shrink-0 text-[#FF8000]" aria-label="Cliente verificado de Cosiris" />
         </div>
         <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
@@ -208,7 +208,7 @@ export function AgencyResultRow({
           handleActivate();
         }
       }}
-      className={`flex cursor-pointer items-center gap-2 border-b py-3 transition-[transform,border-color,box-shadow] duration-[250ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000] active:bg-orange-50/60 sm:items-stretch sm:gap-6 sm:rounded-[24px] sm:border sm:p-6 sm:shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:hover:-translate-y-1 sm:hover:shadow-[0_16px_36px_rgba(15,23,42,0.1)] ${
+      className={`flex cursor-pointer items-center gap-2 border-b py-3 transition-[transform,border-color,box-shadow] duration-[250ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8000] active:bg-orange-50/60 sm:items-stretch sm:gap-6 sm:rounded-[24px] sm:border sm:p-6 sm:shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:hover:-translate-y-1 sm:hover:shadow-[0_16px_36px_rgba(0,0,0,0.1)] ${
         selected ? 'border-[#FF8000] bg-orange-50/40 ring-2 ring-[#FF8000]/20' : 'border-slate-100 bg-white'
       }`}
     >
@@ -220,7 +220,7 @@ export function AgencyResultRow({
         <div className="relative flex shrink-0 flex-col items-start gap-2.5 self-start sm:items-center">
           <Avatar agency={agency} sizeClass="h-14 w-14 sm:h-[92px] sm:w-[92px]" />
           {isNearest && (
-            <span className="absolute -top-2 -left-2 rounded-full bg-[#0F172A]/90 px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.08em] text-white shadow-sm backdrop-blur-sm sm:px-2.5 sm:py-1 sm:text-[9px]">
+            <span className="absolute -top-2 -left-2 rounded-full bg-[#0A0A0A]/90 px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.08em] text-white shadow-sm backdrop-blur-sm sm:px-2.5 sm:py-1 sm:text-[9px]">
               Cerca
             </span>
           )}
@@ -244,7 +244,7 @@ export function AgencyResultRow({
             {/* El titular es la inmobiliaria, no la persona de contacto: es un
                 directorio de inmobiliarias y es el nombre por el que se busca.
                 Igual que el <h1> del perfil y que la tarjeta compacta. */}
-            <p className="truncate text-[15px] font-bold leading-tight text-slate-900 sm:text-[26px] sm:leading-[32px]">{agency.nombre_comercial}</p>
+            <p className="truncate text-[15px] font-bold leading-tight text-neutral-900 sm:text-[26px] sm:leading-[32px]">{agency.nombre_comercial}</p>
             <span className="flex shrink-0 items-center gap-1 text-xs font-bold text-[#FF8000] sm:text-[13px]">
               <BadgeCheck size={16} className="shrink-0" aria-label="Verificada" />
               <span className="hidden sm:inline">Verificada</span>
@@ -267,7 +267,7 @@ export function AgencyResultRow({
                   />
                 ))}
               </div>
-              <span className="text-xs font-bold text-slate-900 sm:text-sm">{agency.rating}</span>
+              <span className="text-xs font-bold text-neutral-900 sm:text-sm">{agency.rating}</span>
               {agency.num_opiniones != null && (
                 <span className="text-xs text-slate-400 sm:text-sm">({agency.num_opiniones} reseñas)</span>
               )}
@@ -290,7 +290,7 @@ export function AgencyResultRow({
               <div key={label} className="flex items-center gap-2">
                 <Icon size={16} className="shrink-0 text-[#FF8000]" />
                 <div className="leading-tight">
-                  <p className="text-sm font-bold text-slate-900">{value}</p>
+                  <p className="text-sm font-bold text-neutral-900">{value}</p>
                   <p className="text-[11px] text-slate-400">{label}</p>
                 </div>
               </div>
@@ -395,7 +395,7 @@ export function AgencyResultRow({
                     <X size={18} />
                   </button>
                   <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Sin compromiso</p>
-                  <h3 className="mb-5 text-lg font-extrabold text-slate-900">
+                  <h3 className="mb-5 text-lg font-extrabold text-neutral-900">
                     Cuéntale a {agency.nombre_comercial} qué necesitas
                   </h3>
                   <AgencyLeadForm

@@ -28,7 +28,7 @@ function buildLeadEmail(lead: PlanLead, phone: string) {
     `<tr><td style="padding:6px 12px 6px 0;color:#64748b;vertical-align:top">${k}</td><td style="padding:6px 0;font-weight:600">${esc(v)}</td></tr>`;
   return {
     subject: `Nuevo lead de la calculadora: ${lead.nombre} (${lead.inmobiliaria})`.slice(0, 180),
-    html: `<div style="font-family:Arial,sans-serif;font-size:14px;color:#0f172a">
+    html: `<div style="font-family:Arial,sans-serif;font-size:14px;color:#0A0A0A">
 <h2 style="margin:0 0 4px">Nuevo lead desde la landing: calculadora del plan</h2>
 <p style="margin:0 0 16px;color:#64748b">Ha descargado su presupuesto en PDF.</p>
 <table style="border-collapse:collapse">${row('Nombre', lead.nombre)}${row('Empresa', lead.inmobiliaria)}${row('Email', lead.email)}${row('Teléfono', phone)}${row('Zona', lead.zona)}${row('Empleados', lead.empleados)}${row('Origen', 'calculadora_plan_pdf')}</table>

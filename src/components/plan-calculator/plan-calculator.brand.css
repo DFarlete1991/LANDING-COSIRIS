@@ -9,8 +9,8 @@
 #ftip {
   --bg: #f8fafc;        /* Accent */
   --card: #ffffff;
-  --navy: #0f172a;      /* Ink */
-  --ink: #0f172a;
+  --navy: #0A0A0A;      /* Ink */
+  --ink: #0A0A0A;
   --text: #475569;      /* slate-600: copy secundario legible */
   --muted: #64748b;     /* Ink Muted */
   --line: #e2e8f0;      /* Border */
@@ -52,7 +52,7 @@
 .plan-calc .card {
   border-color: var(--line);
   border-radius: 16px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -18px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 1px 2px rgba(0,0,0, 0.04), 0 12px 32px -18px rgba(0,0,0, 0.12);
 }
 .plan-calc .opt { border-radius: 12px; background: #fff; }
 .plan-calc .opt:hover { border-color: rgba(255, 128, 0, 0.45); }
@@ -166,3 +166,8 @@
   text-transform: uppercase;
   color: var(--orange-t);
 }
+
+/* Zonas táctiles de 44 px sin agrandar el dibujo: los iconos "i" crecen con un
+   área invisible y el botón de la barra inferior gana alto. */
+.plan-calc .info::after { content: ""; position: absolute; inset: -11px; }
+.plan-calc .m-bar .next { min-height: 44px; }

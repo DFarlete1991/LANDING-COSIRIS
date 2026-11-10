@@ -27,7 +27,7 @@ const SERVICE_OPTIONS = ['Gestión Redes', 'Captación Ads', 'Email Marketing', 
 const EXPO: [number, number, number, number] = [0.19, 1, 0.22, 1];
 
 const baseInputClass =
-  'w-full rounded-md border bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#FF8000]/15';
+  'w-full rounded-md border bg-slate-50 px-4 py-3 text-sm font-medium text-neutral-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#FF8000]/15';
 
 type SubmitPhase = 'idle' | 'loading' | 'sent';
 
@@ -291,7 +291,7 @@ function CaptacionForm() {
                 <div className="mb-7 flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#FF8000]">
                   <Check size={32} strokeWidth={2.5} className="text-[#FF8000]" />
                 </div>
-                <p className="text-2xl font-black tracking-[-0.03em] text-[#0F172A]">Enviado</p>
+                <p className="text-2xl font-black tracking-[-0.03em] text-[#0A0A0A]">Enviado</p>
                 <p className="mt-3 mb-8 max-w-[18rem] text-sm leading-relaxed text-slate-500">
                   Te contactaremos en menos de 24 h. Sin compromiso.
                 </p>
@@ -303,7 +303,7 @@ function CaptacionForm() {
               <motion.div key="form" initial={{ opacity: 1 }}>
                 <div className="mb-7">
                   <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#FF8000]">Primer paso</p>
-                  <h2 className="mt-2 text-2xl font-black leading-tight tracking-[-0.03em] text-[#0F172A]">
+                  <h2 className="mt-2 text-2xl font-black leading-tight tracking-[-0.03em] text-[#0A0A0A]">
                     Cuentanos sobre tu negocio
                   </h2>
                   <p className="mt-2 text-sm leading-relaxed text-slate-600">
@@ -313,7 +313,7 @@ function CaptacionForm() {
 
                 <form onSubmit={handleSubmit} noValidate className="space-y-4 text-left">
                   <div>
-                    <label htmlFor="cp-name" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                    <label htmlFor="cp-name" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-900">
                       Nombre
                     </label>
                     <input
@@ -331,7 +331,7 @@ function CaptacionForm() {
                   </div>
 
                   <div>
-                    <label htmlFor="cp-email" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                    <label htmlFor="cp-email" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-900">
                       Email
                     </label>
                     <input
@@ -349,7 +349,7 @@ function CaptacionForm() {
 
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                      <label htmlFor="cp-phone" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                      <label htmlFor="cp-phone" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-900">
                         Telefono
                       </label>
                       <div className="flex gap-2">
@@ -375,7 +375,7 @@ function CaptacionForm() {
                     </div>
 
                     <div>
-                      <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                      <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-900">
                         Provincia
                       </label>
                       <ProvinceField value={formData.province} onChange={handleProvinceChange} error={errors.province} />
@@ -384,7 +384,7 @@ function CaptacionForm() {
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                    <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-900">
                       Servicios de interes <span className="normal-case font-normal text-slate-400">(opcional)</span>
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -413,7 +413,7 @@ function CaptacionForm() {
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-900">
+                    <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-900">
                       Numero de empleados
                     </label>
                     <div className="flex gap-1.5">
@@ -521,7 +521,7 @@ function InmobiliariasHero() {
         initial={{ opacity: 0, y: 24, filter: 'blur(6px)' }}
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
         transition={{ duration: 0.7, ease: EXPO, delay: 0.1 }}
-        className="text-balance text-4xl font-black leading-[1.08] tracking-[-0.03em] text-[#0F172A] md:text-5xl"
+        className="text-balance text-4xl font-black leading-[1.08] tracking-[-0.03em] text-[#0A0A0A] md:text-5xl"
       >
         Deja de depender solo de referidos.
         <br />
@@ -564,11 +564,11 @@ function InmobiliariasHero() {
         transition={{ duration: 0.6, ease: EXPO, delay: 0.4 }}
         className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-medium text-slate-500"
       >
-        <span><strong className="font-bold text-slate-900">+11 años</strong> en el sector</span>
+        <span><strong className="font-bold text-neutral-900">+11 años</strong> en el sector</span>
         <span className="hidden h-1 w-1 rounded-full bg-slate-300 sm:block" aria-hidden="true" />
-        <span><strong className="font-bold text-slate-900">+1.000</strong> inmobiliarias visitadas</span>
+        <span><strong className="font-bold text-neutral-900">+1.000</strong> inmobiliarias visitadas</span>
         <span className="hidden h-1 w-1 rounded-full bg-slate-300 sm:block" aria-hidden="true" />
-        <span><strong className="font-bold text-slate-900">100%</strong> enfoque en captación</span>
+        <span><strong className="font-bold text-neutral-900">100%</strong> enfoque en captación</span>
       </motion.div>
     </section>
   );
@@ -582,7 +582,7 @@ export function CaptacionInmobiliariasPage() {
   });
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#FF8000]/30 flex flex-col text-center">
+    <div className="relative min-h-screen bg-white font-sans text-neutral-900 antialiased selection:bg-[#FF8000]/30 flex flex-col text-center">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-70 pointer-events-none" />
 
       <LandingNavbar />

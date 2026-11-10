@@ -21,7 +21,7 @@ export function CalculadoraRoiPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased">
+    <div className="relative min-h-screen bg-white font-sans text-neutral-900 antialiased">
       <LandingNavbar />
 
       <main className="relative overflow-x-clip">

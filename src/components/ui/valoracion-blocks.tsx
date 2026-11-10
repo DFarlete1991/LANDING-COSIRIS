@@ -7,14 +7,14 @@ export function WhyChooseCosiris() {
   return (
     <section className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24">
       <div className="text-center mb-12">
-        <h2 className="text-3xl font-black tracking-[-0.03em] text-slate-900 md:text-4xl">
+        <h2 className="text-3xl font-black tracking-[-0.03em] text-neutral-900 md:text-4xl">
           ¿Por qué elegir Cosiris?
         </h2>
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {[
           { 
-            title: 'Valocación Precisa', 
+            title: 'Valoración Precisa', 
             subtitle: 'Trabajamos con los datos de las mejores agencias de confianza de tu zona' 
           },
           { 
@@ -37,7 +37,7 @@ export function WhyChooseCosiris() {
             <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-orange-50 text-[#FF8000] transition-colors group-hover:bg-[#FF8000] group-hover:text-white">
               <Check size={28} strokeWidth={2.5} />
             </div>
-            <h3 className="mb-3 text-lg font-extrabold tracking-tight text-slate-900">{item.title}</h3>
+            <h3 className="mb-3 text-lg font-extrabold tracking-tight text-neutral-900">{item.title}</h3>
             <p className="text-sm font-medium leading-relaxed text-slate-500 uppercase">{item.subtitle}</p>
           </motion.div>
         ))}
@@ -50,7 +50,7 @@ export function HowItWorks({ onCTAClick }: { onCTAClick: () => void }) {
   return (
     <section className="mx-auto w-full max-w-4xl px-6 py-16 md:py-24">
       <div className="text-center mb-16">
-        <h2 className="text-3xl font-black tracking-[-0.03em] text-slate-900 md:text-4xl">
+        <h2 className="text-3xl font-black tracking-[-0.03em] text-neutral-900 md:text-4xl">
           ¿Cómo funciona?
         </h2>
       </div>
@@ -86,7 +86,7 @@ export function HowItWorks({ onCTAClick }: { onCTAClick: () => void }) {
             </div>
 
             <div className="pt-2 pb-6 md:w-[45%] md:pt-3">
-              <h3 className="text-xl font-extrabold text-slate-900 mb-2 md:text-left uppercase tracking-tight">{item.title}</h3>
+              <h3 className="text-xl font-extrabold text-neutral-900 mb-2 md:text-left uppercase tracking-tight">{item.title}</h3>
               <p className="text-sm font-medium leading-relaxed text-slate-500 md:text-left">{item.desc}</p>
             </div>
           </motion.div>

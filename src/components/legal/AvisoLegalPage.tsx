@@ -6,25 +6,25 @@ export function AvisoLegalPage() {
       <p>CONSULTORA NEGOCIO COSIRIS, S.L., responsable de este sitio web, pone a disposición de los usuarios de Internet el presente documento, cuya finalidad es cumplir las obligaciones establecidas en la Ley 34/2002, de 11 de junio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSICE), como en la LO 3/2018, de 5 de diciembre, de Protección de Datos de Carácter Personal y garantía de los derechos digitales, y en el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo de 27 de abril de 2016 y demás normativa aplicable, así como proporcionar información sobre las condiciones de uso.</p>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">DATOS IDENTIFICATIVOS</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">DATOS IDENTIFICATIVOS</h2>
         <p>En cumplimiento del deber de información regulado en el art. 10 LSSICE, a continuación se facilitan los datos necesarios del titular de la página web:</p>
         <p>La empresa que gestiona los servicios y el dominio web es CONSULTORA NEGOCIO COSIRIS, S.L., con N.I.F. B-44913903, con domicilio social a estos efectos en Carrer Mossen Jacint Verdaguer número 4 La Senia, Tarragona (CP 43560), inscrita en el Registro Mercantil de Tarragona, al Tomo 3362, Folio 61, Hoja T-60152, Inscripción 1ª.</p>
         <p>Dirección de correo electrónico de contacto comercial@cosiris.com.</p>
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">USUARIOS</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">USUARIOS</h2>
         <p>Toda persona, ya sea física o jurídica, que acceda, navegue, utilice o participe en los servicios y actividades, gratuitas u onerosas, desarrolladas mediante esta página web asume la condición de USUARIO, y como tal, a través de dicho acceso, se compromete a la observancia y riguroso cumplimiento de las disposiciones aquí presentes, así como a cualquier otra disposición legal que resulte de aplicación, obligándose así a hacer un uso correcto del sitio web. El usuario responderá frente a CONSULTORA NEGOCIO COSIRIS, S.L., o frente a terceros, de cualesquiera daños y perjuicios que pudieran causarse como consecuencia del incumplimiento de dicha obligación.</p>
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">MODIFICACIONES</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">MODIFICACIONES</h2>
         <p>CONSULTORA NEGOCIO COSIRIS, S.L., se reserva el derecho de realizar unilateralmente las modificaciones que estime pertinentes en su portal, pudiendo cambiar, suprimir o añadir tanto los contenidos como los servicios que se presten a través del mismo, sin que exista obligación de preavisar o poner en conocimiento de los usuarios dichas modificaciones, entendiéndose como suficiente con la publicación en el sitio web del prestador.</p>
         <p>La duración de la prestación del servicio del portal se limita al momento en que el usuario esté conectado al sitio web o a alguno de los servicios que éste proporciona. Por ello, el usuario, en cada ocasión que pretenda utilizar el portal, debe leer detenidamente este Aviso Legal, ya que el mismo y sus respectivas condiciones de uso pueden verse alteradas en cualquier momento. Por tanto, la vigencia de las citadas condiciones variará en función de su exposición y se mantendrá mientras estén debidamente publicadas, hasta que se vean sustituidas por otras.</p>
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">CONDICIONES DE USO DEL SITIO WEB</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">CONDICIONES DE USO DEL SITIO WEB</h2>
         <p>Las presentes condiciones de uso y navegación tienen como finalidad regular la relación entre el titular de la página web, CONSULTORA NEGOCIO COSIRIS, S.L.,, como prestador del servicio, y los usuarios que acceden, navegan y disfrutan del servicio ofrecido.</p>
         <p>www.cosiris.com proporciona el acceso libre y gratuito a gran cantidad de información, servicios y datos (en adelante, "los contenidos"), cuya propiedad pertenece a CONSULTORA NEGOCIO COSIRIS, S.L., o a sus licenciantes a los que el usuario puede tener acceso.</p>
         <p>El usuario asume la responsabilidad del uso adecuado del portal de conformidad con la Ley y las presentes condiciones, responsabilidad que se extiende al registro necesario para acceder a determinados servicios y contenidos que se prestan. Dicho registro conlleva la cumplimentación del correspondiente formulario, en el cual el usuario garantiza la autenticidad y actualidad de todos aquellos datos que comunique y se compromete a no proporcionar información o documentación falsa, fraudulenta o ilícita. A raíz del mismo puede surgir la creación de una contraseña que el usuario deberá conservar diligentemente y de manera confidencial. El usuario será el único responsable de las manifestaciones falsas o inexactas que realice y de los perjuicios que cause a CONSULTORA NEGOCIO COSIRIS, S.L., o a terceros por la información que facilite.</p>
@@ -44,7 +44,7 @@ export function AvisoLegalPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">NOTIFICACIONES</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">NOTIFICACIONES</h2>
         <p>Todas las notificaciones y comunicaciones entre los usuarios y CONSULTORA NEGOCIO COSIRIS, S.L. se considerarán eficaces, a todos los efectos, cuando se realicen a través de correo postal, correo electrónico o comunicación telefónica. Los usuarios deberán dirigirse a CONSULTORA NEGOCIO COSIRIS, S.L. mediante:</p>
         <p>a) Envío por correo postal a la siguiente dirección: Carrer Mossen Jacint Verdaguer número 4 La Sènia, Tarragona (CP 43560)..</p>
         <p>b) Comunicación por medio de llamada telefónica al número: +34 623 49 70 27 .</p>
@@ -53,13 +53,13 @@ export function AvisoLegalPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">PROTECCIÓN DE DATOS DE CARÁCTER PERSONAL</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">PROTECCIÓN DE DATOS DE CARÁCTER PERSONAL</h2>
         <p>El titular de la página web se compromete a tratar los datos personales del usuario de conformidad con lo establecido en la legislación vigente en la materia. Concretamente, se compromete a aplicar lo dispuesto en la LO 3/2018, de 5 de diciembre, de Protección de Datos de Carácter Personal y garantía de los derechos digitales, y en el Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo de 27 de abril de 2016.</p>
         <p>Para más información sobre el tratamiento de sus datos personales en el portal, diríjase a la Política de Privacidad.</p>
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">PROPIEDAD INTELECTUAL E INDUSTRIAL</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">PROPIEDAD INTELECTUAL E INDUSTRIAL</h2>
         <p>Todos los contenidos del sitio web, entre otros, textos, fotografías, gráficos, imágenes, iconos, tecnología, software, links y demás contenidos audiovisuales, así como su diseño gráfico y códigos fuente, constituyen una obra cuya propiedad pertenece a CONSULTORA NEGOCIO COSIRIS, S.L., sin que puedan entenderse cedidos al usuario ninguno de los derechos de explotación sobre los mismos más allá de lo estrictamente necesario para el correcto uso de la web, y con independencia de que sean susceptibles o no de propiedad intelectual.</p>
         <p>Asimismo, todas las marcas, nombres comerciales o signos distintivos de cualquier clase que aparecen en el sitio web son propiedad de CONSULTORA NEGOCIO COSIRIS, S.L., sin que pueda entenderse que el uso o acceso al mismo atribuya al usuario derecho alguno sobre los mismos.</p>
         <p>Queda prohibida la reproducción total o parcial, explotación, distribución, modificación, cesión o comunicación pública de los contenidos y cualquier otro acto que no haya sido expresamente autorizado por el titular de los derechos de explotación. Cualquier uso no autorizado previamente se considera un incumplimiento grave de los derechos de propiedad intelectual o industrial del autor.</p>
@@ -68,13 +68,13 @@ export function AvisoLegalPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">ENLACES</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">ENLACES</h2>
         <p>El sitio web de www..cosiris.com propiedad de CONSULTORA NEGOCIO COSIRIS, S.L. puede contener enlaces o hipervínculos a otros sitios de Internet, respecto a los cuales no ejerce ningún tipo de control. Por tanto, una vez que el usuario acceda a los enlaces de terceros y abandone el sitio web, tanto el presente Aviso Legal, como la Política de Privacidad y la Política de Cookies dejarán de surtir efecto, ya que los sitios web a los que el usuario acceda están sujetos a sus propias políticas.</p>
         <p>CONSULTORA NEGOCIO COSIRIS, S.L. no puede asumir responsabilidad alguna por el contenido que pueda aparecer en páginas de terceros, ni garantiza la disponibilidad técnica, calidad, fiabilidad, exactitud, amplitud, veracidad, validez y constitucionalidad de cualquier material o información contenida en ninguno de dichos enlaces o hipervínculos. Asimismo, la inclusión de estas conexiones externas a sitios web ajenos no implica ningún tipo de asociación, fusión o participación con las entidades conectadas.</p>
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">EXCLUSIÓN DE GARANTÍAS Y RESPONSABILIDAD</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">EXCLUSIÓN DE GARANTÍAS Y RESPONSABILIDAD</h2>
         <p>La información suministrada por del presente sitio web es de carácter general y tiene una finalidad meramente informativa, sin que se garantice plenamente el acceso a todos los contenidos, ni su exactitud, exhaustividad, corrección, vigencia o actualidad, ni su idoneidad o utilidad para un objetivo específico.</p>
         <p>CONSULTORA NEGOCIO COSIRIS, S.L. no se hace responsable, en ningún caso, de los daños y perjuicios de cualquier naturaleza derivados de, a título enunciativo:</p>
         <ul className="list-disc pl-6 space-y-2">
@@ -85,7 +85,7 @@ export function AvisoLegalPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">LEY APLICABLE Y JURISDICCIÓN</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">LEY APLICABLE Y JURISDICCIÓN</h2>
         <p>Las relaciones establecidas entre CONSULTORA NEGOCIO COSIRIS, S.L., titular de la página web, y el usuario se regirá por la normativa española vigente.</p>
       </section>
     </LegalPageLayout>

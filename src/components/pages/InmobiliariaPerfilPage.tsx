@@ -131,17 +131,17 @@ function DifferentiatorsStrip() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.45, ease: [0.19, 1, 0.22, 1] }}
-      className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
+      className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4"
     >
       {WHY_US.map(({ icon: Icon, title }) => (
         <div
           key={title}
-          className="flex items-center gap-3 rounded-2xl border border-[#ECE8E1] bg-white px-4 py-3.5 shadow-[0_6px_20px_rgba(30,35,50,.04)]"
+          className="flex flex-col items-start gap-2 rounded-2xl border border-[#ECE8E1] bg-white px-3.5 py-3 shadow-[0_6px_20px_rgba(30,35,50,.04)]"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
             <Icon size={16} />
           </div>
-          <p className="text-sm font-semibold text-[#0F172A]">{title}</p>
+          <p className="text-sm font-semibold leading-snug text-[#0A0A0A]">{title}</p>
         </div>
       ))}
     </motion.div>
@@ -243,11 +243,11 @@ function VideoCard({
           probó con el logo aquí, pero la foto del agente ya cumple ese rol de
           identificar quién habla, más abajo en la columna de texto). */}
       <div className="mb-5">
-        <p className="text-sm font-bold text-[#0F172A]">{nombre}</p>
+        <p className="text-sm font-bold text-[#0A0A0A]">{nombre}</p>
         <p className="text-xs font-bold uppercase tracking-[0.1em] text-primary">Video de presentación</p>
       </div>
 
-      <div className="rounded-[24px] border border-border bg-white p-3 shadow-[0_10px_30px_rgba(15,23,42,.06)]">
+      <div className="rounded-[24px] border border-border bg-white p-3 shadow-[0_10px_30px_rgba(0,0,0,.06)]">
         {embed ? (
           <div className={`mx-auto overflow-hidden rounded-[16px] bg-black ${isVertical ? 'aspect-[9/16] w-full max-w-[300px]' : 'aspect-video w-full max-w-[640px]'}`}>
             <iframe
@@ -350,7 +350,7 @@ function VideoCard({
           </div>
         )}
         <div>
-          <p className="text-sm font-bold text-[#0F172A]">Transparencia, compromiso y resultados comprobados.</p>
+          <p className="text-sm font-bold text-[#0A0A0A]">Transparencia, compromiso y resultados comprobados.</p>
           <p className="text-xs text-[#68707F]">Así trabajamos en {nombre}.</p>
         </div>
       </motion.div>
@@ -390,7 +390,7 @@ function ReviewMiniCard({ review, paused, reducedMotion }: { review: DisplayRevi
               )}
             </div>
             <div className="min-w-0">
-              <p className="truncate text-lg font-semibold text-[#0F172A]">{review.autor}</p>
+              <p className="truncate text-lg font-semibold text-[#0A0A0A]">{review.autor}</p>
             </div>
           </div>
           <span className="inline-flex shrink-0 items-center rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
@@ -592,7 +592,7 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
           </motion.span>
           Reseñas de clientes
         </span>
-        <h3 className="mt-4 text-[42px] font-bold leading-[110%] tracking-[-0.02em] text-[#0F172A]">
+        <h3 className="mt-4 text-[42px] font-bold leading-[110%] tracking-[-0.02em] text-[#0A0A0A]">
           Lo que dicen de nosotros
         </h3>
         <p className="mt-3 text-lg leading-[170%] text-[#68707F]">
@@ -607,21 +607,21 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
           {agency.num_propiedades > 0 && (
             <div className="inline-flex items-center gap-2 rounded-full border border-[#ECE8E1] bg-white px-4 py-2 text-sm shadow-[0_4px_16px_rgba(24,35,52,.04)]">
               <Home size={14} className="text-primary" />
-              <span className="font-bold text-[#0F172A]">{agency.num_propiedades}</span>
+              <span className="font-bold text-[#0A0A0A]">{agency.num_propiedades}</span>
               <span className="text-[#68707F]">viviendas vendidas</span>
             </div>
           )}
           {agency.anos_experiencia > 0 && (
             <div className="inline-flex items-center gap-2 rounded-full border border-[#ECE8E1] bg-white px-4 py-2 text-sm shadow-[0_4px_16px_rgba(24,35,52,.04)]">
               <Briefcase size={14} className="text-primary" />
-              <span className="font-bold text-[#0F172A]">{agency.anos_experiencia}</span>
+              <span className="font-bold text-[#0A0A0A]">{agency.anos_experiencia}</span>
               <span className="text-[#68707F]">años de experiencia</span>
             </div>
           )}
           {agency.precio_medio > 0 && (
             <div className="inline-flex items-center gap-2 rounded-full border border-[#ECE8E1] bg-white px-4 py-2 text-sm shadow-[0_4px_16px_rgba(24,35,52,.04)]">
               <Wallet size={14} className="text-primary" />
-              <span className="font-bold text-[#0F172A]">{formatPrice(agency.precio_medio)}</span>
+              <span className="font-bold text-[#0A0A0A]">{formatPrice(agency.precio_medio)}</span>
               <span className="text-[#68707F]">precio medio</span>
             </div>
           )}
@@ -658,7 +658,7 @@ function ReviewsList({ agency }: { agency: InmobiliariaPublica }) {
                   )}
                 </div>
                 <div>
-                  <p className="text-lg font-semibold text-[#0F172A]">{review.autor}</p>
+                  <p className="text-lg font-semibold text-[#0A0A0A]">{review.autor}</p>
                 </div>
               </div>
               <span className="inline-flex shrink-0 items-center rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
@@ -699,7 +699,7 @@ function LocationSection({ agency, searchPoint, displayCity }: { agency: Inmobil
     <div>
       <span className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">📍 Ubicación</span>
 
-      <h3 className="mt-4 text-[48px] font-bold leading-[110%] tracking-[-0.02em] text-[#0F172A]">
+      <h3 className="mt-4 text-[48px] font-bold leading-[110%] tracking-[-0.02em] text-[#0A0A0A]">
         Estamos en {[displayCity, agency.provincia].filter(Boolean).join(', ')}
       </h3>
 
@@ -707,7 +707,7 @@ function LocationSection({ agency, searchPoint, displayCity }: { agency: Inmobil
         Conocemos cada rincón de la zona para ayudarte a vender mejor tu propiedad.
       </p>
 
-      <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary/8 px-4 py-2 text-sm font-semibold text-[#0F172A]">
+      <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary/8 px-4 py-2 text-sm font-semibold text-[#0A0A0A]">
         <span className="text-base">📍</span>
         Especialistas en {displayCity || 'tu zona'} y municipios cercanos
       </div>
@@ -739,7 +739,7 @@ function LocationSection({ agency, searchPoint, displayCity }: { agency: Inmobil
             <div className="flex items-center gap-4">
               <span className="text-xl">📍</span>
               <div>
-                <p className="text-sm font-bold text-[#0F172A]">{displayCity || agency.provincia}</p>
+                <p className="text-sm font-bold text-[#0A0A0A]">{displayCity || agency.provincia}</p>
                 <p className="text-xs text-[#68707F]">Zona centro</p>
               </div>
             </div>
@@ -963,7 +963,7 @@ function PropertyTypeSelector({ onSelect }: { onSelect: (tipo: TipoInmueble) => 
             <Icon size={22} className="sm:hidden" />
             <Icon size={26} className="hidden sm:block" />
           </div>
-          <span className="text-sm font-bold text-slate-900">{label}</span>
+          <span className="text-sm font-bold text-neutral-900">{label}</span>
         </button>
       ))}
     </div>
@@ -1012,9 +1012,9 @@ function ValuationHero({
           initial={{ opacity: 0, y: 18, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, ease: EASE }}
-          className="w-full max-w-[540px] rounded-[32px] bg-white p-8 text-center shadow-[0_30px_70px_rgba(15,23,42,0.25)] sm:p-11"
+          className="w-full max-w-[540px] rounded-[32px] bg-white p-8 text-center shadow-[0_30px_70px_rgba(0,0,0,0.25)] sm:p-11"
         >
-          <h2 className="text-[28px] font-bold tracking-[-0.01em] text-[#0F172A] sm:text-[36px]">
+          <h2 className="text-[28px] font-bold tracking-[-0.01em] text-[#0A0A0A] sm:text-[36px]">
             Solicita tu valoración
           </h2>
 
@@ -1026,12 +1026,12 @@ function ValuationHero({
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 1, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className="mt-6 flex items-center justify-center gap-1.5 text-xs font-medium text-primary/70 sm:text-sm"
+            className="mt-6 flex items-center justify-center gap-1.5 text-sm font-semibold text-primary"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M5 3L19 10L12 12L12 19L9 15L5 3Z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
             </svg>
-            Haz click y empezamos
+            Haz clic y empezamos
           </motion.p>
         </motion.div>
       </div>
@@ -1097,12 +1097,12 @@ function TypeSelectorModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar"
-            className="absolute right-4 top-4 z-10 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            className="absolute right-2 top-2 z-10 flex size-11 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
           >
             <X size={18} />
           </button>
 
-          <h3 className="text-2xl font-bold text-[#0F172A]">Solicita tu valoración</h3>
+          <h3 className="text-2xl font-bold text-[#0A0A0A]">Solicita tu valoración</h3>
           <p className="mt-1 text-sm text-ink-muted">¿Qué tipo de inmueble quieres valorar con {agency.nombre_comercial}?</p>
 
           <div className="mt-6">
@@ -1166,12 +1166,12 @@ function LeadFormModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar"
-            className="absolute right-4 top-4 z-10 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            className="absolute right-2 top-2 z-10 flex size-11 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
           >
             <X size={18} />
           </button>
           <p className="mb-1 pr-8 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Sin compromiso</p>
-          <h3 className="mb-5 pr-8 text-lg font-extrabold text-slate-900">
+          <h3 className="mb-5 pr-8 text-lg font-extrabold text-neutral-900">
             Solicita la valoración de tu {tipoInmueble.toLowerCase()}
           </h3>
           <AgencyLeadForm agency={agency} tipoInmueble={tipoInmueble} showStepCounter onSuccess={onSuccess} />
@@ -1443,7 +1443,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
     return (
       <div className="flex min-h-screen flex-col">
         <main className="mx-auto flex flex-1 flex-col items-center justify-center px-4 text-center">
-          <p className="text-lg font-bold text-slate-900">No encontramos esta inmobiliaria</p>
+          <p className="text-lg font-bold text-neutral-900">No encontramos esta inmobiliaria</p>
           <button
             type="button"
             onClick={() => navigateTo(getLastDirectoryUrl())}
@@ -1474,7 +1474,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
   const hasSideMedia = hasPlayableVideo || !!heroFotoUrl;
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-900 antialiased">
+    <div className="min-h-screen bg-white font-sans text-neutral-900 antialiased">
       {/* La ficha es el minisite de la inmobiliaria: sin el menú de Cosiris, solo
           una barra fija para volver al directorio. */}
       <div className="sticky top-0 z-30 border-b border-slate-100 bg-white/95 backdrop-blur-sm">
@@ -1482,7 +1482,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
         <button
           type="button"
           onClick={() => navigateTo(backUrl)}
-          className="group inline-flex items-center gap-1 rounded-full px-1.5 py-1.5 text-sm font-semibold text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-95"
+          className="group inline-flex min-h-11 items-center gap-1 rounded-full px-1.5 text-sm font-semibold text-slate-500 transition-all hover:bg-slate-100 hover:text-neutral-900 active:scale-95"
         >
           <ArrowLeft size={15} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
           Volver al directorio
@@ -1527,7 +1527,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
             />
           </div>
 
-          <div className={`relative z-10 mt-10 grid grid-cols-1 items-start gap-10 ${hasSideMedia ? 'md:grid-cols-[1.3fr_1fr] md:gap-10 lg:gap-16' : ''}`}>
+          <div className={`relative z-10 mt-10 grid grid-cols-1 items-start gap-10 ${hasSideMedia ? 'lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-16' : ''}`}>
             {/* El vídeo (o si no hay, la foto grande del agente) va primero en el DOM,
                 pero en móvil se manda al final del stack con `order-2` — el visitante
                 lee primero la presentación (nombre, bio, agente, CTA) y el vídeo queda
@@ -1577,7 +1577,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                     src={optimizedImageUrl(heroFotoUrl, 600)}
                     alt={agency.nombre_agente}
                     style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
-                    className="h-48 w-48 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-56 sm:w-56 md:h-[240px] md:w-[240px] lg:h-[280px] lg:w-[280px]"
+                    className="h-48 w-48 rounded-full border-4 border-white object-cover shadow-xl shadow-neutral-900/15 sm:h-56 sm:w-56 md:h-[240px] md:w-[240px] lg:h-[280px] lg:w-[280px]"
                     decoding="async"
                   />
                 </div>
@@ -1691,7 +1691,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
                         src={optimizedImageUrl(heroFotoUrl, 400)}
                         alt={agency.nombre_agente}
                         style={{ objectPosition: agency.foto_pos ?? '50% 50%' }}
-                        className="h-40 w-40 rounded-full border-4 border-white object-cover shadow-xl shadow-slate-900/15 sm:h-44 sm:w-44 md:h-[190px] md:w-[190px]"
+                        className="h-40 w-40 rounded-full border-4 border-white object-cover shadow-xl shadow-neutral-900/15 sm:h-44 sm:w-44 md:h-[190px] md:w-[190px]"
                         decoding="async"
                       />
                     </motion.div>
@@ -1728,7 +1728,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
         <section className="bg-surface">
           <div className="relative mx-auto max-w-[87.5rem] px-5 md:px-10 py-10 sm:py-12">
             <span className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Confianza</span>
-            <h3 className="mt-1 text-2xl font-bold text-[#0F172A] sm:text-[26px]">Por qué elegirnos</h3>
+            <h3 className="mt-1 text-2xl font-bold text-[#0A0A0A] sm:text-[26px]">Por qué elegirnos</h3>
             <div className="mt-5">
               <DifferentiatorsStrip />
             </div>
@@ -1823,7 +1823,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
       {/* CTA fija en móvil — mismo paso 1 (elegir tipo) que cualquier otro
           botón de la página, no un atajo de scroll hacia arriba. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 p-3 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-sm lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 p-3 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:hidden">
         <button
           type="button"
           onClick={() => setShowTypeModal(true)}

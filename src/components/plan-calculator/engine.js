@@ -77,17 +77,17 @@ export function mountPlanCalculator(root, opts){
       if(r.perm<12&&d.m>r.perm){const gy=Y(full[i].bag);g+=`<rect x="${x+2}" y="${gy}" width="${colW-4}" height="${y-gy}" fill="none" stroke="#C9CDDC" stroke-width="1.5" stroke-dasharray="4 3" rx="4"/>`;}
       g+=`<rect x="${x}" y="${y}" width="${colW}" height="${base-y}" fill="${d.m<=r.perm?"#FFE8D2":"#F1EEEA"}"/>`;
       path+=`V${y}H${x+colW}`;
-      g+=`<text x="${x+colW/2}" y="${y+16}" text-anchor="middle" font-size="${small?10:12}" font-weight="800" fill="#13204A">${Math.round(d.bag)}</text>`;
+      g+=`<text x="${x+colW/2}" y="${y+16}" text-anchor="middle" font-size="${small?10:12}" font-weight="800" fill="#0A0A0A">${Math.round(d.bag)}</text>`;
       if(!small||i===0)g+=`<text x="${x+colW/2}" y="${y+29}" text-anchor="middle" font-size="9.5" font-weight="600" fill="#8A8FA3">leads</text>`;
-      let k=0;const hh=[...Array(d.hN).fill("#FF8C19"),...Array(d.hO).fill("#13204A")];
+      let k=0;const hh=[...Array(d.hN).fill("#FF8C19"),...Array(d.hO).fill("#0A0A0A")];
       hh.forEach(c=>{const col=k%2,row=Math.floor(k/2);g+=house(x+colW/2-(hh.length>1?hs+1:hs/2)+col*(hs+2),y-8-hs-row*(hs+3),hs,c);k++;});
       // pie
-      g+=`<text x="${x+colW/2}" y="${base+16}" text-anchor="middle" font-size="${small?10:11.5}" font-weight="800" fill="#13204A">${small?"M":"Mes "}${d.m}</text>`;
+      g+=`<text x="${x+colW/2}" y="${base+16}" text-anchor="middle" font-size="${small?10:11.5}" font-weight="800" fill="#0A0A0A">${small?"M":"Mes "}${d.m}</text>`;
       if(!small){g+=`<text x="${x+colW/2}" y="${base+31}" text-anchor="middle" font-size="10.5" font-weight="600" fill="${d.inv?"#2F5BEA":"#8A8FA3"}">${d.inv?grp(d.inv)+" €":"—"}</text>`;
         g+=`<text x="${x+colW/2}" y="${base+45}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${d.nw?"#C24E08":"#8A8FA3"}">${d.nw?"+"+Math.round(d.nw)+" leads":"sin nuevos"}</text>`;}
     });
     path+=`V${base}`;
-    g=g+`<path d="${path}" fill="none" stroke="#FF8C19" stroke-width="2.5" stroke-linejoin="round"/><line x1="${pl}" x2="${W-pr}" y1="${base}" y2="${base}" stroke="#13204A" stroke-width="1.5"/>`;
+    g=g+`<path d="${path}" fill="none" stroke="#FF8C19" stroke-width="2.5" stroke-linejoin="round"/><line x1="${pl}" x2="${W-pr}" y1="${base}" y2="${base}" stroke="#0A0A0A" stroke-width="1.5"/>`;
     if(r.perm<12){const xb=pl+r.perm*colW;g+=`<line x1="${xb}" x2="${xb}" y1="${top-34}" y2="${base}" stroke="#C24E08" stroke-width="1.5" stroke-dasharray="5 4"/><text x="${xb+5}" y="${top-24}" font-size="11" font-weight="800" fill="#C24E08">Fin de tu permanencia</text>`;}
     const Hh=base+(small?26:56);
     $("whyChart").innerHTML=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Escalera de leads y captaciones mes a mes">${g}</svg>`;
@@ -106,13 +106,13 @@ export function mountPlanCalculator(root, opts){
     let g="";
     if(o.band&&o.band<n){const xb=(X(o.band-1)+X(o.band))/2;const nar=(xb-pl)<130;g+=`<rect x="${pl}" y="${pt}" width="${xb-pl}" height="${ih}" fill="#FFF3E6"/><text x="${pl+6}" y="${pt+14}" font-size="11" font-weight="800" fill="#C24E08">${nar?"Permanencia":"Tu permanencia"}</text><text x="${xb+8}" y="${pt+(nar?32:14)}" font-size="11" font-weight="700" fill="#8A8FA3">${W<520?"Renovación":"Renovación automática · 490 €/mes"}</text>`;}
     for(let k=0;k<=ticks;k++){const v=mn+step*k,y=Y(v);g+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="#E8E8EC" stroke-width="1"/><text x="${pl-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#8A8FA3" font-weight="600">${o.yFmt(v)}</text>`;}
-    if(o.zero&&mn<0){const y=Y(0);g+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="#13204A" stroke-width="1.5"/>`;}
-    o.labels.forEach((l,i)=>{if((W<520&&n>6||n>14)&&i%2===1&&i!==n-1)return;g+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="#8A8FA3" font-weight="700">${l}</text>`;});
+    if(o.zero&&mn<0){const y=Y(0);g+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="#0A0A0A" stroke-width="1.5"/>`;}
+    o.labels.forEach((l,i)=>{if((W<520&&n>6||n>14)&&((i%2===1&&i!==n-1)||(i===n-2&&(n-1)%2===1)))return;g+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="#8A8FA3" font-weight="700">${l}</text>`;});
     o.series.forEach(s=>{
       const pts=s.data.map((v,i)=>`${X(i)},${Y(v)}`).join(" ");
       g+=`<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="${s.width||3}" stroke-linejoin="round" stroke-linecap="round"/>`;
       s.data.forEach((v,i)=>{const last=i===s.data.length-1;if(s.labels||last||s.end)if(s.labels||last){g+=`<circle cx="${X(i)}" cy="${Y(v)}" r="${last?5:3.5}" fill="#fff" stroke="${s.color}" stroke-width="2.5"/>`;}
-        if(s.labels&&(W>=520||i===0||last||i===3))g+=`<text x="${X(i)}" y="${Y(v)-10}" text-anchor="middle" font-size="11" font-weight="800" fill="#13204A">${grp(Math.round(v))}</text>`;});
+        if(s.labels&&(W>=520||i===0||last||i===3))g+=`<text x="${X(i)}" y="${Y(v)-10}" text-anchor="middle" font-size="11" font-weight="800" fill="#0A0A0A">${grp(Math.round(v))}</text>`;});
     });
     const ends=o.series.filter(s=>!s.labels).map(s=>({s,v:s.data[s.data.length-1],y:Y(s.data[s.data.length-1])-10})).sort((a,b)=>a.y-b.y);
     for(let i=1;i<ends.length;i++)if(ends[i].y-ends[i-1].y<18)ends[i].y=ends[i-1].y+18;
@@ -229,7 +229,7 @@ export function mountPlanCalculator(root, opts){
   on(window,"scroll",hideT,{passive:true});
   // ================= PDF: presupuesto, informe y presentación =================
   const PG=[[4,"FFFFFF","FFFFFF"],[6,"FBFBFB","FBFBFB"],[10,"FAFAF8","F9F8F6"],[11,"FFFFFF","FFFFFF"],[12,"FCFCFC","FFFFFF"],[13,"FAFAFA","FAFAFA"],[14,"FAFAFA","FAFAFA"],[15,"F8F8F8","F8F8F8"]];
-  const K={navy:"#13204A",navy2:"#1C2B5C",or:"#FF8C19",ord:"#F26511",ort:"#C24E08",peach:"#FFE8D2",cream:"#F7F6F4",text:"#4A5068",muted:"#8A8FA3",light:"#C9CDDC",line:"#ECE7E1",green:"#1F9D55",greenBg:"#E7F6EC",blue:"#2F5BEA",white:"#FFFFFF"};
+  const K={navy:"#0A0A0A",navy2:"#1C2B5C",or:"#FF8C19",ord:"#F26511",ort:"#C24E08",peach:"#FFE8D2",cream:"#F7F6F4",text:"#4A5068",muted:"#8A8FA3",light:"#C9CDDC",line:"#ECE7E1",green:"#1F9D55",greenBg:"#E7F6EC",blue:"#2F5BEA",white:"#FFFFFF"};
   const FAM="Montserrat, Arial, sans-serif";
   const imgCache={};
   const loadImg=src=>imgCache[src]||(imgCache[src]=new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src;}));

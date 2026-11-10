@@ -15,11 +15,11 @@ export default {
           hover:   '#E67300',
           foreground: '#FFFFFF',
         },
-        foreground: '#0F172A',
+        foreground: '#0A0A0A',
         background: '#FFFFFF',
         border: '#E5E1DB',
         ink: {
-          DEFAULT: '#0F172A',
+          DEFAULT: '#0A0A0A',
           muted:   '#667085',
           faint:   '#D0CCC5',
         },

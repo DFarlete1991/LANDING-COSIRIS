@@ -54,10 +54,10 @@ export function CookieConsentBanner() {
           transition={{ duration: 0.3 }}
           role="dialog"
           aria-label="Preferencias de cookies"
-          className="fixed inset-x-0 bottom-0 z-[200] flex justify-center px-4 pb-4"
+          className="fixed inset-x-0 bottom-0 z-[200] flex justify-center px-3 pb-3 sm:px-4 sm:pb-4"
         >
-          <div className="w-full max-w-2xl rounded-xl border border-slate-200 bg-white p-5 shadow-[0_24px_64px_-12px_rgba(0,0,0,0.35)]">
-            <p className="text-sm leading-relaxed text-slate-700">
+          <div className="w-full max-w-2xl rounded-xl border border-slate-200 bg-white p-4 shadow-[0_24px_64px_-12px_rgba(0,0,0,0.35)] sm:p-5">
+            <p className="text-[13px] leading-snug text-slate-700 sm:text-sm sm:leading-relaxed">
               Usamos cookies técnicas (siempre activas) y, si nos das permiso, cookies de
               analítica y publicidad. Puedes cambiar tu elección cuando quieras desde
               "Configurar cookies" en el pie de página. Más info en nuestra{' '}
@@ -71,7 +71,7 @@ export function CookieConsentBanner() {
               <div className="mt-4 space-y-3 border-t border-slate-100 pt-4">
                 <label className="flex items-center justify-between gap-3 text-sm text-slate-700">
                   <span>
-                    <strong className="font-semibold text-slate-900">Analítica</strong> — Google Tag
+                    <strong className="font-semibold text-neutral-900">Analítica</strong> — Google Tag
                     Manager, Google Analytics, Google Ads
                   </span>
                   <input
@@ -83,7 +83,7 @@ export function CookieConsentBanner() {
                 </label>
                 <label className="flex items-center justify-between gap-3 text-sm text-slate-700">
                   <span>
-                    <strong className="font-semibold text-slate-900">Publicidad</strong> — Meta Pixel
+                    <strong className="font-semibold text-neutral-900">Publicidad</strong> — Meta Pixel
                     (Facebook / Instagram) y píxel de OpenAI (anuncios en ChatGPT)
                   </span>
                   <input
@@ -96,12 +96,12 @@ export function CookieConsentBanner() {
               </div>
             )}
 
-            <div className="mt-4 flex flex-wrap items-center justify-end gap-2.5">
+            <div className="mt-3 grid grid-cols-3 gap-2 sm:mt-4 sm:flex sm:flex-wrap sm:items-center sm:justify-end sm:gap-2.5">
               {expanded ? (
                 <button
                   type="button"
                   onClick={confirmSelection}
-                  className="rounded-md bg-[#FF8000] px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-[#E67300]"
+                  className="col-span-3 min-h-11 rounded-md bg-[#FF8000] px-4 text-sm font-bold text-white transition hover:bg-[#E67300]"
                 >
                   Guardar preferencias
                 </button>
@@ -110,21 +110,21 @@ export function CookieConsentBanner() {
                   <button
                     type="button"
                     onClick={() => setExpanded(true)}
-                    className="rounded-md border border-slate-200 px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-slate-600 transition hover:bg-slate-50"
+                    className="min-h-11 rounded-md border border-slate-200 px-2 text-[13px] font-bold text-slate-700 transition hover:bg-slate-50 sm:px-4"
                   >
                     Configurar
                   </button>
                   <button
                     type="button"
                     onClick={rejectAll}
-                    className="rounded-md border border-slate-200 px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-slate-600 transition hover:bg-slate-50"
+                    className="min-h-11 rounded-md border border-slate-200 px-2 text-[13px] font-bold text-slate-700 transition hover:bg-slate-50 sm:px-4"
                   >
                     Rechazar
                   </button>
                   <button
                     type="button"
                     onClick={acceptAll}
-                    className="rounded-md bg-[#FF8000] px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-[#E67300]"
+                    className="min-h-11 rounded-md bg-[#FF8000] px-2 text-[13px] font-bold text-white transition hover:bg-[#E67300] sm:px-4"
                   >
                     Aceptar todo
                   </button>

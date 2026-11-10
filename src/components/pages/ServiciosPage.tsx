@@ -120,7 +120,7 @@ function SectionNav() {
               <a
                 href={`#${s.id}`}
                 aria-current={on ? 'true' : undefined}
-                className={`inline-flex min-h-10 items-center gap-2 rounded-full px-1.5 text-xs font-semibold min-[390px]:px-2.5 min-[390px]:text-[13px] transition-[background-color,color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] md:min-h-11 md:px-5 md:text-sm ${
+                className={`inline-flex min-h-11 items-center gap-2 rounded-full px-1.5 text-xs font-semibold min-[390px]:px-2.5 min-[390px]:text-[13px] transition-[background-color,color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] md:min-h-11 md:px-5 md:text-sm ${
                   on ? 'bg-[#FF8000] text-white shadow-[0_6px_16px_-4px_rgba(255,128,0,0.55)]' : 'text-neutral-700 hover:text-black'
                 }`}
               >

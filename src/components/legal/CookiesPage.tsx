@@ -21,7 +21,7 @@ export function CookiesPage() {
       </p>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">POLÍTICA DE COOKIES</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">POLÍTICA DE COOKIES</h2>
         <p>
           En cumplimiento de lo previsto en el artículo 22.2 de la Ley 34/2002, de 11 de
           julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico
@@ -31,7 +31,7 @@ export function CookiesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">¿Qué son las cookies?</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">¿Qué son las cookies?</h2>
         <p>
           Las cookies son pequeños archivos de texto que un sitio web envía al navegador
           del usuario y que permiten, entre otras cosas, reconocer al usuario en visitas
@@ -40,7 +40,7 @@ export function CookiesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">Cookies propias (técnicas)</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">Cookies propias (técnicas)</h2>
         <p>
           Son las estrictamente necesarias para el funcionamiento del sitio y no requieren
           consentimiento, al estar excluidas del ámbito del art. 22.2 LSSI-CE: permiten,
@@ -50,7 +50,7 @@ export function CookiesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">Cookies de terceros (requieren su consentimiento)</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">Cookies de terceros (requieren su consentimiento)</h2>
         <p>Solo se activan si usted las acepta, de forma separada por categoría:</p>
         <ul className="list-disc pl-6 space-y-3 mt-3">
           <li>
@@ -105,7 +105,7 @@ export function CookiesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">Cómo cambiar su consentimiento</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">Cómo cambiar su consentimiento</h2>
         <p>
           Puede aceptar, rechazar o personalizar estas cookies en cualquier momento desde
           el enlace{' '}
@@ -123,7 +123,7 @@ export function CookiesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">Cambios en la política de cookies</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">Cambios en la política de cookies</h2>
         <p>
           Es posible que esta Política de Cookies se actualice para reflejar cambios en
           las cookies realmente utilizadas. Le recomendamos revisarla periódicamente.
@@ -131,7 +131,7 @@ export function CookiesPage() {
       </section>
 
       <section>
-        <h2 className="text-base font-semibold text-slate-900 mt-8 mb-2">Contacto</h2>
+        <h2 className="text-base font-semibold text-neutral-900 mt-8 mb-2">Contacto</h2>
         <p>
           Para cualquier duda sobre esta Política de Cookies, puede escribirnos a{' '}
           comercial@cosiris.com.
