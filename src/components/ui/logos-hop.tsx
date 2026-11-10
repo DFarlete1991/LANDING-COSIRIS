@@ -7,7 +7,9 @@ const VISIBLE = 9;
 const GRID = 15;
 const GRID_PHONE = 10;
 const SECONDS = 28;
-const INK = '#7A3E12';
+// Caja en la línea del resto de la web: caras claras, contorno fino naranja
+// suave y una franja de marca, sin el trazo marrón grueso de dibujo animado.
+const EDGE = '#F0B27A';
 const BOX = 'hop-box pointer-events-none absolute right-0 bottom-3 h-40 w-[13.5rem] origin-bottom md:h-44 md:w-60';
 
 // circle: logo ya preparado para el círculo (los locales); los del directorio no lo traen.
@@ -164,9 +166,12 @@ export function LogosHop() {
       <div className="hop-track relative hidden h-64 xl:block motion-reduce:hidden">
         <span aria-hidden="true" className="absolute right-0 bottom-3 left-0 border-b-2 border-dashed border-neutral-200" />
 
-        <svg aria-hidden="true" viewBox="0 0 240 180" className={BOX} style={beat} strokeLinejoin="round">
-          <path d="M30 58 72 18h128l-50 40Z" fill="#E9833A" stroke={INK} strokeWidth="2.5" />
-          <path d="M72 18 30 58v16l42-40Z" fill="#D9722B" />
+        <svg aria-hidden="true" viewBox="0 0 240 180" overflow="visible" className={BOX} style={beat} strokeLinejoin="round">
+          <ellipse cx="128" cy="174" rx="112" ry="7" fill="#C2410C" opacity="0.1" />
+          <path d="M72 18h128l10-16H86Z" fill="#FFF0E5" stroke={EDGE} strokeWidth="1.5" />
+          <path d="M30 58 72 18h128l-50 40Z" fill="#E9944F" />
+          <path d="M72 18h128l-14 13H80Z" fill="#C9692A" opacity="0.45" />
+          <path d="M72 18 30 58v14l42-40Z" fill="#D27C3C" />
         </svg>
 
         <ul className="absolute inset-0">
@@ -182,16 +187,18 @@ export function LogosHop() {
           ))}
         </ul>
 
-        <div aria-hidden="true" className={`${BOX} z-10`} style={beat}>
+        <div aria-hidden="true" className={`${BOX} z-10 drop-shadow-[0_16px_22px_rgba(194,65,12,0.16)]`} style={beat}>
           <svg viewBox="0 0 240 180" className="absolute inset-0 h-full w-full" strokeLinejoin="round">
-            <path d="M150 58 200 18v112l-50 40Z" fill="#FFAE66" stroke={INK} strokeWidth="2.5" />
-            <path d="M150 58 200 18l32 36-50 38Z" fill="#FFB877" stroke={INK} strokeWidth="2.5" />
-            <path d="M30 58h120v112H30Z" fill="#FFD3A1" stroke={INK} strokeWidth="2.5" />
-            <path d="M30 100h92l28-42v20l-20 34H30Z" fill="#F7B678" />
-            <path d="M30 58h120l-28 42H4Z" fill="#FFE2C2" stroke={INK} strokeWidth="2.5" />
-            <path d="M12 96 34 62h100" fill="none" stroke="#FFFFFF" strokeOpacity="0.8" strokeWidth="2" strokeLinecap="round" />
+            <path d="M150 58 200 18v112l-50 40Z" fill="#FFE3C7" stroke={EDGE} strokeWidth="1.5" />
+            <path d="M150 158 200 118v12l-50 40Z" fill="#E67300" />
+            <path d="M150 58 200 18l30 34-48 38Z" fill="#FFD3A1" stroke={EDGE} strokeWidth="1.5" />
+            <path d="M30 58h120v112H30Z" fill="#FFFFFF" stroke={EDGE} strokeWidth="1.5" />
+            <path d="M30 100h92l28-42v18l-20 32H30Z" fill="#FFF4EA" />
+            <path d="M30 158h120v12H30Z" fill="#FF8000" />
+            <path d="M30 58h120l-28 42H4Z" fill="#FFF0E5" stroke={EDGE} strokeWidth="1.5" />
+            <path d="M14 94 34 64h96" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
           </svg>
-          <span className="absolute top-[62%] left-[12.5%] flex w-1/2 flex-col items-center leading-tight text-black">
+          <span className="absolute top-[60%] left-[12.5%] flex w-1/2 flex-col items-center leading-tight text-black">
             <img src="/assets/logo_black.png" alt="" width={380} height={170} className="h-7 w-auto md:h-8" />
             <span className="mt-0.5 text-[10px] font-bold md:text-[11px]">+1.000 visitadas</span>
           </span>
