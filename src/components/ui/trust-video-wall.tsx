@@ -12,7 +12,7 @@ const SNAPPY = 'ease-[cubic-bezier(0.23,1,0.32,1)]';
 const METRICS = [
   { value: '+11 años', label: 'en el sector inmobiliario' },
   { value: '+1.000', label: 'inmobiliarias visitadas' },
-  { value: '24 h', label: 'para responderte, sin compromiso' },
+  { value: '72 h', label: 'para tener tu servicio activo' },
 ];
 
 const QUICK_LINKS = [
@@ -109,7 +109,7 @@ export function TrustVideoWall() {
           Plataforma de marketing y captación <span className="text-[#E67300]">para inmobiliarias</span>
         </motion.h1>
 
-        <p className="mt-4 text-xs font-bold uppercase tracking-[0.08em] text-[#E67300] sm:text-sm md:mt-6 md:text-base md:tracking-[0.12em]">
+        <p className="mt-4 text-balance text-[11px] font-bold uppercase tracking-[0.04em] text-[#E67300] min-[400px]:text-xs min-[400px]:tracking-[0.08em] sm:text-sm md:mt-6 md:text-base md:tracking-[0.12em]">
           Marketing · Captación · Automatizaciones IA
         </p>
 

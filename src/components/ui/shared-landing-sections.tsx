@@ -262,10 +262,10 @@ export function SharedLandingSections({ disableYouTube = false }: { disableYouTu
             {
               icon: <Calendar size={24} className="text-[#FF8000]" />,
               title: 'Condiciones de pago',
-              subtitle: 'La fidelidad tiene premio:',
+              subtitle: '',
               checks: [
-                'Sin permanencias',
                 'Sin pagos por adelantado',
+                'La fidelidad tiene premio',
               ],
               delay: 0.2,
             },

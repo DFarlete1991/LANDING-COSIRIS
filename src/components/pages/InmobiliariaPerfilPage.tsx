@@ -24,7 +24,6 @@ import { getVideoEmbed, isDirectVideoUrl } from '@/lib/video-embed';
 import { useValidImageUrl } from '@/lib/use-valid-image-url';
 import { animate, splitText, stagger } from 'animejs';
 import { useFluidPage } from '@/lib/use-fluid-page';
-import { LandingNavbar } from '@/components/pages/landing-navbar';
 
 // three.js + fiber pesan varios cientos de KB — nada de esto debe entrar en
 // el bundle inicial de una landing de campaña de pago. Se carga solo si el
@@ -1476,9 +1475,10 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 antialiased">
-      <LandingNavbar />
-
-      <div className="mx-auto w-full max-w-[87.5rem] px-5 py-3 md:px-10">
+      {/* La ficha es el minisite de la inmobiliaria: sin el menú de Cosiris, solo
+          una barra fija para volver al directorio. */}
+      <div className="sticky top-0 z-30 border-b border-slate-100 bg-white/95 backdrop-blur-sm">
+        <div className="mx-auto flex h-14 w-full max-w-[87.5rem] items-center px-5 md:px-10">
         <button
           type="button"
           onClick={() => navigateTo(backUrl)}
@@ -1487,6 +1487,7 @@ export function InmobiliariaPerfilPage({ id, city, slug }: { id?: string; city?:
           <ArrowLeft size={15} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
           Volver al directorio
         </button>
+        </div>
       </div>
 
       <ValuationHero agency={agency} onSelect={setSelectedTipo} />

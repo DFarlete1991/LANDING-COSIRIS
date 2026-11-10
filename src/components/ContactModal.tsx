@@ -650,7 +650,7 @@ export default function ContactModal() {
                           variants={fieldVariants}
                           className="text-center text-[11px] text-slate-500"
                         >
-                          Sin spam · Sin permanencia · Comprometidos y Sencillos
+                          Sin spam · Sin pagos por adelantado · Comprometidos y Sencillos
                         </motion.p>
                       </motion.form>
                     </motion.div>

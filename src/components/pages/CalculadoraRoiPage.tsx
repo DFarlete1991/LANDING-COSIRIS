@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { LandingNavbar } from '@/components/pages/landing-navbar';
 import { Footer } from '@/components/Footer';
 import { PlanCalculator } from '@/components/plan-calculator/PlanCalculator';
 import { useUI } from '@/context/UIContext';
 import { useSEO } from '@/lib/seo';
+import { navigateTo } from '@/lib/utils';
 
 export function CalculadoraRoiPage() {
   useSEO({
@@ -30,7 +32,20 @@ export function CalculadoraRoiPage() {
           <div className="absolute left-1/2 top-0 h-[420px] w-[min(900px,100%)] -translate-x-1/2 rounded-full bg-[#FF8000]/[0.07] blur-3xl" />
         </div>
 
-        <div className="px-4 pb-16 pt-10 md:px-10 md:pb-24 md:pt-24">
+        <div className="px-4 pb-16 pt-6 md:px-10 md:pb-24 md:pt-16">
+          {/* Se llega desde los botones "Calcula tu plan": vuelve a donde estaba el
+              visitante; si entró directo a esta página, a la home (las navegaciones
+              internas guardan un estado en el historial; la carga directa, no). */}
+          <div className="mx-auto max-w-[760px]">
+            <button
+              type="button"
+              onClick={() => (window.history.state !== null ? window.history.back() : navigateTo('/'))}
+              className="group inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-orange-50 hover:text-[#C2410C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000]"
+            >
+              <ArrowLeft size={16} aria-hidden="true" className="transition-transform duration-200 group-hover:-translate-x-0.5" />
+              Volver
+            </button>
+          </div>
           <PlanCalculator />
         </div>
 

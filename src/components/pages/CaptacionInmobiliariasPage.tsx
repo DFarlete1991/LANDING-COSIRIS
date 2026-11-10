@@ -492,7 +492,7 @@ function CaptacionForm() {
                   </div>
 
                   <p className="text-center text-[11px] text-slate-500">
-                    Sin spam · Sin permanencia · Comprometidos y Sencillos
+                    Sin spam · Sin pagos por adelantado · Comprometidos y Sencillos
                   </p>
                 </form>
               </motion.div>
@@ -555,7 +555,7 @@ function InmobiliariasHero() {
         transition={{ duration: 0.6, ease: EXPO, delay: 0.25 }}
         className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-600 md:text-lg"
       >
-        Gestión de redes, captación de leads, email marketing y automatizaciones con IA — con un único proveedor especializado en el sector, sin permanencia.
+        Gestión de redes, captación de leads, email marketing y automatizaciones con IA — con un único proveedor especializado en el sector.
       </motion.p>
 
       <motion.div

@@ -115,8 +115,7 @@ const PILLARS = [
   {
     icon: Calendar,
     title: 'Condiciones de pago',
-    subtitle: 'La fidelidad tiene premio:',
-    checks: ['Sin permanencias', 'Sin pagos por adelantado'],
+    checks: ['Sin pagos por adelantado', 'La fidelidad tiene premio'],
   },
 ];
 

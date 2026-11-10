@@ -59,22 +59,22 @@ const SERVICES: ServiceCard[] = [
   {
     id: 'ads', icon: Megaphone, title: 'Captación Ads + IA', desc: 'Campañas que traen propietarios, filtrados por nuestro agente de IA.',
     img: '/assets/servicios/captacion.webp', alt: 'Casa moderna iluminada al atardecer',
-    tilt: 'xl:-rotate-[1.6deg]', lift: '', radius: 'rounded-[2rem_1.5rem_2rem_1.25rem]', photo: 'rounded-[1.6rem_0.9rem_1.6rem_2.4rem]',
+    tilt: 'xl:-rotate-[1.6deg]', lift: '', radius: 'rounded-2xl sm:rounded-[2rem_1.5rem_2rem_1.25rem]', photo: 'rounded-xl sm:rounded-[1.6rem_0.9rem_1.6rem_2.4rem]',
   },
   {
     id: 'redes', icon: ThumbsUp, title: 'Redes Sociales', desc: 'Diseño, textos, planificación y vídeos para hacer zona.',
     img: '/assets/servicios/redes.webp', alt: 'Manos sujetando un móvil con un perfil de redes sociales',
-    tilt: 'xl:rotate-[1.4deg]', lift: 'xl:translate-y-10', radius: 'rounded-[1.5rem_2.25rem_1.5rem_2.25rem]', photo: 'rounded-[2.4rem_1rem_2.4rem_1rem]',
+    tilt: 'xl:rotate-[1.4deg]', lift: 'xl:translate-y-10', radius: 'rounded-2xl sm:rounded-[1.5rem_2.25rem_1.5rem_2.25rem]', photo: 'rounded-xl sm:rounded-[2.4rem_1rem_2.4rem_1rem]',
   },
   {
     id: 'email', icon: Mail, title: 'Email Marketing', desc: 'Seguimiento automático para no perder ningún lead.',
     img: '/assets/servicios/email.webp', alt: 'Portátil con el correo electrónico abierto',
-    tilt: 'xl:rotate-[1deg]', lift: 'xl:-translate-x-3', radius: 'rounded-[2.25rem_1.25rem_2.25rem_1.5rem]', photo: 'rounded-[1rem_2.2rem_1.4rem_2.2rem]',
+    tilt: 'xl:rotate-[1deg]', lift: 'xl:-translate-x-3', radius: 'rounded-2xl sm:rounded-[2.25rem_1.25rem_2.25rem_1.5rem]', photo: 'rounded-xl sm:rounded-[1rem_2.2rem_1.4rem_2.2rem]',
   },
   {
     id: 'crm', icon: Settings, title: 'Automatizaciones IA y CRM', desc: 'Todos tus contactos ordenados, con avisos y tareas.',
     img: '/assets/servicios/crm.webp', alt: 'Portátil con un panel de contactos y métricas',
-    tilt: 'xl:-rotate-[1.2deg]', lift: 'xl:translate-y-10', radius: 'rounded-[1.25rem_2rem_1.75rem_2.25rem]', photo: 'rounded-[2.2rem_1.2rem_1rem_2.2rem]',
+    tilt: 'xl:-rotate-[1.2deg]', lift: 'xl:translate-y-10', radius: 'rounded-2xl sm:rounded-[1.25rem_2rem_1.75rem_2.25rem]', photo: 'rounded-xl sm:rounded-[2.2rem_1.2rem_1rem_2.2rem]',
   },
 ];
 
@@ -191,9 +191,9 @@ function ServiceTile({ s, index }: { s: ServiceCard; index: number }) {
       <div className={`h-full ${s.lift}`}>
         <a
           href={`#${s.id}`}
-          className={`group relative flex h-full items-stretch gap-3 bg-white p-2 shadow-[0_22px_44px_-22px_rgba(194,65,12,0.35)] ring-1 ring-[#FFE3C7] transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:z-10 hover:-translate-y-1 hover:scale-[1.04] hover:shadow-[0_30px_56px_-22px_rgba(194,65,12,0.45)] motion-reduce:hover:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] md:gap-4 md:p-2.5 ${s.radius} ${s.tilt}`}
+          className={`group relative flex h-full flex-col gap-2 bg-white p-1.5 shadow-[0_22px_44px_-22px_rgba(194,65,12,0.35)] ring-1 ring-[#FFE3C7] transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:z-10 hover:-translate-y-1 hover:scale-[1.04] hover:shadow-[0_30px_56px_-22px_rgba(194,65,12,0.45)] motion-reduce:hover:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E67300] sm:flex-row sm:items-stretch sm:gap-3 sm:p-2 md:gap-4 md:p-2.5 ${s.radius} ${s.tilt}`}
         >
-          <span className={`relative aspect-square w-[34%] shrink-0 overflow-hidden bg-[#FFF0E5] sm:aspect-auto sm:min-h-[13.5rem] sm:w-[44%] xl:w-[40%] ${s.photo}`}>
+          <span className={`relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-[#FFF0E5] sm:aspect-auto sm:min-h-[13.5rem] sm:w-[44%] xl:w-[40%] ${s.photo}`}>
             <img
               src={s.img}
               alt={s.alt}
@@ -203,13 +203,13 @@ function ServiceTile({ s, index }: { s: ServiceCard; index: number }) {
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.07]"
             />
           </span>
-          <span className="absolute top-2 left-[calc(34%-1rem)] flex size-9 items-center justify-center rounded-xl bg-[#FF8000] text-white shadow-[0_8px_18px_-6px_rgba(255,128,0,0.7)] ring-4 ring-white transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:-translate-y-1 group-hover:-rotate-6 sm:top-4 sm:left-[calc(44%-1.25rem)] md:size-11 xl:left-[calc(40%-1.25rem)]">
+          <span className="absolute top-3 left-3 flex size-8 items-center justify-center rounded-xl bg-[#FF8000] text-white shadow-[0_8px_18px_-6px_rgba(255,128,0,0.7)] ring-2 ring-white sm:size-9 sm:ring-4 transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:-translate-y-1 group-hover:-rotate-6 sm:top-4 sm:left-[calc(44%-1.25rem)] md:size-11 xl:left-[calc(40%-1.25rem)]">
             <Icon size={19} aria-hidden="true" />
           </span>
-          <span className="flex min-w-0 flex-1 flex-col py-1.5 pr-1.5 pl-3 sm:pt-14 sm:pb-2 sm:pl-2">
-            <span className="block text-[15px] font-extrabold leading-tight tracking-tight text-black hyphens-auto md:text-lg xl:text-base 2xl:text-[1.05rem]">{s.title}</span>
-            <span className="mt-1 block text-[13px] leading-snug text-neutral-600 md:mt-2 md:text-sm">{s.desc}</span>
-            <span className="mt-auto flex size-8 items-center justify-center self-end rounded-full bg-[#FF8000] text-white transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-1 md:size-9">
+          <span className="flex min-w-0 flex-1 flex-col px-1.5 pb-1.5 sm:px-0 sm:pt-14 sm:pr-1.5 sm:pb-2 sm:pl-2">
+            <span className="block text-[14px] font-extrabold leading-tight sm:text-[15px] tracking-tight text-black hyphens-auto md:text-lg xl:text-base 2xl:text-[1.05rem]">{s.title}</span>
+            <span className="mt-1 hidden text-[13px] leading-snug text-neutral-600 sm:block md:mt-2 md:text-sm">{s.desc}</span>
+            <span className="mt-auto hidden size-8 items-center justify-center self-end rounded-full sm:flex bg-[#FF8000] text-white transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-1 md:size-9">
               <ArrowRight size={16} aria-hidden="true" />
             </span>
           </span>
@@ -253,7 +253,7 @@ function Hero() {
           <svg aria-hidden="true" viewBox="0 0 400 300" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 -z-10 hidden h-full w-full text-[#FFB877] xl:block" fill="none">
             <path d="M130 70C190 40 240 110 300 80M120 240C180 210 240 280 300 250" stroke="currentColor" strokeWidth="1.5" strokeDasharray="5 7" />
           </svg>
-          <ul className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 sm:gap-4 xl:gap-x-6 xl:gap-y-7">
+          <ul className="grid grid-cols-2 gap-3 sm:gap-4 xl:gap-x-6 xl:gap-y-7">
             {SERVICES.map((s, i) => (
               <ServiceTile key={s.id} s={s} index={i} />
             ))}
@@ -437,8 +437,8 @@ function BenefitGrid({ items }: { items: { icon: React.ReactNode; label: string 
   return (
     <ul className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 md:mt-5">
       {items.map((b) => (
-        <li key={b.label} className="flex items-center gap-2 text-[13px] font-semibold leading-tight text-black md:text-sm">
-          <span className="shrink-0 text-[#E67300]">{b.icon}</span>
+        <li key={b.label} className="flex items-start gap-2 text-[13px] font-semibold leading-tight text-black md:text-sm">
+          <span className="mt-px shrink-0 text-[#E67300]">{b.icon}</span>
           {b.label}
         </li>
       ))}
@@ -593,9 +593,9 @@ function EmailSection() {
 
         <FadeUp delay={0.06} className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
           <PaperPlaneArt className="pointer-events-none absolute -top-10 -right-2 hidden w-48 lg:block xl:-right-6 xl:w-56" />
-          <EnvelopeArt className="pointer-events-none absolute -right-3 bottom-6 w-24 rotate-[8deg] drop-shadow-[0_14px_20px_rgba(194,65,12,0.25)] sm:-right-8 sm:w-32 lg:-right-6 lg:bottom-10 lg:w-28 xl:-right-10 xl:w-44" />
+          <EnvelopeArt className="pointer-events-none absolute -right-3 bottom-6 hidden w-24 rotate-[8deg] sm:block drop-shadow-[0_14px_20px_rgba(194,65,12,0.25)] sm:-right-8 sm:w-32 lg:-right-6 lg:bottom-10 lg:w-28 xl:-right-10 xl:w-44" />
 
-          <div className="relative mr-10 flex flex-col rounded-[1.75rem] bg-white p-6 shadow-[0_28px_60px_-28px_rgba(194,65,12,0.45)] ring-1 ring-[#FFE3C7] transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:scale-[1.03] hover:shadow-[0_36px_70px_-28px_rgba(194,65,12,0.55)] motion-reduce:hover:scale-100 sm:mr-16 md:p-8 lg:mr-12 lg:-rotate-2 xl:mr-32">
+          <div className="relative flex flex-col rounded-[1.75rem] bg-white p-6 shadow-[0_28px_60px_-28px_rgba(194,65,12,0.45)] ring-1 ring-[#FFE3C7] transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:scale-[1.03] hover:shadow-[0_36px_70px_-28px_rgba(194,65,12,0.55)] motion-reduce:hover:scale-100 sm:mr-16 md:p-8 lg:mr-12 lg:-rotate-2 xl:mr-32">
             <p className="text-3xl font-extrabold tracking-tight text-black md:text-[2rem]">
               PACK <span className="text-[#E67300]">PRO</span>
             </p>
