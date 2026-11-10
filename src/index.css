@@ -142,6 +142,26 @@
   animation: hop linear infinite;
 }
 
+/* Versión de móvil: tres saltos cortos y uno alto que cae dentro de la caja
+   pequeña (burbuja de 2,75rem, caja de 7rem a la derecha). */
+@keyframes hop-mini {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  6% { transform: translate(0, 0) scale(1); opacity: 1; animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  17% { transform: translate(calc((100cqw - 10rem) * 0.1667), -2.25rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  28% { transform: translate(calc((100cqw - 10rem) * 0.3333), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  39% { transform: translate(calc((100cqw - 10rem) * 0.5), -2.25rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  50% { transform: translate(calc((100cqw - 10rem) * 0.6667), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  61% { transform: translate(calc((100cqw - 10rem) * 0.8333), -2.25rem); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4); }
+  72% { transform: translate(calc(100cqw - 10rem), 0); animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1); }
+  86% { transform: translate(calc(100cqw - 7.5rem), -6rem); animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5); }
+  99.9% { transform: translate(calc(100cqw - 5.6rem), -0.25rem) scale(0.85); opacity: 1; }
+  100% { transform: translate(calc(100cqw - 5.6rem), -0.25rem) scale(0.85); opacity: 0; }
+}
+
+.hop-mini {
+  animation: hop-mini linear infinite;
+}
+
 .hop-track:hover .hop,
 .hop-track:hover .hop-box,
 .hop-track:focus-within .hop,
