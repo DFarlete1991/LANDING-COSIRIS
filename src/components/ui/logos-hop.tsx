@@ -164,7 +164,9 @@ export function LogosHop() {
     <div ref={rootRef}>
       <p className="mb-2 text-center text-base font-medium text-slate-700">Todos estos clientes ya confían en nosotros</p>
       <div className="hop-track relative hidden h-64 xl:block motion-reduce:hidden">
-        <span aria-hidden="true" className="absolute right-0 bottom-3 left-0 border-b-2 border-dashed border-neutral-200" />
+        {/* Suelo donde se apoyan las inmobiliarias antes de saltar a la caja. */}
+        <span aria-hidden="true" className="absolute right-0 -bottom-2 left-0 h-5 bg-[radial-gradient(ellipse_at_top,#FFE3C7,transparent_70%)]" />
+        <span aria-hidden="true" className="absolute right-0 bottom-3 left-0 h-0.5 bg-gradient-to-r from-transparent via-[#FFB877] to-transparent" />
 
         <svg aria-hidden="true" viewBox="0 0 240 180" overflow="visible" className={BOX} style={beat} strokeLinejoin="round">
           <ellipse cx="128" cy="174" rx="112" ry="7" fill="#C2410C" opacity="0.1" />

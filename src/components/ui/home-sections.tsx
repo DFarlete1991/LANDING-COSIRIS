@@ -191,7 +191,8 @@ export function ServicesSection() {
 export function ClientsSection() {
   return (
     <section id="testimonios" className="w-full scroll-mt-16 bg-white">
-      <VideoGrid agencyMedia />
+      {/* El mismo muro de vídeos que en /servicios. */}
+      <VideoGrid />
       <div className={`${WRAP} pt-8 pb-12 md:pb-20`}>
         <div className="flex flex-wrap gap-3">
           <LinkButton href="/inmobiliarias">Inmobiliarias en tu zona</LinkButton>
