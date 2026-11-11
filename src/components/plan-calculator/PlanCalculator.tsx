@@ -71,7 +71,7 @@ async function sendPlanLead(lead: PlanLead): Promise<boolean> {
 }
 
 /**
- * Calculadora del plan de captación (4 pasos + informe + PDF). El HTML y la
+ * Calculadora del plan de captación (5 pasos + informe + PDF). El HTML y la
  * lógica vienen de la versión entregada por Cosiris; aquí solo se monta.
  * `headingTag` permite no repetir un <h1> cuando va dentro de otra página.
  */

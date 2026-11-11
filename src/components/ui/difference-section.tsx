@@ -26,7 +26,7 @@ export function DifferenceSection() {
         transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
       >
         <p className="text-sm font-bold">Calculadora ROI</p>
-        <h2 className="mt-2 text-balance text-3xl font-extrabold leading-[1.08] tracking-[-0.03em] md:text-5xl">Calcula tu plan de captación en 4 pasos</h2>
+        <h2 className="mt-2 text-balance text-3xl font-extrabold leading-[1.08] tracking-[-0.03em] md:text-5xl">Calcula tu plan de captación en 5 pasos</h2>
         <p className="mt-4 max-w-xl text-base font-medium leading-relaxed md:text-lg">Elige tu plan y mira los leads, captaciones, ventas y retorno estimados.</p>
 
         <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row md:mt-8">

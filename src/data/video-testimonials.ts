@@ -43,6 +43,7 @@ export const SHORTS_CLIENTES: VideoTestimonial[] = [
   { id: 'U1ZYDQfotJc', title: 'CS Gestiones | Zaragoza', who: 'Testimonio', agency: 'CS Gestiones', category: 'Testimonios', short: true },
   { id: '8mUNQvWAUtk', title: 'DSS Servicios Inmobiliarios | Donostia San Sebastián', who: 'Testimonio', agency: 'DSS Servicios Inmobiliarios', category: 'Testimonios', short: true },
   { id: 'Yn59HnVKwrM', title: 'Inmara Inmobiliaria | Alcorcón, Madrid', who: 'Testimonio', agency: 'Inmara Inmobiliaria', category: 'Testimonios', short: true },
+  { id: 'Ui9Y4e8eRU8', title: 'Pedro Moya Inmobiliaria | Cambrils', who: 'Testimonio', agency: 'Pedro Moya Inmobiliaria', category: 'Testimonios', short: true },
 ];
 
 // Muro de vídeos (home, /servicios y buscador de inmobiliarias): primero los

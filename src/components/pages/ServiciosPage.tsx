@@ -315,7 +315,7 @@ function CalculatorPromo() {
             Calculadora ROI
           </p>
           <h3 className="mt-1.5 text-xl font-extrabold leading-tight tracking-tight text-black md:text-3xl">
-            Calcula tu plan de captación en <span className="text-[#E67300]">4 pasos</span>
+            Calcula tu plan de captación en <span className="text-[#E67300]">5 pasos</span>
           </h3>
           <p className="mt-2 hidden max-w-lg text-[15px] leading-relaxed text-neutral-600 sm:block">
             Elige tu plan de inversión, y mira los leads, captaciones, ventas y retorno estimados.
