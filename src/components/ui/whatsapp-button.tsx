@@ -311,11 +311,11 @@ export function WhatsAppButton() {
         aria-controls="wa-panel"
         aria-label={open ? 'Cerrar WhatsApp' : '¿Dudas? Escríbenos por WhatsApp'}
         tabIndex={shown ? 0 : -1}
-        className={`fixed right-4 bottom-4 z-50 inline-flex size-14 cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-sm font-bold text-white shadow-lg shadow-black/25 ring-1 ring-white/15 transition-[opacity,transform,background-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-neutral-800 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] md:right-6 md:bottom-6 ${
+        className={`fixed right-4 bottom-4 z-50 inline-flex size-14 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#25D366] text-sm font-bold text-white shadow-lg shadow-black/25 transition-[opacity,transform,background-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-[#1FBF5B] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#075E54] focus-visible:ring-offset-2 md:right-6 md:bottom-6 ${
           shown ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'
         }`}
       >
-        {open ? <X size={22} className="text-[#25D366]" /> : <WhatsAppIcon className="size-7 text-[#25D366]" />}
+        {open ? <X size={24} className="text-white" /> : <WhatsAppIcon className="size-8 text-white" />}
       </button>
     </>
   );
