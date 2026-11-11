@@ -15,7 +15,7 @@ export function LandingNavbar() {
     { label: 'Servicios', href: '/servicios' },
     { label: 'Calculadora ROI', href: '/calculadora-roi' },
     { label: 'Nosotros', href: '/nosotros' },
-    { label: 'Buscador de inmobiliarias', href: '/inmobiliarias' },
+    { label: 'Inmobiliaria de tu zona', href: '/inmobiliarias' },
   ];
 
   const [path, setPath] = React.useState(() => window.location.pathname);
