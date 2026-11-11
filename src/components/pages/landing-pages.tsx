@@ -4,7 +4,8 @@ import { AuthorityPage } from '@/components/pages/page-authority';
 import { Footer } from '@/components/Footer';
 import { TrustVideoWall } from '@/components/ui/trust-video-wall';
 import { EvolutionSection } from '@/components/ui/evolution-story';
-import { AboutSection, ClientsSection, FaqSection, FloatingHelpButton, ServicesSection } from '@/components/ui/home-sections';
+import { AboutSection, ClientsSection, FaqSection, ServicesSection } from '@/components/ui/home-sections';
+import { WhatsAppButton } from '@/components/ui/whatsapp-button';
 import { ProcessSection } from '@/components/ui/process-story';
 import { useSEO } from '@/lib/seo';
 import { useFluidPage } from '@/lib/use-fluid-page';
@@ -46,7 +47,7 @@ export default function LandingPages() {
           <Footer />
         </main>
 
-        <FloatingHelpButton />
+        <WhatsAppButton />
       </div>
     </MotionConfig>
   );

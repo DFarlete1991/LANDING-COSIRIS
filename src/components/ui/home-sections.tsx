@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, ArrowUpRight, Check, MessageCircle, Play, Plus } from 'lucide-react';
-import { useUI } from '@/context/UIContext';
+import { ArrowRight, ArrowUpRight, Check, Play, Plus } from 'lucide-react';
 import { navigateTo } from '@/lib/utils';
 import { FAQS } from '@/data/faqs';
 import { TeamVideo } from '@/components/ui/team-video';
@@ -338,44 +337,5 @@ export function FaqSection() {
         </ul>
       </div>
     </section>
-  );
-}
-
-/* ── Botón flotante de dudas ───────────────────────────────────────────── */
-
-// Aparece cuando el visitante ya ha bajado del hero (allí ya tiene el botón
-// principal) y se esconde mientras el formulario de contacto está abierto y al
-// llegar al final, donde ya están el bloque de la calculadora y el pie.
-export function FloatingHelpButton() {
-  const { openContactModal, isContactModalOpen } = useUI();
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      const nearEnd = y + window.innerHeight > document.documentElement.scrollHeight - window.innerHeight * 1.2;
-      setVisible(y > window.innerHeight * 0.6 && !nearEnd);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const shown = visible && !isContactModalOpen;
-
-  return (
-    <button
-      type="button"
-      onClick={() => openContactModal({ sourceContext: 'home_floating_help' })}
-      aria-hidden={!shown}
-      aria-label="¿Dudas? Escríbenos"
-      tabIndex={shown ? 0 : -1}
-      className={`fixed right-4 bottom-4 z-40 inline-flex size-14 cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-sm font-bold text-white shadow-lg shadow-black/25 ring-1 ring-white/15 transition-[opacity,transform,background-color] duration-200 ${SNAPPY} hover:bg-neutral-800 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8000] md:right-6 md:bottom-6 lg:size-auto lg:min-h-12 lg:py-3 lg:pr-5 lg:pl-4 ${
-        shown ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'
-      }`}
-    >
-      <MessageCircle size={20} className="text-[#FF8000]" />
-      <span className="hidden lg:inline">¿Dudas? Escríbenos</span>
-    </button>
   );
 }
