@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { LandingNavbar } from '@/components/pages/landing-navbar';
 import { Footer } from '@/components/Footer';
 import { PlanCalculator } from '@/components/plan-calculator/PlanCalculator';
+import { VideoGrid } from '@/components/ui/video-grid';
 import { useUI } from '@/context/UIContext';
 import { useSEO } from '@/lib/seo';
 import { navigateTo } from '@/lib/utils';
@@ -11,7 +12,7 @@ export function CalculadoraRoiPage() {
   useSEO({
     path: '/calculadora-roi',
     title: 'Calculadora de tu plan de captación inmobiliaria | Cosiris',
-    description: 'Calcula en 4 pasos tu plan de captación de propietarios: permanencia, pack, inversión en Meta Ads y comisión. Ve leads, captaciones, ventas y retorno estimados y descarga tu presupuesto en PDF.',
+    description: 'Calcula en 5 pasos tu plan de captación de propietarios: permanencia, pack, forma de pago, inversión en Meta Ads y comisión. Ve leads, captaciones, ventas y retorno estimados y descarga tu presupuesto en PDF.',
   });
 
   const { openContactModal } = useUI();
@@ -47,6 +48,11 @@ export function CalculadoraRoiPage() {
             </button>
           </div>
           <PlanCalculator />
+        </div>
+
+        {/* El mismo muro de testimonios en vídeo que en la home y en Servicios. */}
+        <div id="testimonios" className="mb-16 scroll-mt-24 md:mb-24">
+          <VideoGrid />
         </div>
 
         <section className="mx-4 mb-20 overflow-hidden rounded-2xl bg-[#FF8000] md:mx-auto md:max-w-5xl">
