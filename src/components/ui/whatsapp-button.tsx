@@ -6,21 +6,25 @@ import { useUI } from '@/context/UIContext';
 import { CountryCodeSelect } from '@/components/ui/CountryCodeSelect';
 import { ConsentCheckbox } from '@/components/ui/ConsentCheckbox';
 import { DEFAULT_COUNTRY_DIAL, toInternationalPhone } from '@/data/country-codes';
+import { LEAD_WEBHOOK_URL } from '@/lib/lead-webhook';
+import { getAttributionFields } from '@/lib/utm';
 
 // Botón flotante de WhatsApp. El visitante deja nombre, teléfono (con prefijo) y
-// correo; al enviar se arma un enlace wa.me con esos datos ya escritos en el
-// mensaje, así que en WhatsApp solo tiene que añadir lo que quiera y pulsar
-// enviar. En escritorio también se muestra un QR para abrirlo desde el móvil.
-// Nada se guarda en el servidor: los datos viajan solo dentro del enlace.
+// correo; esos datos se mandan al mismo webhook de n8n que el formulario de
+// contacto (de ahí sale la fila del Google Sheet) y después se le abre WhatsApp
+// con un saludo fijo, sin sus datos. En escritorio también se muestra un QR para
+// abrirlo desde el móvil.
 
 // Número de destino en formato internacional, solo dígitos (Colombia +57).
 const WHATSAPP_NUMBER = '573197229868';
+const WHATSAPP_TEXT = 'Hola, vengo de la página web, me interesa saber más sobre sus servicios';
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_TEXT)}`;
 const EASE = [0.23, 1, 0.32, 1] as const;
 
-type Form = { name: string; dial: string; phone: string; email: string; message: string };
+type Form = { name: string; dial: string; phone: string; email: string };
 type Errors = Partial<Record<'name' | 'phone' | 'email' | 'consent', string>>;
 
-const EMPTY: Form = { name: '', dial: DEFAULT_COUNTRY_DIAL, phone: '', email: '', message: '' };
+const EMPTY: Form = { name: '', dial: DEFAULT_COUNTRY_DIAL, phone: '', email: '' };
 
 // Si el visitante ya escribió el prefijo en el número ("+34 600…"), se quita
 // para no duplicarlo.
@@ -33,17 +37,27 @@ function fullPhone(dial: string, phone: string) {
   return toInternationalPhone(dial, local);
 }
 
-function buildLink(form: Form) {
-  const lines = [
-    'Hola, vengo de la página web, soy:',
-    '',
-    `*Nombre:* ${form.name.trim()}`,
-    `*Teléfono:* ${fullPhone(form.dial, form.phone)}`,
-    `*Correo:* ${form.email.trim()}`,
-    '',
-    form.message.trim() || 'Me gustaría recibir más información.',
-  ];
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`;
+// Mismo formato de lead que el formulario de contacto, para que n8n lo guarde
+// en las mismas columnas del Sheet. `keepalive` deja terminar el envío aunque el
+// móvil salte a la app de WhatsApp. Si falla, no se bloquea al visitante.
+function saveLead(form: Form) {
+  const payload = {
+    name: form.name.trim(),
+    company: '',
+    email: form.email.trim(),
+    phone: fullPhone(form.dial, form.phone),
+    province: '',
+    employees: '',
+    services: [],
+    source_context: 'home_whatsapp_button',
+    ...getAttributionFields(),
+  };
+  fetch(LEAD_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    keepalive: true,
+  }).catch(() => {});
 }
 
 function validate(form: Form, consent: boolean): Errors {
@@ -79,6 +93,7 @@ export function WhatsAppButton() {
   const [link, setLink] = useState<string | null>(null);
   const firstFieldRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const sentRef = useRef<string | null>(null);
 
   // Al cerrar se vuelve al formulario (con los datos guardados) y el foco
   // regresa al botón flotante.
@@ -129,10 +144,15 @@ export function WhatsAppButton() {
     const next = validate(form, consent);
     setErrors(next);
     if (Object.keys(next).length) return;
-    const url = buildLink(form);
-    setLink(url);
+    // Si vuelve atrás y envía los mismos datos, no se duplica la fila.
+    const key = JSON.stringify(form);
+    if (sentRef.current !== key) {
+      saveLead(form);
+      sentRef.current = key;
+    }
+    setLink(WHATSAPP_LINK);
     // En móvil se abre WhatsApp directamente; en escritorio se deja ver el QR.
-    if (window.matchMedia('(max-width: 767px)').matches) window.open(url, '_blank', 'noopener,noreferrer');
+    if (window.matchMedia('(max-width: 767px)').matches) window.open(WHATSAPP_LINK, '_blank', 'noopener,noreferrer');
   };
 
   const shown = (visible || open) && !isContactModalOpen;
@@ -173,7 +193,7 @@ export function WhatsAppButton() {
 
             {!link ? (
               <form onSubmit={onSubmit} noValidate className="space-y-3.5 p-4">
-                <p className="text-sm text-neutral-600">Déjanos tus datos y se añadirán solos a tu mensaje.</p>
+                <p className="text-sm text-neutral-600">Déjanos tus datos y te llevamos a nuestro WhatsApp.</p>
 
                 <div>
                   <label htmlFor="wa-name" className={LABEL}>Nombre completo</label>
@@ -227,21 +247,6 @@ export function WhatsAppButton() {
                   {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
                 </div>
 
-                <div>
-                  <label htmlFor="wa-message" className={LABEL}>
-                    Mensaje <span className="font-normal normal-case tracking-normal text-slate-400">(opcional)</span>
-                  </label>
-                  <textarea
-                    id="wa-message"
-                    rows={2}
-                    maxLength={300}
-                    value={form.message}
-                    onChange={(e) => set('message', e.target.value)}
-                    placeholder="¿En qué te podemos ayudar?"
-                    className={`${INPUT} resize-none ${border()}`}
-                  />
-                </div>
-
                 <ConsentCheckbox
                   id="wa-consent"
                   checked={consent}
@@ -263,7 +268,7 @@ export function WhatsAppButton() {
             ) : (
               <div className="space-y-4 p-4 text-center">
                 <p className="text-sm text-neutral-600">
-                  Tu mensaje ya lleva tus datos. Solo añade lo que quieras y pulsa <strong>enviar</strong> en WhatsApp.
+                  ¡Gracias! Ya tenemos tus datos. Abre WhatsApp y pulsa <strong>enviar</strong> para empezar a hablar con nosotros.
                 </p>
 
                 <div className="hidden md:block">
