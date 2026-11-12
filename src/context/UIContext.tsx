@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -41,6 +42,18 @@ export function UIProvider({ children }: { children: ReactNode }) {
     // Reset params after close animation
     setTimeout(() => setModalParams({}), 400);
   }, []);
+
+  // Enlaces de publicidad: ?contacto (o ?contacto=instagram) abre el formulario
+  // al entrar. El valor queda como origen del lead. Se quita el parámetro de la
+  // URL para que al recargar o compartir no se vuelva a abrir solo; los utm_* se quedan.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has('contacto')) return;
+    const origen = url.searchParams.get('contacto')?.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 40);
+    url.searchParams.delete('contacto');
+    window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+    openContactModal({ sourceContext: origen ? `enlace_${origen}` : 'enlace_publicidad' });
+  }, [openContactModal]);
 
   const value = useMemo<UIContextValue>(
     () => ({ isContactModalOpen, modalParams, openContactModal, closeContactModal }),
