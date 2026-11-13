@@ -65,7 +65,8 @@ function LinkButton({ href, children, dark = false }: { href: string; children: 
 
 /* ── 4. Un solo equipo: vídeo en la propia página y cuatro servicios ───── */
 
-const HOW_TO_VIDEO = 'yRyfCQtk3wo';
+const HOW_TO_VIDEO = '-3o4OXrIFOc';
+const HOW_TO_TITLE = 'Captación inmobiliaria: qué ha cambiado desde 1990 y qué hacer ahora';
 
 const SERVICES = [
   { image: '/assets/home/megafono.webp', title: 'Captación Ads + IA', text: 'Campañas en Meta para llegar a propietarios de tu zona que quieren vender. Un agente de IA les llama para saber si de verdad van en serio.', href: '/servicios#ads', tint: 'bg-[#FEEEE1]' },
@@ -83,7 +84,7 @@ function InlineVideo({ playing, onPlay }: { playing: boolean; onPlay: () => void
         <iframe
           className="absolute inset-0 h-full w-full"
           src={`https://www.youtube.com/embed/${HOW_TO_VIDEO}?autoplay=1&rel=0`}
-          title="¿Tus anuncios captan pisos o solo leads?"
+          title={HOW_TO_TITLE}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
@@ -91,7 +92,7 @@ function InlineVideo({ playing, onPlay }: { playing: boolean; onPlay: () => void
         <button
           type="button"
           onClick={onPlay}
-          aria-label="Reproducir el vídeo: ¿Tus anuncios captan pisos o solo leads?"
+          aria-label={`Reproducir el vídeo: ${HOW_TO_TITLE}`}
           className="group absolute inset-0 cursor-pointer focus-visible:outline-none"
         >
           {/* En móvil y tablet basta la portada de 640 px (~40 kB); la de 1280 px
@@ -132,7 +133,7 @@ export function ServicesSection() {
               <span className="block">Toda tu captación.</span>
             </h2>
             <p className="mt-5 max-w-[31.25rem] text-base leading-relaxed text-neutral-700 md:text-lg">
-              Todo lo digital de tu inmobiliaria con un único proveedor, especializado en el sector. En este vídeo te explicamos por qué unos anuncios captan pisos y otros solo leads.
+              Todo lo digital de tu inmobiliaria con un único proveedor, especializado en el sector. En este vídeo te contamos qué ha cambiado en la captación inmobiliaria desde 1990 y qué hacer ahora.
             </p>
             <div className="mt-5 flex flex-wrap gap-3 md:mt-7">
               <button
