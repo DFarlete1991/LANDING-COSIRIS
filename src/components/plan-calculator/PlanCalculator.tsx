@@ -50,6 +50,7 @@ async function sendPlanLead(lead: PlanLead): Promise<boolean> {
     services: ['Captación Ads'],
     message: lead.summary,
     source_context: 'calculadora_plan_pdf',
+    origen: 'Formulario web',
     ...getAttributionFields(),
   };
 

@@ -50,6 +50,8 @@ function saveLead(form: Form) {
     employees: '',
     services: [],
     source_context: 'home_whatsapp_button',
+    // Columna "Origen" del Sheet: distingue los leads del botón de WhatsApp.
+    origen: 'WhatsApp',
     ...getAttributionFields(),
   };
   fetch(LEAD_WEBHOOK_URL, {
