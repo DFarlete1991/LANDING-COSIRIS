@@ -45,6 +45,7 @@ export const SHORTS_CLIENTES: VideoTestimonial[] = [
   { id: 'Yn59HnVKwrM', title: 'Inmara Inmobiliaria | Alcorcón, Madrid', who: 'Testimonio', agency: 'Inmara Inmobiliaria', category: 'Testimonios', short: true },
   { id: 'Ui9Y4e8eRU8', title: 'Pedro Moya Inmobiliaria | Cambrils', who: 'Testimonio', agency: 'Pedro Moya Inmobiliaria', category: 'Testimonios', short: true },
   { id: 'ZdBjBMae-yw', title: 'RE/MAX Welcome | Madrid', who: 'Testimonio', agency: 'RE/MAX Welcome', category: 'Testimonios', short: true },
+  { id: 'Ao9BsjaqSRc', title: 'Mundocasa | Zaragoza', who: 'Testimonio', agency: 'Mundocasa', category: 'Testimonios', short: true },
 ];
 
 // Muro de vídeos (home, /servicios y buscador de inmobiliarias): primero los
